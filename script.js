@@ -4,6 +4,8 @@ const navLinks = document.querySelectorAll(".site-nav a");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const productCards = document.querySelectorAll("[data-category]");
 const leadForms = document.querySelectorAll("[data-lead-form]");
+const salesWhatsApp = "8613827719946";
+const salesEmail = "57317996@qq.com";
 
 if (navToggle) {
   navToggle.addEventListener("click", () => {
@@ -47,8 +49,32 @@ leadForms.forEach((form) => {
       return;
     }
 
-    message.textContent = "Inquiry recorded. After email or CRM integration, it will be sent to the sales team.";
+    const fields = requiredFields.map((field) => {
+      const label = field.closest("label")?.querySelector("span")?.textContent?.trim() || field.name;
+      return `${label}: ${String(field.value).trim()}`;
+    });
+    const subject = form.classList.contains("quote-form")
+      ? "Quick fabric RFQ from Bingo Textile website"
+      : "Fabric inquiry from Bingo Textile website";
+    const inquiryText = [
+      subject,
+      "",
+      ...fields,
+      "",
+      "Source: https://www.bingofabric.com/"
+    ].join("\n");
+    const whatsappUrl = `https://wa.me/${salesWhatsApp}?text=${encodeURIComponent(inquiryText)}`;
+    const emailUrl = `mailto:${salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(inquiryText)}`;
+
+    message.textContent = "Opening WhatsApp with your inquiry. If it does not open, ";
+    const fallbackLink = document.createElement("a");
+    fallbackLink.href = emailUrl;
+    fallbackLink.textContent = "email this inquiry instead";
+    message.appendChild(fallbackLink);
+    message.append(".");
     message.style.color = "#3f8f7c";
+
+    window.open(whatsappUrl, "_blank", "noopener");
     form.reset();
   });
 });
