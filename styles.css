@@ -432,6 +432,48 @@ textarea:focus {
   border-radius: 6px;
 }
 
+.catalog-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.catalog-summary article {
+  min-height: 158px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 28px rgba(86, 73, 92, 0.06);
+}
+
+.catalog-summary span,
+.catalog-summary strong {
+  display: block;
+}
+
+.catalog-summary span {
+  color: var(--brick);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.catalog-summary strong {
+  margin: 4px 0 8px;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.catalog-summary p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -595,6 +637,10 @@ textarea:focus {
   color: var(--ink-soft);
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.catalog-card .product-specs div {
+  grid-template-columns: 70px 1fr;
 }
 
 .capability-layout {
@@ -916,6 +962,10 @@ textarea:focus {
     font-size: 42px;
   }
 
+  .catalog-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .product-grid,
   .service-grid,
   .insight-grid,
@@ -956,6 +1006,7 @@ textarea:focus {
   }
 
   .trust-grid,
+  .catalog-summary,
   .product-grid,
   .capability-list,
   .service-grid,

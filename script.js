@@ -2,12 +2,14 @@ const body = document.body;
 const navToggle = document.querySelector(".nav-toggle");
 const navLinks = document.querySelectorAll(".site-nav a");
 const filterButtons = document.querySelectorAll("[data-filter]");
-const productCards = document.querySelectorAll("[data-category]");
+const productGrid = document.querySelector("[data-product-grid]");
 const leadForms = document.querySelectorAll("[data-lead-form]");
-const productInterestLinks = document.querySelectorAll("[data-product-interest]");
 const salesWhatsApp = "8613827719946";
 const salesEmail = "57317996@qq.com";
 const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+const catalogProducts = Array.isArray(window.bingoProductCatalog) ? window.bingoProductCatalog : [];
+let productCards = document.querySelectorAll("[data-category]");
+let productInterestLinks = document.querySelectorAll("[data-product-interest]");
 
 const safeSessionSet = (key, value) => {
   try {
@@ -24,6 +26,90 @@ const safeSessionGet = (key) => {
     return "";
   }
 };
+
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+
+    return entities[character];
+  });
+
+const categoryNotes = {
+  "single-jersey": "Soft jersey direction for T-shirts, fitted tops and summer knit programs.",
+  sweatshirt: "Stable sweatshirt fabric direction for casual sets, hoodies and daily outer tops.",
+  "double-knit": "Structured double-knit option for cleaner silhouettes and streetwear weight.",
+  terry: "Loop-back terry direction for hoodies, joggers and premium casual sets.",
+  "brushed-fleece": "Brushed fleece direction for warm winter streetwear and soft hand feel."
+};
+
+const renderProductCatalog = () => {
+  if (!productGrid || catalogProducts.length === 0) {
+    return;
+  }
+
+  productGrid.innerHTML = catalogProducts
+    .map((product) => {
+      const productInterest = `${product.code} ${product.name}`;
+      const productSummary = `${categoryNotes[product.category] || "Knit fabric option for custom development"} Reference use: ${product.application}.`;
+
+      return `
+        <article class="product-card catalog-card" data-category="${escapeHtml(product.category)}" data-product-code="${escapeHtml(product.code)}">
+          <figure class="product-media">
+            <img
+              class="product-photo"
+              src="${escapeHtml(product.image)}"
+              alt="${escapeHtml(`${product.code} ${product.name} knit fabric`)}"
+              loading="lazy"
+            />
+            <figcaption>
+              <span>${escapeHtml(product.code)}</span>
+              ${escapeHtml(product.series)} / ${escapeHtml(product.gsm)}
+            </figcaption>
+          </figure>
+          <div class="card-body">
+            <p class="tag">${escapeHtml(product.series)}</p>
+            <h3>${escapeHtml(product.name)}</h3>
+            <p>${escapeHtml(productSummary)}</p>
+            <dl class="product-specs">
+              <div>
+                <dt>Comp.</dt>
+                <dd>${escapeHtml(product.composition)}</dd>
+              </div>
+              <div>
+                <dt>GSM</dt>
+                <dd>${escapeHtml(product.gsm)}</dd>
+              </div>
+              <div>
+                <dt>Width</dt>
+                <dd>${escapeHtml(product.width)}</dd>
+              </div>
+              <div>
+                <dt>Season</dt>
+                <dd>${escapeHtml(product.season)}</dd>
+              </div>
+              <div>
+                <dt>Use</dt>
+                <dd>${escapeHtml(product.application)}</dd>
+              </div>
+            </dl>
+            <a href="#contact" data-product-interest="${escapeHtml(productInterest)}">Ask for matching sample</a>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  productCards = document.querySelectorAll("[data-category]");
+  productInterestLinks = document.querySelectorAll("[data-product-interest]");
+};
+
+renderProductCatalog();
 
 if (!safeSessionGet("landingUrl")) {
   safeSessionSet("landingUrl", window.location.href);
