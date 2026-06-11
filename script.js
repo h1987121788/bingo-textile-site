@@ -8,6 +8,7 @@ const salesWhatsApp = "8613827719946";
 const salesEmail = "57317996@qq.com";
 const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 const catalogProducts = Array.isArray(window.bingoProductCatalog) ? window.bingoProductCatalog : [];
+const marketingConfig = window.bingoMarketingConfig || {};
 let productCards = document.querySelectorAll("[data-category]");
 let productInterestLinks = document.querySelectorAll("[data-product-interest]");
 
@@ -24,6 +25,30 @@ const safeSessionGet = (key) => {
     return sessionStorage.getItem(key);
   } catch {
     return "";
+  }
+};
+
+const safeLocalAppend = (key, value, limit = 30) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    existing.unshift(value);
+    localStorage.setItem(key, JSON.stringify(existing.slice(0, limit)));
+  } catch {
+    // CRM fallback is best-effort only.
+  }
+};
+
+const isConfiguredValue = (value) => {
+  const normalized = String(value || "").trim();
+  return normalized.length > 0 && !["PASTE_WEBHOOK_URL", "WEBHOOK_URL"].includes(normalized);
+};
+
+const trackMarketingEvent = (eventName, params = {}) => {
+  if (typeof window.bingoTrackEvent === "function") {
+    window.bingoTrackEvent(eventName, {
+      event_source: "website",
+      ...params
+    });
   }
 };
 
@@ -149,7 +174,11 @@ filterButtons.forEach((button) => {
 
 productInterestLinks.forEach((link) => {
   link.addEventListener("click", () => {
-    safeSessionSet("productInterest", link.dataset.productInterest || link.textContent.trim());
+    const productInterest = link.dataset.productInterest || link.textContent.trim();
+    safeSessionSet("productInterest", productInterest);
+    trackMarketingEvent("product_interest", {
+      product_interest: productInterest
+    });
   });
 });
 
@@ -164,20 +193,75 @@ const getFieldValue = (field) => {
 const getFieldLabel = (field) =>
   field.dataset.label || field.closest("label")?.querySelector("span")?.textContent?.trim() || field.name;
 
-const getTrackingLines = (form) => {
+const getTrackingPayload = (form) => {
   const params = new URLSearchParams(window.location.search);
-  const utmLines = trackingKeys
-    .filter((key) => params.get(key))
-    .map((key) => `${key}: ${params.get(key)}`);
+  const payload = {
+    formName: form.dataset.formName || "Website lead form",
+    landingUrl: safeSessionGet("landingUrl") || window.location.href,
+    currentUrl: window.location.href,
+    referrer: safeSessionGet("initialReferrer") || document.referrer || "Direct / unavailable",
+    productInterest: safeSessionGet("productInterest") || "Not selected",
+    sourceLabel: marketingConfig.sourceLabel || "Bingo Textile website"
+  };
 
+  trackingKeys.forEach((key) => {
+    if (params.get(key)) {
+      payload[key] = params.get(key);
+    }
+  });
+
+  return payload;
+};
+
+const getTrackingLines = (form) => {
+  const payload = getTrackingPayload(form);
   return [
-    `Form: ${form.dataset.formName || "Website lead form"}`,
-    `Landing page: ${safeSessionGet("landingUrl") || window.location.href}`,
-    `Current page: ${window.location.href}`,
-    `Referrer: ${safeSessionGet("initialReferrer") || document.referrer || "Direct / unavailable"}`,
-    `Product button source: ${safeSessionGet("productInterest") || "Not selected"}`,
-    ...utmLines
+    `Form: ${payload.formName}`,
+    `Landing page: ${payload.landingUrl}`,
+    `Current page: ${payload.currentUrl}`,
+    `Referrer: ${payload.referrer}`,
+    `Product button source: ${payload.productInterest}`,
+    ...trackingKeys.filter((key) => payload[key]).map((key) => `${key}: ${payload[key]}`)
   ];
+};
+
+const getLeadPayload = (form, fields) => {
+  const fieldPayload = {};
+  fields.forEach((field) => {
+    fieldPayload[field.name] = getFieldValue(field);
+  });
+
+  return {
+    submittedAt: new Date().toISOString(),
+    ...fieldPayload,
+    ...getTrackingPayload(form)
+  };
+};
+
+const submitLeadToCrm = (payload) => {
+  safeLocalAppend("bingoWebsiteLeadDrafts", payload);
+
+  if (!isConfiguredValue(marketingConfig.crmWebhookUrl)) {
+    return;
+  }
+
+  const body = JSON.stringify(payload);
+  const blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
+
+  if (navigator.sendBeacon && navigator.sendBeacon(marketingConfig.crmWebhookUrl, blob)) {
+    return;
+  }
+
+  fetch(marketingConfig.crmWebhookUrl, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8"
+    },
+    body
+  }).catch(() => {
+    // The local fallback above preserves the payload for manual inspection.
+  });
 };
 
 leadForms.forEach((form) => {
@@ -203,6 +287,7 @@ leadForms.forEach((form) => {
     const subject = form.classList.contains("quote-form")
       ? "Streetwear fabric sourcing intake from Bingo Textile website"
       : "Fabric sourcing brief from Bingo Textile website";
+    const leadPayload = getLeadPayload(form, fields);
     const inquiryText = [
       subject,
       "",
@@ -216,7 +301,16 @@ leadForms.forEach((form) => {
     const whatsappUrl = `https://wa.me/${salesWhatsApp}?text=${encodeURIComponent(inquiryText)}`;
     const emailUrl = `mailto:${salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(inquiryText)}`;
 
-    message.textContent = "Opening WhatsApp with your inquiry. If it does not open, ";
+    submitLeadToCrm(leadPayload);
+    trackMarketingEvent("generate_lead", {
+      form_name: leadPayload.formName,
+      garment_type: leadPayload.garment_type || "",
+      country: leadPayload.country || "",
+      timeline: leadPayload.timeline || "",
+      product_interest: leadPayload.productInterest || ""
+    });
+
+    message.textContent = "Saving your brief and opening WhatsApp. If it does not open, ";
     const fallbackLink = document.createElement("a");
     fallbackLink.href = emailUrl;
     fallbackLink.textContent = "email this inquiry instead";
@@ -226,5 +320,14 @@ leadForms.forEach((form) => {
 
     window.open(whatsappUrl, "_blank", "noopener");
     form.reset();
+  });
+});
+
+document.querySelectorAll('a[href^="https://wa.me/"]').forEach((link) => {
+  link.addEventListener("click", () => {
+    trackMarketingEvent("contact_whatsapp", {
+      link_url: link.href,
+      link_text: link.textContent.trim()
+    });
   });
 });

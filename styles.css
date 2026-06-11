@@ -383,6 +383,34 @@ textarea:focus {
   line-height: 1.45;
 }
 
+.consent-banner {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: grid;
+  gap: 14px;
+  width: min(420px, calc(100% - 40px));
+  padding: 18px;
+  color: var(--ink);
+  background: rgba(255, 253, 251, 0.98);
+  border: 1px solid rgba(234, 223, 231, 0.96);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.consent-banner p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.consent-banner div {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .trust-strip {
   padding: 18px 0;
   color: var(--ink);
@@ -668,6 +696,41 @@ textarea:focus {
   display: block;
   color: var(--ink);
   font-size: 19px;
+}
+
+.capability-media {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.capability-media figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.capability-media img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #eef8f4;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.capability-media figcaption {
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.source-note {
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .capability-list {
@@ -1008,6 +1071,7 @@ textarea:focus {
   .trust-grid,
   .catalog-summary,
   .product-grid,
+  .capability-media,
   .capability-list,
   .service-grid,
   .insight-grid,
