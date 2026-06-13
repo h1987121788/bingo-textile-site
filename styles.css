@@ -274,6 +274,180 @@ h3 {
   margin-bottom: 28px;
 }
 
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.breadcrumb a {
+  color: var(--teal-dark);
+  font-weight: 800;
+}
+
+.seo-hero {
+  padding: 72px 0 64px;
+  background:
+    linear-gradient(100deg, rgba(255, 248, 243, 0.98), rgba(247, 240, 251, 0.78)),
+    linear-gradient(135deg, rgba(168, 230, 207, 0.32), rgba(255, 216, 199, 0.28), rgba(191, 227, 255, 0.24));
+}
+
+.seo-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(340px, 0.7fr);
+  gap: 52px;
+  align-items: center;
+}
+
+.seo-hero h1 {
+  max-width: 10.5em;
+}
+
+.seo-hero-media {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.seo-hero-media img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #eef8f4;
+}
+
+.seo-hero-media figcaption {
+  padding: 12px 14px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.seo-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: 48px;
+  align-items: start;
+}
+
+.seo-content {
+  display: grid;
+  gap: 34px;
+}
+
+.seo-block {
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 28px rgba(86, 73, 92, 0.06);
+}
+
+.seo-block h2 {
+  font-size: 28px;
+}
+
+.seo-block p,
+.seo-block li {
+  color: var(--ink-soft);
+}
+
+.seo-block ul,
+.seo-block ol {
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.seo-check-grid,
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.seo-check-grid article,
+.related-grid a {
+  min-height: 150px;
+  padding: 18px;
+  background: #fffdfb;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.seo-check-grid h3,
+.related-grid h3 {
+  font-size: 18px;
+}
+
+.related-grid a {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.related-grid span {
+  color: var(--brick);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.seo-aside {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 18px;
+}
+
+.seo-aside-card {
+  padding: 22px;
+  background: rgba(255, 253, 251, 0.95);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 28px rgba(86, 73, 92, 0.07);
+}
+
+.seo-aside-card p {
+  color: var(--ink-soft);
+}
+
+.seo-spec-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.seo-spec-list div {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 8px;
+  padding: 9px 10px;
+  background: var(--mist);
+  border: 1px solid rgba(234, 223, 231, 0.75);
+  border-radius: 6px;
+}
+
+.seo-spec-list dt,
+.seo-spec-list dd {
+  margin: 0;
+  font-size: 13px;
+}
+
+.seo-spec-list dt {
+  color: var(--brick);
+  font-weight: 800;
+}
+
+.seo-spec-list dd {
+  color: var(--ink-soft);
+}
+
 .proof-row {
   display: flex;
   flex-wrap: wrap;
@@ -773,7 +947,8 @@ textarea:focus {
 }
 
 .service-grid article,
-.insight-grid article {
+.insight-grid article,
+.insight-grid a {
   min-height: 190px;
   padding: 22px;
   background: var(--surface);
@@ -786,6 +961,18 @@ textarea:focus {
 .insight-grid p:not(.tag) {
   margin-bottom: 0;
   color: var(--ink-soft);
+}
+
+.insight-grid a {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.insight-grid a:hover,
+.insight-grid a:focus-visible {
+  border-color: var(--teal);
+  transform: translateY(-1px);
 }
 
 .process-list {
@@ -1015,6 +1202,8 @@ textarea:focus {
   }
 
   .hero-grid,
+  .seo-hero-grid,
+  .seo-layout,
   .capability-layout,
   .faq-layout,
   .contact-layout {
@@ -1029,9 +1218,15 @@ textarea:focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .seo-aside {
+    position: static;
+  }
+
   .product-grid,
   .service-grid,
   .insight-grid,
+  .seo-check-grid,
+  .related-grid,
   .process-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1043,6 +1238,7 @@ textarea:focus {
   }
 
   .section,
+  .seo-hero,
   .contact-section {
     padding: 58px 0;
   }
@@ -1075,7 +1271,17 @@ textarea:focus {
   .capability-list,
   .service-grid,
   .insight-grid,
+  .seo-check-grid,
+  .related-grid,
   .process-list {
+    grid-template-columns: 1fr;
+  }
+
+  .seo-block {
+    padding: 20px;
+  }
+
+  .seo-spec-list div {
     grid-template-columns: 1fr;
   }
 
