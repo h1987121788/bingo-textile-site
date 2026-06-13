@@ -231,11 +231,17 @@ const getLeadPayload = (form, fields) => {
     fieldPayload[field.name] = getFieldValue(field);
   });
 
-  return {
+  const payload = {
     submittedAt: new Date().toISOString(),
     ...fieldPayload,
     ...getTrackingPayload(form)
   };
+
+  if (isConfiguredValue(marketingConfig.crmSubmitToken)) {
+    payload.crmSubmitToken = marketingConfig.crmSubmitToken;
+  }
+
+  return payload;
 };
 
 const submitLeadToCrm = (payload) => {
