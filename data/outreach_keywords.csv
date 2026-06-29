@@ -1,0 +1,74 @@
+category,label,language,keyword,priority,usage
+product,plain jersey / single jersey,en,plain jersey,5,Product match
+product,plain jersey / single jersey,en,single jersey,5,Product match
+product,plain jersey / single jersey,en,cotton jersey,5,Product match
+product,plain jersey / single jersey,en,jersey knit,4,Product match
+product,plain jersey / single jersey,en,t-shirt fabric,5,Product match
+product,plain jersey / single jersey,en,tee fabric,5,Product match
+product,heavyweight T-shirt fabric,en,heavyweight tee,5,Product match
+product,heavyweight T-shirt fabric,en,heavyweight t-shirt,5,Product match
+product,heavyweight T-shirt fabric,en,premium basics,5,Product match
+product,heavyweight T-shirt fabric,en,boxy tee,5,Product match
+product,heavyweight T-shirt fabric,en,oversized tee,5,Product match
+product,heavyweight T-shirt fabric,en,structured tee,4,Product match
+product,French terry / hoodie fabric,en,French terry,5,Product match
+product,French terry / hoodie fabric,en,loopback terry,5,Product match
+product,French terry / hoodie fabric,en,hoodie fabric,5,Product match
+product,French terry / hoodie fabric,en,sweatshirt fabric,5,Product match
+product,French terry / hoodie fabric,en,sweatpants fabric,4,Product match
+product,French terry / hoodie fabric,en,brushed terry,4,Product match
+product,stretch jersey / spandex jersey,en,stretch jersey,4,Product match
+product,stretch jersey / spandex jersey,en,spandex jersey,4,Product match
+product,stretch jersey / spandex jersey,en,elastane jersey,4,Product match
+product,stretch jersey / spandex jersey,en,fitted tee,4,Product match
+product,rib knit / trims,en,rib knit,3,Product match
+product,rib knit / trims,en,rib trim,3,Product match
+product,rib knit / trims,en,rib collar,3,Product match
+product,rib knit / trims,en,rib cuff,3,Product match
+garment,streetwear products,en,streetwear hoodie,5,Customer fit
+garment,streetwear products,en,hoodie drop,5,Customer fit
+garment,streetwear products,en,sweatshirt,4,Customer fit
+garment,streetwear products,en,sweatpants,4,Customer fit
+garment,streetwear products,en,oversized t-shirt,5,Customer fit
+garment,streetwear products,en,boxy t-shirt,5,Customer fit
+garment,streetwear products,en,cut and sew,5,Customer fit
+garment,streetwear products,en,private label,4,Customer fit
+buyer,buyer type,en,streetwear brand,5,Lead discovery
+buyer,buyer type,en,independent clothing brand,5,Lead discovery
+buyer,buyer type,en,premium basics brand,5,Lead discovery
+buyer,buyer type,en,cut and sew brand,5,Lead discovery
+buyer,decision maker,en,brand founder,5,High-value contact
+buyer,decision maker,en,brand owner,5,High-value contact
+buyer,decision maker,en,creative director,5,High-value contact
+buyer,decision maker,en,fashion designer,5,High-value contact
+buyer,decision maker,en,production manager,4,High-value contact
+buyer,decision maker,en,sourcing manager,4,High-value contact
+buyer,decision maker,en,product developer,4,High-value contact
+intent,sourcing intent,en,fabric sourcing,5,Buying signal
+intent,sourcing intent,en,sample development,5,Buying signal
+intent,sourcing intent,en,swatches,5,Buying signal
+intent,sourcing intent,en,lab dips,5,Buying signal
+intent,sourcing intent,en,tech pack,5,Buying signal
+intent,sourcing intent,en,bulk order,5,Buying signal
+intent,sourcing intent,en,GSM,4,Buying signal
+intent,sourcing intent,en,composition,3,Buying signal
+recent,recent activity,en,new arrivals,4,Recent drop
+recent,recent activity,en,latest drop,5,Recent drop
+recent,recent activity,en,new release,5,Recent drop
+recent,recent activity,en,preorder,4,Recent drop
+recent,recent activity,en,back in stock,4,Recent activity
+quality,positive signal,en,official contact page plus current product page,5,Quality signal
+quality,positive signal,en,public email on official brand website,5,Quality signal
+quality,positive signal,en,target-market physical address or country proof,4,Quality signal
+quality,positive signal,en,founder owner designer production or sourcing contact,4,Quality signal
+quality,bounce rule,en,role inbox requires product evidence and activity signal,5,Email quality rule
+quality,bounce rule,en,free-mail address requires official-site proof,5,Email quality rule
+quality,sending rule,en,stop on first QQ SMTP 550,5,Sending rule
+quality,sending rule,en,use at least sixty seconds between messages,4,Sending rule
+exclude,bad source,en,marketplace resale directory coupon or preowned store,5,Reject
+exclude,bad source,en,web design law health tourism SaaS or software site,5,Reject
+exclude,bad source,en,blank apparel printer embroidery service or supplier,5,Reject
+exclude,bad email,en,privacy legal gdpr abuse noreply no-reply shopify system mailbox,5,Reject
+exclude,bad email,en,search snippet email not present on official website,5,Reject
+exclude,bad email,en,email domain mismatch with official website,5,Reject
+exclude,region,en,unknown country or non-target-market proof,4,Reject
