@@ -40,7 +40,12 @@ const safeLocalAppend = (key, value, limit = 30) => {
 
 const isConfiguredValue = (value) => {
   const normalized = String(value || "").trim();
-  return normalized.length > 0 && !["PASTE_WEBHOOK_URL", "WEBHOOK_URL"].includes(normalized);
+  return normalized.length > 0 && ![
+    "PASTE_WEBHOOK_URL",
+    "WEBHOOK_URL",
+    "SAME_TOKEN_AS_APPS_SCRIPT",
+    "CRM_WEBHOOK_TOKEN"
+  ].includes(normalized);
 };
 
 const trackMarketingEvent = (eventName, params = {}) => {
