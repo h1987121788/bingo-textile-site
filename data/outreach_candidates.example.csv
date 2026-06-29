@@ -1,0 +1,2 @@
+brandName,country,website,instagramUrl,facebookUrl,businessEmail,contactName,contactRole,contactSource,personalEmailAllowed,productType,priceTier,recentSignal,sourceLinks,notes
+Example Streetwear,United States,https://example.com,https://instagram.com/example,,founder@example.com,Jane Example,Founder,https://example.com/contact,true,"heavyweight tees / hoodies",mid/upper,new collection,https://example.com/contact,Replace this row with a real public brand source before running.
