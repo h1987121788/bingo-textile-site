@@ -1,0 +1,20 @@
+{
+  "updatedAt": "2026-06-23",
+  "updatedBy": "Codex",
+  "status": "facebook_publishing_enabled_by_operator_request",
+  "allowDryRunWhenPaused": true,
+  "socialPublishing": true,
+  "facebookPublishing": true,
+  "instagramPublishing": false,
+  "xPublishing": false,
+  "outreachDiscovery": true,
+  "outreachReportGeneration": true,
+  "outreachEmailSending": false,
+  "outreachSmtpTest": false,
+  "crmWebhook": true,
+  "notes": [
+    "Facebook publishing is enabled after explicit operator request; Instagram and X remain disabled.",
+    "B2B discovery and review reports are allowed, but real QQ SMTP sending is blocked by default.",
+    "Dry runs are allowed only for validation and must not publish posts or send emails."
+  ]
+}

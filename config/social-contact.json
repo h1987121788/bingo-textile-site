@@ -1,0 +1,15 @@
+{
+  "confirmed": true,
+  "lastReviewedAt": "2026-06-09",
+  "note": "Confirmed by user on 2026-06-09. Social posts and outreach emails must validate against this file before publishing or sending.",
+  "company": "Bingo Textile",
+  "contactPerson": "Jason Huang",
+  "website": "https://www.bingofabric.com/",
+  "whatsappUrl": "https://wa.me/8613827719946",
+  "whatsappDisplay": "+86 13827719946",
+  "phoneDisplay": "+86 13827719946",
+  "wechat": "13827719946",
+  "email": "57317996@qq.com",
+  "address": "Zhujiang Textile City, Haizhu District, Guangzhou, Guangdong Province, China",
+  "productIntroAttachmentNote": "Generated product intro decks live outside the clean deployment branch. Configure the attachment in local outreach runtime only."
+}
