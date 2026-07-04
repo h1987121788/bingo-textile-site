@@ -1,17 +1,16 @@
-# Project Status - 2026-06-28
+# Project Status - 2026-07-04
 
 ## Source of Truth
 
 - Production domain: `https://www.bingofabric.com/`
 - Remote repository: `https://github.com/h1987121788/bingo-textile-site.git`
-- Deployment baseline: `origin/main` at `36fa43b3e02a47a37b8689500c1b189a2d39edc2` (`Add SEO landing pages for fabric sourcing`)
-- Clean governance branch: `codex/project-governance-p1`
-- Clean worktree: `/Users/huang/Documents/poly/bingo-textile-p1-governance`
-- Operational workspace: `/Users/huang/Desktop/纺织`
+- Deployment source: `origin/main`
+- Current deployment worktree: `/Users/huang/Documents/poly/bingo-textile-governance-20260704`
+- Operations workspace: `/Users/huang/Desktop/纺织`
 
-The operational workspace is not a clean deployment source. It contains website source, automation code, reports, generated outputs, local environment files, and live outreach data. Deployment work should use the clean branch created from `origin/main`, then selectively promote reviewed source changes.
+The operations workspace is not a deployment source. It contains local automation state, reports, outputs, `.env.*.local` files, and private outreach data. Deploy only from `origin/main` or a clean worktree created from `origin/main`.
 
-## Clean Branch Scope
+## Clean Repository Scope
 
 Keep in the deployment repository:
 
@@ -26,55 +25,42 @@ Do not keep in the deployment repository:
 - `reports/`: generated operation reports.
 - `outputs/`: generated decks, PDFs, screenshots, and other runtime artifacts.
 - `.env.*`: local tokens, IDs, SMTP settings, and account credentials. Only `.env.*.example` templates may remain.
-- Real outreach data under `data/outreach_*`, including leads, sent logs, suppression lists, bounces, dated candidates, send batches, follow-up files, and query logs.
+- `config/marketing-config.local.js`: local production-fill marketing config.
+- Real outreach data under `data/outreach_*`, including leads, sent logs, suppression lists, bounces, dated candidates, send batches, follow-up files, query logs, and reply logs.
+- `data/customs_trade_sources_*`: customs/trade-source precheck data.
 - Local learned keyword files such as `data/outreach_keyword_bank.local.json` and `data/outreach_keywords.local.csv`.
 - `node_modules/` or local dependency output.
 
-## Current Website State
+## Configuration Status
 
-- The site includes the home page plus SEO pages for fabric sourcing, heavyweight T-shirt fabric, French terry hoodie fabric, rib knit fabric, and stretch jersey fabric.
-- The product catalog is source-backed by `catalog-data.js` and website product images in `assets/products/`.
-- CRM and tracking setup files exist, including `scripts/google_apps_script_lead_webhook.gs` and `CRM_AND_TRACKING_SETUP.md`.
-- `config/marketing-config.js` is kept as a production-fill template in the clean branch. GA4, Meta Pixel, CRM webhook URL, and CRM submit token must be filled during deployment or local production setup.
+`config/marketing-config.js` is a production-fill template. Real GA4, Meta Pixel, Google Apps Script webhook URL, and CRM submit token must stay outside source control.
 
-## Current Automation State
+The Apps Script webhook template requires `CRM_WEBHOOK_TOKEN` in Apps Script project properties. The source file must not contain a reusable fallback token. If the previous CRM submit token was ever deployed publicly, rotate it in Apps Script before relying on webhook capture again.
 
-As of the 2026-06-28 governance record, `config/automation-control.json` defines:
+Production tracking or CRM capture should be considered active only after these checks pass:
+
+- GA4 Realtime receives a visit.
+- Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
+- A test website form creates one Google Sheet row.
+- WhatsApp opens with the prefilled sourcing brief.
+
+## Automation Status
+
+As of `config/automation-control.json` dated 2026-06-23:
 
 - Facebook publishing: enabled by operator request.
 - Instagram publishing: disabled.
 - X publishing: disabled.
-- Outreach discovery and review reports: enabled.
+- B2B discovery and review reports: enabled.
 - Real QQ SMTP outreach sending: disabled by default.
 - QQ SMTP test emails: disabled by default.
-- CRM webhook capture: enabled.
-- Dry runs: allowed only for validation and must not publish posts or send emails.
+- CRM webhook capture: enabled, but source config is templated and requires production values before live capture.
+- Dry runs are allowed only for validation and must not publish posts or send emails.
 
-All social and outreach runs must validate `config/social-contact.json` first. The clean branch does not include generated product-intro decks from `outputs/`; any email attachment must be configured in local runtime storage, not committed to the deployment repository.
+## Governance Rules
 
-The CRM webhook token is intentionally not committed. `scripts/google_apps_script_lead_webhook.gs` requires `CRM_WEBHOOK_TOKEN` in Apps Script project properties before accepting website lead submissions.
-
-## Operational Data Baseline
-
-The operational workspace holds live acquisition history and should be treated as private business data. Around the 2026-06-28 audit window it contained:
-
-- Hundreds of outreach lead rows and sent-log entries.
-- Suppression, bounce, SMTP rejection, follow-up, and dated candidate files.
-- Generated reports and output artifacts from outreach, social posting, SEO, CRM, and testing work.
-
-These files were intentionally excluded from the clean governance branch. If operational data is needed for analysis, export a redacted snapshot outside the deployment repository.
-
-## Governance Status
-
-P1 cleanup action:
-
-- A clean branch was created from `origin/main`.
-- Source files, public pages, config templates, necessary images, and automation source were copied into the clean worktree.
-- `reports/`, `outputs/`, real `.env.*`, `node_modules/`, and real `data/outreach_*` operation files were kept out of the deployment branch.
-- Keyword files committed to the clean branch were reduced to sanitized seed rules; operational learning updates should use ignored `.local` files.
-- `.gitignore` was tightened to keep future operational outreach files out of Git.
-
-Next recommended step:
-
-- Review the clean branch diff, then commit only the governance source set.
-- Keep daily outreach/social operation output in local storage or a private operations repository, not in the public deployment repository.
+- Do not deploy `/Users/huang/Desktop/纺织` directly.
+- Keep deployment source clean and separate from operation output.
+- Keep real outreach data, env files, generated reports, and generated outputs out of Git.
+- Keep source templates free of reusable secrets.
+- Commit and deploy only reviewed source changes from a clean `origin/main` worktree.
