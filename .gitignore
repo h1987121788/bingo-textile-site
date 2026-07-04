@@ -11,6 +11,7 @@ outputs/
 reports/
 data/customs_trade_sources_*.csv
 data/customs_trade_sources_*.json
+data/crm_export*.csv
 data/*.backup-*.csv
 data/outreach_candidates.csv
 data/outreach_candidates_*.csv
@@ -31,3 +32,5 @@ data/outreach_sent_log.csv
 data/outreach_smtp_rejections.csv
 data/outreach_suppression.csv
 data/social_media_history.jsonl
+data/website_leads_export*.csv
+data/weekly_conversion_events*.csv

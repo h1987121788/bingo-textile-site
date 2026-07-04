@@ -95,6 +95,60 @@ When a visitor submits a valid form, the site sends the lead payload to the webh
 
 If the webhook is not configured, the site stores recent lead payloads in browser localStorage as a temporary fallback only.
 
+### Sales Pipeline Fields
+
+The Apps Script keeps the existing lead columns and adds CRM pipeline fields when the Sheet is created or when an older Sheet is used:
+
+- `lead_status`: default `new_inquiry`.
+- `next_action_at`: default next calendar day.
+- `sample_requested`: `yes` when the visitor requests swatches, lab dips, or sample matching support.
+- `quoted_value`: manual quote value for weekly review.
+- `source_channel`: direct, organic search, social, referral, or campaign source.
+- `utm_campaign`: campaign value from the landing URL.
+- `reply_owner`: default `Jason Huang`.
+- `reference_links`: Google Drive, Instagram post, Dropbox, product URL, or tech pack link supplied by the buyer.
+
+Recommended status flow:
+
+```text
+new_inquiry -> replied -> sample_sent -> quoted -> won
+new_inquiry -> replied -> sample_sent -> quoted -> lost
+```
+
+Use `next_action_at` as the daily follow-up queue. A row should not stay in `new_inquiry` after the first WhatsApp or email reply.
+
+### Reference Image / Tech Pack Links
+
+Static hosting does not store uploaded files. The website form now accepts a link field for buyer-supplied references, including Google Drive, Dropbox, Instagram posts, product pages, or tech packs. Keep file permissions viewable before quoting.
+
+### Weekly Conversion Report
+
+Export the Website Leads Google Sheet as CSV into `data/website_leads_export_YYYY-MM-DD.csv`, then run:
+
+```bash
+node scripts/weekly_conversion_report.js --crm-csv data/website_leads_export_YYYY-MM-DD.csv --visits 120 --whatsapp-clicks 18
+```
+
+Optional date range:
+
+```bash
+node scripts/weekly_conversion_report.js --week-start 2026-07-01 --week-end 2026-07-07 --crm-csv data/website_leads_export_2026-07-07.csv
+```
+
+If npm is available, the same script is also exposed as `npm run report:weekly-conversion -- ...`.
+
+The report writes to `reports/weekly-conversion-START_to_END.md` and covers:
+
+- Visits.
+- Form submissions.
+- WhatsApp clicks.
+- Sheet rows.
+- Replies.
+- Sample requests.
+- Quotes.
+
+`reports/` and real CRM CSV exports stay outside the deployment repository.
+
 ## 5. Verification Checklist
 
 After deployment:
@@ -104,9 +158,10 @@ After deployment:
 3. Submit a test sourcing brief.
 4. Confirm WhatsApp opens with a prefilled message.
 5. Confirm the lead row appears in Google Sheets.
-6. Confirm GA4 Realtime shows activity.
-7. Confirm Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
-8. Confirm Search Console verifies the site and the sitemap is submitted.
+6. Confirm the Sheet row includes `lead_status`, `next_action_at`, `source_channel`, `sample_requested`, and `reference_links`.
+7. Confirm GA4 Realtime shows activity.
+8. Confirm Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
+9. Confirm Search Console verifies the site and the sitemap is submitted.
 
 ## Manual Values Needed
 

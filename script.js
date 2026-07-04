@@ -48,6 +48,37 @@ const isConfiguredValue = (value) => {
   ].includes(normalized);
 };
 
+const isoDateAfterDays = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const sourceChannelFromReferrer = (params) => {
+  if (params.get("utm_source")) {
+    return params.get("utm_source");
+  }
+
+  const referrer = safeSessionGet("initialReferrer") || document.referrer || "";
+  if (!referrer) {
+    return "direct";
+  }
+
+  let hostname = "";
+  try {
+    hostname = new URL(referrer).hostname.toLowerCase();
+  } catch {
+    return "referral";
+  }
+
+  if (/google|bing|yahoo|duckduckgo|baidu|naver/.test(hostname)) return "organic_search";
+  if (/instagram|facebook|fb\.com|t\.co|twitter|x\.com|linkedin|pinterest|youtube|tiktok/.test(hostname)) return "social";
+  return "referral";
+};
+
 const trackMarketingEvent = (eventName, params = {}) => {
   if (typeof window.bingoTrackEvent === "function") {
     window.bingoTrackEvent(eventName, {
@@ -206,6 +237,7 @@ const getTrackingPayload = (form) => {
     currentUrl: window.location.href,
     referrer: safeSessionGet("initialReferrer") || document.referrer || "Direct / unavailable",
     productInterest: safeSessionGet("productInterest") || "Not selected",
+    source_channel: sourceChannelFromReferrer(params),
     sourceLabel: marketingConfig.sourceLabel || "Bingo Textile website"
   };
 
@@ -225,6 +257,7 @@ const getTrackingLines = (form) => {
     `Landing page: ${payload.landingUrl}`,
     `Current page: ${payload.currentUrl}`,
     `Referrer: ${payload.referrer}`,
+    `Source channel: ${payload.source_channel}`,
     `Product button source: ${payload.productInterest}`,
     ...trackingKeys.filter((key) => payload[key]).map((key) => `${key}: ${payload[key]}`)
   ];
@@ -238,6 +271,10 @@ const getLeadPayload = (form, fields) => {
 
   const payload = {
     submittedAt: new Date().toISOString(),
+    lead_status: "new_inquiry",
+    next_action_at: isoDateAfterDays(1),
+    quoted_value: "",
+    reply_owner: "Jason Huang",
     ...fieldPayload,
     ...getTrackingPayload(form)
   };
@@ -318,7 +355,9 @@ leadForms.forEach((form) => {
       garment_type: leadPayload.garment_type || "",
       country: leadPayload.country || "",
       timeline: leadPayload.timeline || "",
-      product_interest: leadPayload.productInterest || ""
+      product_interest: leadPayload.productInterest || "",
+      source_channel: leadPayload.source_channel || "",
+      sample_requested: leadPayload.sample_requested || ""
     });
 
     message.textContent = "Saving your brief and opening WhatsApp. If it does not open, ";
