@@ -7,7 +7,7 @@
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
 - The customer-facing catalog contains 20 garment styles; the homepage features six of them.
-- All 20 styles have public CNY base-style prices. Source costs and supplier records remain in the operations workspace and are not committed.
+- All 20 styles have public USD settlement prices calculated at the fixed rate `USD 1 = CNY 6.5`. Source costs and supplier records remain in the operations workspace and are not committed.
 - All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
 - Website forms send the existing CRM webhook payload and open a prepared WhatsApp inquiry.

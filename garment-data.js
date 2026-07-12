@@ -1,3 +1,9 @@
+window.bingoGarmentPricing = {
+  currency: "USD",
+  cnyPerUsd: 6.5,
+  decimalPlaces: 2
+};
+
 window.bingoGarmentLaunchCodes = [
   "BG-GM-003",
   "BG-GM-006",

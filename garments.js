@@ -1,4 +1,5 @@
 const garmentCatalog = Array.isArray(window.bingoGarmentCatalog) ? window.bingoGarmentCatalog : [];
+const garmentPricing = window.bingoGarmentPricing || {};
 const garmentLaunchCodes = new Set(
   Array.isArray(window.bingoGarmentLaunchCodes) ? window.bingoGarmentLaunchCodes : []
 );
@@ -17,17 +18,30 @@ const escapeGarmentHtml = (value) =>
   });
 
 const renderGarmentPrice = (product) => {
-  const price = Number(product.priceCny);
-  if (!Number.isFinite(price)) return "";
+  const priceCny = Number(product.priceCny);
+  const cnyPerUsd = Number(garmentPricing.cnyPerUsd);
+  const decimalPlaces = Number.isInteger(garmentPricing.decimalPlaces)
+    ? garmentPricing.decimalPlaces
+    : 2;
+
+  if (!Number.isFinite(priceCny) || !Number.isFinite(cnyPerUsd) || cnyPerUsd <= 0) return "";
+
+  const priceUsd = priceCny / cnyPerUsd;
+  const formattedPrice = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces
+  }).format(priceUsd);
 
   return `
     <div class="garment-price-block">
-      <span>Wholesale price</span>
+      <span>USD settlement price</span>
       <p>
-        <strong>CNY ¥${escapeGarmentHtml(price.toLocaleString("en-US"))}</strong>
+        <strong>USD ${escapeGarmentHtml(formattedPrice)}</strong>
         <small>/ ${escapeGarmentHtml(product.unit || "piece")}</small>
       </p>
-      <em>Customization, freight, duties and taxes are quoted separately.</em>
+      <em>Fixed conversion: USD 1 = CNY ${escapeGarmentHtml(cnyPerUsd)}. Customization, freight, duties and taxes are separate.</em>
     </div>
   `;
 };
