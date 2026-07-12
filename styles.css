@@ -1124,6 +1124,189 @@ textarea:focus {
   gap: 18px;
 }
 
+.preview-banner {
+  padding: 8px 20px;
+  color: var(--ink);
+  background: var(--gold);
+  border-bottom: 1px solid rgba(168, 117, 43, 0.22);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.garment-hero {
+  display: grid;
+  min-height: min(570px, calc(100svh - 112px));
+  padding: 54px 0 44px;
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(255, 248, 243, 0.98) 0%, rgba(255, 248, 243, 0.94) 48%, rgba(255, 248, 243, 0.5) 100%),
+    url("./assets/products/plain-jersey.jpg") center / cover no-repeat;
+}
+
+.garment-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 720px);
+  align-items: center;
+}
+
+.garment-hero-copy {
+  padding: 4px 0;
+}
+
+.catalog-review-note {
+  max-width: 900px;
+  margin: 0 auto 28px;
+  padding: 14px 16px;
+  color: var(--ink-soft);
+  background: rgba(255, 232, 163, 0.42);
+  border: 1px solid rgba(168, 117, 43, 0.22);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.catalog-review-note strong {
+  color: var(--ink);
+}
+
+.garment-card {
+  grid-template-rows: auto 1fr;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.garment-card:hover {
+  border-color: rgba(63, 143, 124, 0.42);
+  box-shadow: 0 18px 34px rgba(86, 73, 92, 0.12);
+  transform: translateY(-2px);
+}
+
+.garment-media {
+  aspect-ratio: 1 / 1;
+}
+
+.garment-photo {
+  object-fit: contain;
+  background: #efefef;
+  transition:
+    transform 220ms ease,
+    filter 220ms ease;
+}
+
+.garment-card:hover .garment-photo {
+  filter: contrast(1.02) saturate(1.03);
+  transform: scale(1.035);
+}
+
+.garment-placeholder {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.garment-placeholder::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  content: "";
+  opacity: 0.48;
+  background:
+    repeating-linear-gradient(35deg, rgba(255, 255, 255, 0.3) 0 4px, transparent 4px 18px),
+    repeating-linear-gradient(145deg, rgba(47, 59, 63, 0.08) 0 2px, transparent 2px 15px);
+}
+
+.garment-placeholder::after {
+  position: absolute;
+  inset: 18px;
+  z-index: -1;
+  content: "";
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 6px;
+}
+
+.garment-placeholder--mint {
+  background: linear-gradient(135deg, #a8e6cf, #bfe3ff);
+}
+
+.garment-placeholder--rose {
+  background: linear-gradient(135deg, #f5b7c8, #ffd8c7);
+}
+
+.garment-placeholder--gold {
+  background: linear-gradient(135deg, #ffe8a3, #d8cff7);
+}
+
+.garment-placeholder--sky {
+  background: linear-gradient(135deg, #bfe3ff, #a8e6cf);
+}
+
+.garment-placeholder--lilac {
+  background: linear-gradient(135deg, #d8cff7, #f5b7c8);
+}
+
+.garment-placeholder small {
+  position: absolute;
+  right: 28px;
+  bottom: 64px;
+  left: 28px;
+  color: rgba(47, 59, 63, 0.82);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.garment-shape {
+  width: 150px;
+  height: 126px;
+  margin-bottom: 22px;
+  background: rgba(255, 253, 251, 0.76);
+  border: 2px solid rgba(47, 59, 63, 0.18);
+  clip-path: polygon(28% 5%, 42% 0, 50% 12%, 58% 0, 72% 5%, 100% 28%, 82% 50%, 72% 42%, 72% 100%, 28% 100%, 28% 42%, 18% 50%, 0 28%);
+  filter: drop-shadow(0 12px 16px rgba(47, 59, 63, 0.13));
+}
+
+.garment-placeholder[data-visual="tank"] .garment-shape {
+  width: 112px;
+  clip-path: polygon(20% 0, 38% 0, 50% 12%, 62% 0, 80% 0, 100% 24%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 0 24%);
+}
+
+.garment-placeholder[data-visual="shorts"] .garment-shape {
+  width: 126px;
+  height: 108px;
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 56% 100%, 50% 58%, 44% 100%, 0 100%);
+}
+
+.garment-placeholder[data-visual="pants"] .garment-shape {
+  width: 112px;
+  height: 142px;
+  clip-path: polygon(5% 0, 95% 0, 84% 100%, 54% 100%, 50% 42%, 46% 100%, 16% 100%);
+}
+
+.garment-placeholder[data-visual="hoodie"] .garment-shape,
+.garment-placeholder[data-visual="set"] .garment-shape {
+  border-radius: 48% 48% 0 0;
+  clip-path: polygon(35% 8%, 42% 0, 58% 0, 65% 8%, 75% 10%, 100% 30%, 82% 53%, 73% 44%, 73% 100%, 27% 100%, 27% 44%, 18% 53%, 0 30%, 25% 10%);
+}
+
+.garment-specs div {
+  grid-template-columns: 68px 1fr;
+}
+
+.garment-service-grid article {
+  min-height: 180px;
+}
+
+.garment-entry-actions {
+  justify-content: center;
+}
+
 @media (max-width: 980px) {
   .site-header {
     grid-template-columns: auto auto;
@@ -1203,6 +1386,7 @@ textarea:focus {
 
   .hero-grid,
   .seo-hero-grid,
+  .garment-hero-grid,
   .seo-layout,
   .capability-layout,
   .faq-layout,
@@ -1259,6 +1443,47 @@ textarea:focus {
     font-size: 16px;
   }
 
+  .garment-hero {
+    min-height: auto;
+    padding: 32px 0 26px;
+    background:
+      linear-gradient(90deg, rgba(255, 248, 243, 0.93), rgba(255, 248, 243, 0.72)),
+      url("./assets/products/plain-jersey.jpg") center / cover no-repeat;
+  }
+
+  .garment-hero .breadcrumb {
+    margin-bottom: 12px;
+  }
+
+  .garment-hero .hero-lede {
+    margin-bottom: 18px;
+  }
+
+  .garment-hero .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .garment-hero .button {
+    min-height: 52px;
+    padding: 7px 10px;
+    text-align: center;
+  }
+
+  .garment-hero .proof-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .garment-hero .proof-row span {
+    min-height: 62px;
+    padding: 8px;
+    font-size: 12px;
+    text-align: center;
+  }
+
   .quote-panel,
   .contact-form {
     padding: 20px;
@@ -1289,6 +1514,10 @@ textarea:focus {
     grid-template-rows: 190px 1fr;
   }
 
+  .garment-card {
+    grid-template-rows: auto 1fr;
+  }
+
   .trust-grid {
     gap: 6px;
   }
@@ -1300,5 +1529,765 @@ textarea:focus {
   .footer-grid {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* Garment-first local transition build */
+body.garment-site {
+  --ink: #202724;
+  --ink-soft: #5d6863;
+  --paper: #f5f6f2;
+  --surface: #ffffff;
+  --line: #d8ddd8;
+  --teal: #a9d8c7;
+  --teal-dark: #176b58;
+  --gold: #e7c66d;
+  --brick: #a44d37;
+  --mist: #ecefeb;
+  --peach: #e8c1b2;
+  --lilac: #cbcbd9;
+  --sky: #bed3dc;
+  --rose: #d8aaa8;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+body.garment-site .site-header {
+  border-color: rgba(216, 221, 216, 0.92);
+  background: rgba(245, 246, 242, 0.95);
+}
+
+body.garment-site .brand-mark {
+  color: #ffffff;
+  background: var(--ink);
+}
+
+body.garment-site .site-nav {
+  gap: 20px;
+}
+
+body.garment-site .header-cta,
+body.garment-site .button.primary,
+body.garment-site .form-button {
+  color: #ffffff;
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+}
+
+body.garment-site .header-cta:hover,
+body.garment-site .button.primary:hover,
+body.garment-site .form-button:hover {
+  color: #ffffff;
+  background: #125847;
+}
+
+body.garment-site .preview-banner {
+  color: #332b1c;
+  background: #ead48e;
+  border-color: #c9ab56;
+}
+
+.garment-home-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: min(580px, calc(100svh - 150px));
+  overflow: hidden;
+  color: #ffffff;
+  background: #202724;
+  align-items: center;
+}
+
+.garment-home-hero-image,
+.garment-home-hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.garment-home-hero-image {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 68% 48%;
+  filter: saturate(0.84) contrast(1.05);
+}
+
+.garment-home-hero-overlay {
+  z-index: -1;
+  background: rgba(21, 27, 24, 0.72);
+}
+
+.garment-home-hero-content {
+  padding: 64px 0 58px;
+}
+
+.garment-home-hero-content > * {
+  max-width: 680px;
+}
+
+.garment-home-hero h1 {
+  max-width: 12.5em;
+  margin-bottom: 20px;
+  font-size: 54px;
+}
+
+.garment-home-hero .eyebrow,
+.garment-home-hero .breadcrumb,
+.garment-home-hero .breadcrumb a {
+  color: #b9ead9;
+}
+
+.garment-home-hero .hero-lede {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.garment-home-hero .button.secondary {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.52);
+}
+
+.garment-home-hero .button.secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffffff;
+}
+
+.garment-home-hero .proof-row span {
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(14, 20, 17, 0.48);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.garment-home-hero .proof-row strong {
+  color: #b9ead9;
+}
+
+.hero-visual-note {
+  margin: 20px 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+}
+
+.garment-catalog-hero .garment-home-hero-image {
+  object-position: 70% 48%;
+}
+
+.garment-value-strip {
+  padding: 18px 0;
+  color: var(--ink);
+  background: #d9e8df;
+  border-bottom: 1px solid #c5d8cc;
+}
+
+.garment-value-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.garment-value-grid span {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+body.garment-site .section {
+  padding: 76px 0;
+}
+
+body.garment-site .muted {
+  background: var(--mist);
+}
+
+body.garment-site .section-heading {
+  max-width: 780px;
+}
+
+.launch-heading {
+  margin-bottom: 24px;
+}
+
+.launch-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.launch-grid .garment-card {
+  border-color: #d6dcd7;
+  box-shadow: 0 10px 24px rgba(32, 39, 36, 0.07);
+}
+
+.garment-card-heading {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.garment-card-heading .tag {
+  margin: 0;
+}
+
+.sample-gate {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  color: #72551b;
+  background: #f5e8bd;
+  border: 1px solid #e0c873;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.verification-note {
+  padding-left: 10px;
+  color: #6a5a30 !important;
+  border-left: 3px solid #d5b85d;
+  font-size: 12px !important;
+}
+
+.section-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.text-link {
+  color: var(--teal-dark);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.service-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.service-tier-grid article {
+  min-height: 330px;
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.service-tier-grid article:nth-child(2) {
+  border-top: 4px solid var(--teal-dark);
+}
+
+.tier-label {
+  margin: 0 0 22px;
+  color: var(--brick);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.service-tier-grid article > p:not(.tier-label),
+.service-tier-grid li {
+  color: var(--ink-soft);
+}
+
+.service-tier-grid ul {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+  margin: 20px 0 0;
+}
+
+.material-layout,
+.quality-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.material-actions {
+  margin: 26px 0 0;
+}
+
+.material-family-list {
+  border-top: 1px solid var(--line);
+}
+
+.material-family-list article {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 14px;
+  min-height: 108px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.material-family-list article > span {
+  color: var(--brick);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.material-family-list h3 {
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+
+.material-family-list p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.process-section {
+  color: #ffffff;
+  background: #202724;
+}
+
+.process-section .eyebrow {
+  color: #a9d8c7;
+}
+
+.process-section .section-heading p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.garment-workflow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 28px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.garment-workflow li {
+  min-height: 196px;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.garment-workflow li > span,
+.garment-workflow li > strong {
+  display: block;
+}
+
+.garment-workflow li > span {
+  margin-bottom: 22px;
+  color: #a9d8c7;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.garment-workflow li > strong {
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.garment-workflow li > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.garment-catalog-page .compact-workflow {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.garment-catalog-page #garment-process {
+  background: var(--mist);
+}
+
+.garment-catalog-page #garment-process .eyebrow {
+  color: var(--brick);
+}
+
+.garment-catalog-page .compact-workflow li {
+  border-color: var(--line);
+}
+
+.garment-catalog-page .compact-workflow li > span {
+  color: var(--brick);
+}
+
+.garment-catalog-page .compact-workflow li > strong {
+  color: var(--ink);
+}
+
+.garment-catalog-page .compact-workflow li > p {
+  color: var(--ink-soft);
+}
+
+.quality-status {
+  display: grid;
+  gap: 4px;
+  margin-top: 28px;
+  padding: 16px 18px;
+  color: var(--ink);
+  background: #f2e7c6;
+  border-left: 4px solid #c6a84d;
+}
+
+.quality-status span {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.quality-checklist {
+  border-top: 1px solid var(--line);
+}
+
+.quality-checklist article {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.32fr) 1fr;
+  gap: 18px;
+  min-height: 82px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.quality-checklist span {
+  color: var(--brick);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.quality-checklist strong {
+  font-size: 15px;
+}
+
+.market-section {
+  background: #f5f6f2;
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.market-grid article {
+  min-height: 210px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.market-grid p,
+.market-note {
+  color: var(--ink-soft);
+}
+
+.market-note {
+  max-width: 760px;
+  margin: 24px auto 0;
+  font-size: 13px;
+  text-align: center;
+}
+
+.launch-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.launch-summary article {
+  min-height: 138px;
+}
+
+body.garment-site .contact-section {
+  color: var(--ink);
+  background: #dce8e1;
+  border-top: 1px solid #c5d7cd;
+}
+
+body.garment-site .contact-form {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: #cbd6d0;
+  box-shadow: 0 18px 40px rgba(32, 39, 36, 0.13);
+}
+
+body.garment-site .site-footer {
+  background: #e7e9e5;
+  border-color: #d4d9d4;
+}
+
+.material-page .seo-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #ffffff;
+  background: #202724;
+}
+
+.material-page .seo-hero::before,
+.material-page .seo-hero::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.material-page .seo-hero::before {
+  z-index: -2;
+  background-image: var(--material-hero-image);
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.78) contrast(1.06);
+}
+
+.material-page .seo-hero::after {
+  z-index: -1;
+  background: rgba(21, 27, 24, 0.72);
+}
+
+.material-page .seo-hero-grid {
+  grid-template-columns: minmax(0, 720px);
+}
+
+.material-page .seo-hero-media {
+  display: none;
+}
+
+.material-page .seo-hero h1 {
+  max-width: 11em;
+}
+
+.material-page .seo-hero .breadcrumb,
+.material-page .seo-hero .breadcrumb a,
+.material-page .seo-hero .eyebrow {
+  color: #b9ead9;
+}
+
+.material-page .seo-hero .hero-lede {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.material-page .seo-hero .button.secondary {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.material-page .seo-hero .proof-row span {
+  color: rgba(255, 255, 255, 0.76);
+  background: rgba(14, 20, 17, 0.48);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.material-page .seo-hero .proof-row strong {
+  color: #b9ead9;
+}
+
+@media (max-width: 980px) {
+  body.garment-site .site-nav {
+    background: var(--paper);
+  }
+
+  .garment-home-hero {
+    min-height: 540px;
+  }
+
+  .garment-home-hero h1 {
+    font-size: 44px;
+  }
+
+  .garment-value-grid,
+  .launch-grid,
+  .service-tier-grid,
+  .garment-workflow,
+  .market-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .material-layout,
+  .quality-layout {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .service-tier-grid article {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 680px) {
+  body.garment-site .section,
+  body.garment-site .contact-section {
+    padding: 54px 0;
+  }
+
+  .garment-home-hero {
+    min-height: auto;
+  }
+
+  .garment-home-hero-image {
+    object-position: 62% 50%;
+  }
+
+  .garment-home-hero-overlay {
+    background: rgba(21, 27, 24, 0.78);
+  }
+
+  .garment-home-hero-content {
+    padding: 30px 0 24px;
+  }
+
+  .garment-home-hero h1 {
+    margin-bottom: 14px;
+    font-size: 32px;
+  }
+
+  .garment-home-hero .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .garment-home-hero .hero-lede {
+    margin-bottom: 18px;
+    font-size: 15px;
+    line-height: 1.52;
+  }
+
+  .garment-home-hero .button {
+    min-height: 52px;
+    padding: 7px 9px;
+    font-size: 14px;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .garment-home-hero .proof-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .garment-home-hero .proof-row span {
+    min-height: 64px;
+    padding: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .garment-home-hero .proof-row strong {
+    display: block;
+  }
+
+  .garment-home-hero .hero-visual-note {
+    display: none;
+  }
+
+  .material-page .seo-hero {
+    padding: 34px 0 28px;
+  }
+
+  .material-page .seo-hero .breadcrumb {
+    margin-bottom: 10px;
+  }
+
+  .material-page .seo-hero h1 {
+    margin-bottom: 14px;
+    font-size: 30px;
+  }
+
+  .material-page .seo-hero .hero-lede {
+    margin-bottom: 18px;
+    font-size: 15px;
+    line-height: 1.48;
+  }
+
+  .material-page .seo-hero .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .material-page .seo-hero .button {
+    min-height: 52px;
+    padding: 7px 9px;
+    font-size: 14px;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .material-page .seo-hero .proof-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .material-page .seo-hero .proof-row span {
+    min-height: 64px;
+    padding: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .material-page .seo-hero .proof-row strong {
+    display: block;
+  }
+
+  .garment-value-grid,
+  .launch-grid,
+  .service-tier-grid,
+  .garment-workflow,
+  .market-grid,
+  .launch-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .garment-value-grid {
+    gap: 4px;
+  }
+
+  .garment-value-grid span {
+    min-height: 34px;
+  }
+
+  .service-tier-grid article {
+    min-height: 0;
+    padding: 22px;
+  }
+
+  .material-family-list article {
+    grid-template-columns: 42px 1fr;
+  }
+
+  .garment-workflow {
+    gap: 0;
+  }
+
+  .garment-workflow li {
+    min-height: 0;
+  }
+
+  .quality-checklist article {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .section-cta-row {
+    align-items: stretch;
+    flex-direction: column;
+    text-align: center;
   }
 }

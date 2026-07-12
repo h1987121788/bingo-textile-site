@@ -1,4 +1,17 @@
-# Project Status - 2026-07-04
+# Project Status - 2026-07-12
+
+## Garment-First Production Release
+
+- Release worktree: `/Users/huang/Documents/poly/bingo-textile-garments-local-20260712`
+- Release branch: `codex/garments-local-20260712`, published to `origin/main`.
+- The homepage is now garment-first under the `Bingo Garments` customer-facing name.
+- Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
+- The customer-facing shortlist contains six garment development directions selected from a 20-style internal pool.
+- All current garment images are original AI concepts for product direction, not supplier, factory, sample, or production proof.
+- The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
+- Website forms send the existing CRM webhook payload and open a prepared WhatsApp inquiry.
+- The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
+- AI concepts remain labelled on the public pages. Replace them with approved physical-sample photography as samples become available.
 
 ## Source of Truth
 
@@ -33,9 +46,9 @@ Do not keep in the deployment repository:
 
 ## Configuration Status
 
-`config/marketing-config.js` is a production-fill template. Real GA4, Meta Pixel, Google Apps Script webhook URL, and CRM submit token must stay outside source control.
+`config/marketing-config.js` currently contains the production Google Apps Script webhook URL and browser submit token so the static GitHub Pages form can reach CRM. Both values are publicly readable in the browser and must not be treated as secrets. GA4 and Meta Pixel remain placeholders.
 
-The Apps Script webhook template requires `CRM_WEBHOOK_TOKEN` in Apps Script project properties. The source file must not contain a reusable fallback token. If the previous CRM submit token was ever deployed publicly, rotate it in Apps Script before relying on webhook capture again.
+The Apps Script webhook requires the matching `CRM_WEBHOOK_TOKEN` in Apps Script project properties. The Apps Script source file must not contain a reusable fallback token. Stronger protection requires server-side rate limiting, validation or a challenge mechanism; a browser token alone is not authentication.
 
 Production tracking or CRM capture should be considered active only after these checks pass:
 
@@ -54,7 +67,7 @@ As of `config/automation-control.json` dated 2026-06-23:
 - B2B discovery and review reports: enabled.
 - Real QQ SMTP outreach sending: disabled by default.
 - QQ SMTP test emails: disabled by default.
-- CRM webhook capture: enabled, but source config is templated and requires production values before live capture.
+- CRM webhook capture: enabled with the current public browser configuration and Apps Script property check.
 - Dry runs are allowed only for validation and must not publish posts or send emails.
 
 ## Governance Rules
@@ -62,5 +75,5 @@ As of `config/automation-control.json` dated 2026-06-23:
 - Do not deploy `/Users/huang/Desktop/纺织` directly.
 - Keep deployment source clean and separate from operation output.
 - Keep real outreach data, env files, generated reports, and generated outputs out of Git.
-- Keep source templates free of reusable secrets.
+- Keep server-side credentials and reusable secrets out of browser source. Treat all static-site configuration as public.
 - Commit and deploy only reviewed source changes from a clean `origin/main` worktree.

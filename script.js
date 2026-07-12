@@ -1,4 +1,5 @@
 const body = document.body;
+const isPreviewMode = body?.dataset.previewMode === "true";
 const navToggle = document.querySelector(".nav-toggle");
 const navLinks = document.querySelectorAll(".site-nav a");
 const filterButtons = document.querySelectorAll("[data-filter]");
@@ -269,9 +270,12 @@ const getLeadPayload = (form, fields) => {
     fieldPayload[field.name] = getFieldValue(field);
   });
 
+  const serviceType = String(fieldPayload.service_type || "");
+  const isGarmentLead = /garment|private label/i.test(serviceType);
+
   const payload = {
     submittedAt: new Date().toISOString(),
-    lead_status: "new_inquiry",
+    lead_status: isGarmentLead ? "new_garment_lead" : "new_fabric_lead",
     next_action_at: isoDateAfterDays(1),
     quoted_value: "",
     reply_owner: "Jason Huang",
@@ -289,7 +293,7 @@ const getLeadPayload = (form, fields) => {
 const submitLeadToCrm = (payload) => {
   safeLocalAppend("bingoWebsiteLeadDrafts", payload);
 
-  if (!isConfiguredValue(marketingConfig.crmWebhookUrl)) {
+  if (isPreviewMode || !isConfiguredValue(marketingConfig.crmWebhookUrl)) {
     return;
   }
 
@@ -332,9 +336,13 @@ leadForms.forEach((form) => {
       .map((field) => [getFieldLabel(field), getFieldValue(field)])
       .filter(([, value]) => value.length > 0)
       .map(([label, value]) => `${label}: ${value}`);
-    const subject = form.classList.contains("quote-form")
-      ? "Streetwear fabric sourcing intake from Bingo Textile website"
-      : "Fabric sourcing brief from Bingo Textile website";
+    const serviceType = form.querySelector('[name="service_type"]')?.value || "";
+    const isGarmentLead = /garment|private label/i.test(serviceType);
+    const subject = isGarmentLead
+      ? "Private label garment development brief from Bingo Garments website"
+      : form.classList.contains("quote-form")
+        ? "Streetwear fabric sourcing intake from Bingo Textile website"
+        : "Fabric sourcing brief from Bingo Textile website";
     const leadPayload = getLeadPayload(form, fields);
     const inquiryText = [
       subject,
@@ -355,10 +363,19 @@ leadForms.forEach((form) => {
       garment_type: leadPayload.garment_type || "",
       country: leadPayload.country || "",
       timeline: leadPayload.timeline || "",
+      development_route: leadPayload.development_route || "",
+      destination: leadPayload.destination || "",
       product_interest: leadPayload.productInterest || "",
       source_channel: leadPayload.source_channel || "",
       sample_requested: leadPayload.sample_requested || ""
     });
+
+    if (isPreviewMode) {
+      message.textContent = "Local preview: the test brief was saved in this browser only. Nothing was sent externally.";
+      message.style.color = "#3f8f7c";
+      form.reset();
+      return;
+    }
 
     message.textContent = "Saving your brief and opening WhatsApp. If it does not open, ";
     const fallbackLink = document.createElement("a");

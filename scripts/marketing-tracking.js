@@ -94,7 +94,7 @@
     banner.className = "consent-banner";
     banner.dataset.marketingConsent = "true";
     banner.innerHTML = `
-      <p>We use analytics to understand which fabric sourcing channels bring useful inquiries.</p>
+      <p>We use analytics to understand which garment-development channels bring useful inquiries.</p>
       <div>
         <button type="button" class="button secondary" data-consent-choice="reject">Reject</button>
         <button type="button" class="button primary" data-consent-choice="accept">Accept</button>

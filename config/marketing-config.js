@@ -6,5 +6,5 @@ window.bingoMarketingConfig = {
   requireMarketingConsent: true,
   googleSearchConsoleVerification: "PASTE_SEARCH_CONSOLE_VERIFICATION",
   siteUrl: "https://www.bingofabric.com/",
-  sourceLabel: "Bingo Textile website"
+  sourceLabel: "Bingo Garments website"
 };
