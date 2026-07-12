@@ -46,14 +46,24 @@ const renderGarmentPrice = (product) => {
   `;
 };
 
-const renderGarmentCard = (product, contactTarget) => `
-  <article class="product-card garment-card" data-category="${escapeGarmentHtml(product.category)}">
-    <figure class="product-media garment-media">
+const getGarmentDetailImage = (product) =>
+  `./assets/garments/details/${String(product.code || "").toLowerCase()}-detail.webp`;
+
+const renderGarmentCard = (product, contactTarget) => {
+  const detailImage = getGarmentDetailImage(product);
+
+  return `
+  <article class="product-card garment-card" data-category="${escapeGarmentHtml(product.category)}" data-product-code="${escapeGarmentHtml(product.code)}">
+    <figure class="product-media garment-media" data-garment-media>
       ${product.image
         ? `<img
             class="product-photo garment-photo"
             src="${escapeGarmentHtml(product.image)}"
             alt="Unbranded style reference for ${escapeGarmentHtml(product.name)}"
+            data-primary-src="${escapeGarmentHtml(product.image)}"
+            data-primary-alt="Unbranded style reference for ${escapeGarmentHtml(product.name)}"
+            data-detail-src="${escapeGarmentHtml(detailImage)}"
+            data-detail-alt="English detail board for ${escapeGarmentHtml(product.name)}"
             loading="lazy"
             decoding="async"
           />`
@@ -66,8 +76,12 @@ const renderGarmentCard = (product, contactTarget) => `
             <span class="garment-shape" aria-hidden="true"></span>
             <small>Style reference pending</small>
           </div>`}
+      <div class="garment-image-switch" role="group" aria-label="Image view for ${escapeGarmentHtml(product.name)}">
+        <button class="active" type="button" data-garment-view="product" aria-pressed="true">Product</button>
+        <button type="button" data-garment-view="details" aria-pressed="false">Details</button>
+      </div>
       <figcaption>
-        <span>${escapeGarmentHtml(product.code)} / Style reference</span>
+        <span data-garment-caption>${escapeGarmentHtml(product.code)} / Style reference</span>
         ${escapeGarmentHtml(product.categoryLabel)} / ${escapeGarmentHtml(product.gsm)}
       </figcaption>
     </figure>
@@ -87,13 +101,17 @@ const renderGarmentCard = (product, contactTarget) => `
         <div><dt>Season</dt><dd>${escapeGarmentHtml(product.season)}</dd></div>
       </dl>
       <p class="verification-note">Confirm stock, color, size, quantity and the physical sample before ordering.</p>
-      <a
-        href="${escapeGarmentHtml(contactTarget)}"
-        data-product-interest="${escapeGarmentHtml(`${product.code} ${product.name}`)}"
-      >Ask about this style</a>
+      <div class="garment-card-actions">
+        <a href="${escapeGarmentHtml(detailImage)}" target="_blank" rel="noopener">Open full-size details</a>
+        <a
+          href="${escapeGarmentHtml(contactTarget)}"
+          data-product-interest="${escapeGarmentHtml(`${product.code} ${product.name}`)}"
+        >Ask about this style</a>
+      </div>
     </div>
   </article>
 `;
+};
 
 document.querySelectorAll("[data-garment-grid]").forEach((garmentGrid) => {
   const launchOnly = garmentGrid.dataset.launchOnly === "true";
@@ -118,5 +136,31 @@ document.querySelectorAll("[data-product-interest]").forEach((link) => {
     if (referenceField) {
       referenceField.value = link.dataset.productInterest || "";
     }
+  });
+});
+
+document.querySelectorAll("[data-garment-media]").forEach((media) => {
+  const image = media.querySelector("[data-primary-src]");
+  const caption = media.querySelector("[data-garment-caption]");
+  const buttons = media.querySelectorAll("[data-garment-view]");
+  if (!image) return;
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const showDetails = button.dataset.garmentView === "details";
+      image.src = showDetails ? image.dataset.detailSrc : image.dataset.primarySrc;
+      image.alt = showDetails ? image.dataset.detailAlt : image.dataset.primaryAlt;
+
+      buttons.forEach((item) => {
+        const isActive = item === button;
+        item.classList.toggle("active", isActive);
+        item.setAttribute("aria-pressed", String(isActive));
+      });
+
+      if (caption) {
+        const code = caption.textContent.split("/")[0].trim();
+        caption.textContent = `${code} / ${showDetails ? "English details" : "Style reference"}`;
+      }
+    });
   });
 });

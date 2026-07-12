@@ -9,6 +9,7 @@
 - The customer-facing catalog contains 20 garment styles; the homepage features six of them.
 - All 20 styles have public USD settlement prices calculated at the fixed rate `USD 1 = CNY 6.5`. Source costs and supplier records remain in the operations workspace and are not committed.
 - All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
+- Each catalog style includes an all-English detail board with construction and fabric zooms; no supplier logo, Chinese copy, or supplier style number is published.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
 - Website forms send the existing CRM webhook payload and open a prepared WhatsApp inquiry.
 - The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
