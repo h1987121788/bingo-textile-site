@@ -6,8 +6,9 @@
 - Release branch: `codex/garments-local-20260712`, published to `origin/main`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
-- The customer-facing shortlist contains six garment development directions selected from a 20-style internal pool.
-- All current garment images are original AI concepts for product direction, not supplier, factory, sample, or production proof.
+- The customer-facing catalog contains 20 garment styles; the homepage features six of them.
+- All 20 styles have public CNY base-style prices. Source costs and supplier records remain in the operations workspace and are not committed.
+- All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
 - Website forms send the existing CRM webhook payload and open a prepared WhatsApp inquiry.
 - The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
@@ -18,7 +19,7 @@
 - Production domain: `https://www.bingofabric.com/`
 - Remote repository: `https://github.com/h1987121788/bingo-textile-site.git`
 - Deployment source: `origin/main`
-- Current deployment worktree: `/Users/huang/Documents/poly/bingo-textile-governance-20260704`
+- Current deployment worktree: `/Users/huang/Documents/poly/bingo-textile-garments-local-20260712`
 - Operations workspace: `/Users/huang/Desktop/纺织`
 
 The operations workspace is not a deployment source. It contains local automation state, reports, outputs, `.env.*.local` files, and private outreach data. Deploy only from `origin/main` or a clean worktree created from `origin/main`.
@@ -28,7 +29,7 @@ The operations workspace is not a deployment source. It contains local automatio
 Keep in the deployment repository:
 
 - Website pages, styles, browser scripts, catalog data, favicon, robots file, sitemap, and CNAME.
-- Necessary website assets under `assets/capability/` and `assets/products/`.
+- Necessary website assets under `assets/capability/`, `assets/products/`, and `assets/garments/`.
 - Configuration templates and non-secret operating config.
 - Automation source code under `scripts/`.
 - Example outreach data and sanitized keyword seed files only.

@@ -16,6 +16,22 @@ const escapeGarmentHtml = (value) =>
     return entities[character];
   });
 
+const renderGarmentPrice = (product) => {
+  const price = Number(product.priceCny);
+  if (!Number.isFinite(price)) return "";
+
+  return `
+    <div class="garment-price-block">
+      <span>Wholesale price</span>
+      <p>
+        <strong>CNY ¥${escapeGarmentHtml(price.toLocaleString("en-US"))}</strong>
+        <small>/ ${escapeGarmentHtml(product.unit || "piece")}</small>
+      </p>
+      <em>Customization, freight, duties and taxes are quoted separately.</em>
+    </div>
+  `;
+};
+
 const renderGarmentCard = (product, contactTarget) => `
   <article class="product-card garment-card" data-category="${escapeGarmentHtml(product.category)}">
     <figure class="product-media garment-media">
@@ -23,7 +39,7 @@ const renderGarmentCard = (product, contactTarget) => `
         ? `<img
             class="product-photo garment-photo"
             src="${escapeGarmentHtml(product.image)}"
-            alt="Concept product image for ${escapeGarmentHtml(product.name)}"
+            alt="Unbranded style reference for ${escapeGarmentHtml(product.name)}"
             loading="lazy"
             decoding="async"
           />`
@@ -31,23 +47,24 @@ const renderGarmentCard = (product, contactTarget) => `
             class="garment-placeholder garment-placeholder--${escapeGarmentHtml(product.tone)}"
             data-visual="${escapeGarmentHtml(product.visual)}"
             role="img"
-            aria-label="Concept product image pending for ${escapeGarmentHtml(product.name)}"
+            aria-label="Style reference pending for ${escapeGarmentHtml(product.name)}"
           >
             <span class="garment-shape" aria-hidden="true"></span>
-            <small>Concept image pending</small>
+            <small>Style reference pending</small>
           </div>`}
       <figcaption>
-        <span>${escapeGarmentHtml(product.code)} / Concept visual</span>
+        <span>${escapeGarmentHtml(product.code)} / Style reference</span>
         ${escapeGarmentHtml(product.categoryLabel)} / ${escapeGarmentHtml(product.gsm)}
       </figcaption>
     </figure>
     <div class="card-body">
       <div class="garment-card-heading">
         <p class="tag">${escapeGarmentHtml(product.categoryLabel)}</p>
-        <span class="sample-gate">Sample gate</span>
+        <span class="sample-gate">Sample first</span>
       </div>
       <h3>${escapeGarmentHtml(product.name)}</h3>
       <p>${escapeGarmentHtml(product.description)}</p>
+      ${renderGarmentPrice(product)}
       <dl class="product-specs garment-specs">
         <div><dt>Fabric</dt><dd>${escapeGarmentHtml(product.composition)}</dd></div>
         <div><dt>Weight</dt><dd>${escapeGarmentHtml(product.gsm)}</dd></div>
@@ -55,11 +72,11 @@ const renderGarmentCard = (product, contactTarget) => `
         <div><dt>Sizes</dt><dd>${escapeGarmentHtml(product.sizes)}</dd></div>
         <div><dt>Season</dt><dd>${escapeGarmentHtml(product.season)}</dd></div>
       </dl>
-      <p class="verification-note">Physical sample and order specification required before quotation.</p>
+      <p class="verification-note">Confirm stock, color, size, quantity and the physical sample before ordering.</p>
       <a
         href="${escapeGarmentHtml(contactTarget)}"
         data-product-interest="${escapeGarmentHtml(`${product.code} ${product.name}`)}"
-      >Discuss this style</a>
+      >Ask about this style</a>
     </div>
   </article>
 `;

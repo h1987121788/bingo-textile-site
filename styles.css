@@ -1744,6 +1744,50 @@ body.garment-site .section-heading {
   text-transform: uppercase;
 }
 
+.garment-price-block {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  background: #edf5f0;
+  border: 1px solid #c9dcd1;
+  border-radius: 6px;
+}
+
+.garment-price-block > span {
+  color: var(--teal-dark);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.card-body .garment-price-block p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: baseline;
+  margin: 0;
+  color: var(--ink);
+}
+
+.garment-price-block strong {
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.garment-price-block small {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.garment-price-block em {
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1.4;
+}
+
 .verification-note {
   padding-left: 10px;
   color: #6a5a30 !important;
