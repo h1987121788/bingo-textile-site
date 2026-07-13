@@ -1,4 +1,4 @@
-# Project Status - 2026-07-12
+# Project Status - 2026-07-13
 
 ## Garment-First Production Release
 
@@ -6,8 +6,8 @@
 - Release branch: `codex/garments-local-20260712`, published to `origin/main`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
-- The customer-facing catalog contains 20 garment styles; the homepage features six of them.
-- All 20 styles have public USD settlement prices calculated at the fixed rate `USD 1 = CNY 6.5`. Source costs and supplier records remain in the operations workspace and are not committed.
+- The customer-facing catalog contains 36 garment styles; the homepage features six of them.
+- All 36 styles have public USD settlement prices calculated from source list price plus `CNY 20` at the fixed rate `USD 1 = CNY 6.5`. Source costs and supplier records remain in the operations workspace and are not committed.
 - All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
 - Each catalog style includes an all-English detail board with construction and fabric zooms; no supplier logo, Chinese copy, or supplier style number is published.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
