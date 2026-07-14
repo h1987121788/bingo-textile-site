@@ -388,13 +388,13 @@ const FREE_EMAIL_DOMAINS = new Set([
 const HOSTED_STORE_DOMAINS = new Set(["myshopify.com"]);
 
 const PRODUCT_PATTERNS = [
-  ["heavyweight tees / jersey", /\b(heavyweight|boxy|oversized|tee|t-shirt|t shirt|jersey)\b/i],
-  ["hoodies / sweatshirts / french terry", /\b(hoodie|hooded|sweatshirt|sweatpants|fleece|french terry|terry)\b/i],
-  ["knit polos / rib trims", /\b(polo|rugby|rib|collar|pique)\b/i],
-  ["garment dye / vintage wash", /\b(garment dye|garment-dye|pigment dye|vintage wash|washed)\b/i],
-  ["mesh / sports jersey", /\b(mesh|sports jersey|football jersey|basketball jersey)\b/i],
-  ["stretch jersey / fitted tops", /\b(stretch|spandex|elastane|fitted|compression)\b/i],
-  ["interlock / double knit", /\b(interlock|double knit|scuba|spacer)\b/i],
+  ["heavyweight / boxy T-shirts", /\b(heavyweight|boxy|oversized|tee|t-shirt|t shirt|jersey)\b/i],
+  ["hoodies / sweatshirts / sweatpants", /\b(hoodie|hooded|sweatshirt|sweatpants|fleece|french terry|terry)\b/i],
+  ["knit polos / rugby shirts", /\b(polo|rugby|rib|collar|pique)\b/i],
+  ["garment-dyed / vintage-wash styles", /\b(garment dye|garment-dye|pigment dye|vintage wash|washed)\b/i],
+  ["mesh / sports tops", /\b(mesh|sports jersey|football jersey|basketball jersey)\b/i],
+  ["stretch / fitted tops", /\b(stretch|spandex|elastane|fitted|compression)\b/i],
+  ["structured knit garments", /\b(interlock|double knit|scuba|spacer)\b/i],
 ];
 
 function usage() {
@@ -1639,7 +1639,7 @@ function buildWhyFit(candidate, scoring) {
       : "",
     scoring.breakdown.sourcingNeed.note,
   ].filter(Boolean);
-  return `Matches Bingo Textile outreach because of ${notes.join(", ")}.`;
+  return `Matches Bingo garment-development outreach because of ${notes.join(", ")}.`;
 }
 
 function contactQualityFor(candidate, sourceText) {
@@ -1682,18 +1682,18 @@ function buildEmailDraft(candidate, env) {
   const brand = candidate.brandName || "your brand";
   const recipientName = firstName(candidate.contactName);
   const salutation = recipientName || `${brand} team`;
-  const product = candidate.productType || "knit tops and streetwear basics";
+  const product = candidate.productType || "streetwear tees and hoodies";
   const signal = emailSignalPhrase(candidate);
   const sentenceSignal = sentenceCase(signal);
   const variant = candidateVariantIndex(candidate, 4);
   const shortProduct = shortProductName(product);
-  const valuePoint = fabricValuePoint(product, candidate);
+  const valuePoint = garmentDevelopmentValuePoint(product, candidate);
 
   const subject = [
-    `Quick fabric note for ${brand}`,
-    `A fabric thought for ${brand}`,
-    `${shortProduct[0].toUpperCase()}${shortProduct.slice(1)} fabric idea`,
-    `For your next ${shortProduct}`,
+    `Private-label garment note for ${brand}`,
+    `A garment development thought for ${brand}`,
+    `${shortProduct[0].toUpperCase()}${shortProduct.slice(1)} development idea`,
+    `A question about your next ${shortProduct}`,
   ][variant];
   const opener = [
     `I came across ${brand} while looking at ${signal}.`,
@@ -1709,7 +1709,7 @@ ${valuePoint}
 
 ${companyIntroParagraph(contact, candidate)}
 
-${attachmentParagraph(candidate)}
+${catalogReferenceParagraph(contact, candidate, env)}
 
 ${whatsappCtaParagraph(candidate)}
 
@@ -1720,6 +1720,7 @@ ${optOutParagraph(candidate)}`;
 
 function formatOutreachEmailBody(rawBody, candidate, env) {
   const contact = loadConfirmedContactInfo();
+  const attachmentAvailable = hasProductIntroAttachment(contact, env);
   const bodyWithoutFooter = stripExistingEmailFooter(String(rawBody || ""));
   let paragraphs = normalizeEmailParagraphs(bodyWithoutFooter);
 
@@ -1730,13 +1731,16 @@ function formatOutreachEmailBody(rawBody, candidate, env) {
   }
 
   paragraphs = ensureShortCompanyIntro(paragraphs, contact);
-  paragraphs = humanizeBoilerplateParagraphs(paragraphs, candidate);
+  paragraphs = humanizeBoilerplateParagraphs(paragraphs, candidate, env);
 
   const joined = paragraphs.join("\n\n");
-  if (!/\battached\b|\bproduct intro\b/i.test(joined)) {
+  if (attachmentAvailable && !/\battached\b|\bproduct intro\b/i.test(joined)) {
     paragraphs.push(attachmentParagraph(candidate));
   }
-  if (!/\bWhatsApp\b.*\b(reference photo|garment link|tech pack|fabric direction)\b/i.test(joined)) {
+  if (!attachmentAvailable && !/\bgarments\.html\b|\bcurrent garment catalog\b/i.test(joined)) {
+    paragraphs.push(catalogReferenceParagraph(contact, candidate, env));
+  }
+  if (!/\bWhatsApp\b.*\b(reference photo|garment link|tech pack|development brief|sample brief)\b/i.test(joined)) {
     paragraphs.push(whatsappCtaParagraph(candidate));
   }
   if (!/\breply\s+[\"“]no[\"”]|\bnot relevant\b/i.test(joined)) {
@@ -1799,10 +1803,11 @@ function ensureShortCompanyIntro(paragraphs, contact) {
   return [...filtered.slice(0, insertAt), intro, ...filtered.slice(insertAt)];
 }
 
-function humanizeBoilerplateParagraphs(paragraphs, candidate) {
+function humanizeBoilerplateParagraphs(paragraphs, candidate, env) {
+  const contact = loadConfirmedContactInfo();
   return paragraphs.map((paragraph) => {
-    if (/^I attached a one-page Bingo Textile product intro for a quick look\.?$/i.test(paragraph)) {
-      return attachmentParagraph(candidate);
+    if (/\b(one-page|short).*\b(product intro|product introduction)\b|\bproduct intro attached\b/i.test(paragraph)) {
+      return catalogReferenceParagraph(contact, candidate, env);
     }
     if (/^If you are working on a new sample, send me a reference photo, garment link or tech pack on WhatsApp\. I can first suggest a fabric direction\.?$/i.test(paragraph)) {
       return whatsappCtaParagraph(candidate);
@@ -1817,7 +1822,7 @@ function humanizeBoilerplateParagraphs(paragraphs, candidate) {
 function isCompanyIntroParagraph(paragraph, contact) {
   const text = String(paragraph || "");
   if (!new RegExp(`\\b${escapeRegExp(contact.company)}\\b`, "i").test(text)) return false;
-  return /\b(helps apparel brands|knit fabric supplier|compare knit fabrics|source and develop|arrange swatches|fabric options|supply knit fabrics|work with knit fabrics|match reference fabric|fabric development)\b/i.test(text);
+  return /\b(private-label garment|garment briefs|garment development|helps apparel brands|knit fabric supplier|compare knit fabrics|source and develop|arrange swatches|fabric options|supply knit fabrics|work with knit fabrics|match reference fabric|fabric development)\b/i.test(text);
 }
 
 function escapeRegExp(value) {
@@ -1847,25 +1852,42 @@ function sentenceCase(value) {
 
 function companyIntroParagraph(contact, candidate = {}) {
   return [
-    `I am Jason from ${contact.company} in Guangzhou. We work with knit fabrics like jersey, French terry, fleece, rib and stretch knits, and we can help match reference fabric before sampling.`,
-    `${contact.company} is my fabric office in Guangzhou. We help apparel teams source and develop jersey, French terry, fleece, rib and stretch knits, then arrange swatches for sampling.`,
-    `I run fabric development for ${contact.company} in Guangzhou. Most of our work is knit fabrics: jersey, French terry, fleece, rib and stretch knits for tees, hoodies and activewear.`,
+    `I am Jason from ${contact.company} in Guangzhou. We help independent brands organize private-label garment briefs for tees, hoodies and coordinated knit styles, with material sourcing handled as part of development.`,
+    `${contact.company} supports streetwear teams with private-label garment development in Guangzhou, starting from a reference image or tech pack and a clear sample brief.`,
+    `I coordinate garment development at ${contact.company} in Guangzhou, mainly for knit streetwear styles such as tees, hoodies, sweatpants and related sets.`,
   ][candidateVariantIndex(candidate, 3)];
 }
 
 function attachmentParagraph(candidate) {
   return [
-    "I attached a one-page product intro so you can quickly see the fabric range.",
-    "I also attached a short one-page intro for Bingo Textile, just for context.",
-    "There is a one-page product intro attached if you want to check what we usually supply.",
+    "I attached the configured one-page product introduction for context.",
+    "There is a short product introduction attached if you want a quick overview.",
+    "I included the configured product overview as an attachment for reference.",
   ][candidateVariantIndex(candidate, 3)];
+}
+
+function hasProductIntroAttachment(contact, env) {
+  if (boolEnv(env.OUTREACH_DISABLE_PRODUCT_INTRO_ATTACHMENT)) return false;
+  const configured = contact.productIntroAttachment || {};
+  const rawPath = env.OUTREACH_PRODUCT_INTRO_ATTACHMENT || configured.path || "";
+  if (!String(rawPath).trim()) return false;
+  return fs.existsSync(path.resolve(__dirname, "..", String(rawPath)));
+}
+
+function catalogReferenceParagraph(contact, candidate, env) {
+  if (hasProductIntroAttachment(contact, env)) {
+    return attachmentParagraph(candidate);
+  }
+
+  const catalogUrl = new URL("garments.html", contact.website).href;
+  return `Our current garment catalog is at ${catalogUrl}. The images are style references, so we confirm the physical sample, specification and order terms before any bulk commitment.`;
 }
 
 function whatsappCtaParagraph(candidate) {
   return [
-    "If you have a sample you are trying to match, send me a photo or garment link on WhatsApp. I can first tell you whether we have a close fabric direction.",
-    "If WhatsApp is easier, send me a reference photo, garment link or tech pack there. I can suggest a starting fabric before you spend time on a full sample.",
-    "If you are planning a new sample, you can send the reference on WhatsApp. I will check the fabric direction first and tell you what is realistic.",
+    "If you have a style in development, send me the reference photo or garment link on WhatsApp. I can review the brief and list the missing inputs before sampling.",
+    "If WhatsApp is easier, send the reference photo, garment link or tech pack there. I can first turn it into a clear garment development brief.",
+    "If you are planning a new sample, send the reference on WhatsApp. I can check the sample brief before we discuss specifications or price.",
   ][candidateVariantIndex(candidate, 3)];
 }
 
@@ -1873,7 +1895,7 @@ function optOutParagraph(candidate) {
   return [
     'If this is not relevant, reply "no" and I will not contact you again.',
     'If this is not the right contact, just reply "no" and I will leave it there.',
-    'If fabric sourcing is not relevant right now, reply "no" and I will not follow up.',
+    'If garment development is not relevant right now, reply "no" and I will not follow up.',
   ][candidateVariantIndex(candidate, 3)];
 }
 
@@ -1896,56 +1918,56 @@ function buildEmailContactFooter(contact, env) {
   return lines.join("\n");
 }
 
-function fabricValuePoint(product, candidate = {}) {
+function garmentDevelopmentValuePoint(product, candidate = {}) {
   const text = String(product || "");
   if (/hoodie|sweat|terry|fleece/i.test(text)) {
     return [
-      "On hoodie and sweat fabrics, I would check loop density, brushing, shrinkage and rib recovery before locking the sample.",
-      "For hoodies, the part I usually look at first is not just GSM, but how the fleece or terry behaves after washing.",
-      "If you are developing hoodies or sweats, rib recovery and shrinkage can make a bigger difference than the spec sheet suggests.",
-      "For fleece and French terry, a small change in brushing or loop structure can change the final hand feel quite a lot.",
+      "For a hoodie sample, I would lock the fit, hood shape, rib recovery and wash result before comparing bulk prices.",
+      "For hoodies, a clear sample brief should cover silhouette, fabric hand feel, shrinkage and decoration placement, not only GSM.",
+      "If you are developing hoodies or sweats, rib recovery and post-wash measurements are worth agreeing before bulk approval.",
+      "For a hoodie program, the base garment, wash and decoration need to be reviewed together because each can change the final fit.",
     ][candidateVariantIndex(candidate, 4)];
   }
   if (/tee|jersey|t-shirt|heavyweight/i.test(text)) {
     return [
-      "For heavyweight tees, structure and finishing usually matter more than just chasing the highest GSM.",
-      "With tees, I would normally check hand feel, shrinkage and collar/rib balance before moving into a sample.",
-      "If you are working on tees, the right jersey can feel substantial without making the garment stiff.",
-      "For graphic tees, fabric surface and washing stability are worth checking early, especially before printing.",
+      "For a heavyweight tee, fit block, neck rib, hand feel and post-wash measurements should be confirmed before bulk pricing.",
+      "With tees, I would define the silhouette and collar balance first, then confirm fabric and decoration on a physical sample.",
+      "For an oversized tee, shoulder position, body width and fabric structure need to work together; GSM alone does not define the result.",
+      "For graphic tees, print method, surface feel and wash stability are worth checking on the same approval sample.",
     ][candidateVariantIndex(candidate, 4)];
   }
   if (/polo|rugby|rib|pique/i.test(text)) {
     return [
-      "For polos and rugby shirts, I would pay close attention to collar rib stability and body fabric weight before sampling.",
-      "On polo programs, the collar/rib can make the garment look sharp or cheap, even when the body fabric is good.",
-      "For pique and rugby fabrics, shrinkage and collar recovery are the first things I would test.",
+      "For polos and rugby shirts, collar shape, placket construction and body measurements should be part of the first sample review.",
+      "On a polo program, collar recovery and body balance matter as much as the selected material.",
+      "For a rugby or polo sample, I would check shrinkage, collar recovery and seam construction together.",
     ][candidateVariantIndex(candidate, 3)];
   }
   if (/garment|dye|washed|vintage/i.test(text)) {
     return [
-      "For garment-dye or washed programs, I would test shrinkage and surface stability before the calendar gets tight.",
-      "If the direction is washed or vintage, the base fabric needs to survive the process without losing the shape you want.",
-      "For garment wash styles, the fabric decision has to happen early because shrinkage can move the whole fit.",
+      "For garment-dye or washed styles, the base size, wash recipe and post-wash measurements need one approval standard.",
+      "If the direction is washed or vintage, the physical sample should confirm both the surface result and the final silhouette.",
+      "For garment-wash styles, shrinkage can move the whole fit, so the measurement review belongs after the intended wash.",
     ][candidateVariantIndex(candidate, 3)];
   }
   if (/mesh|sports/i.test(text)) {
     return [
-      "For mesh or sports jersey tops, hole size, recovery and hand feel can change the finished garment more than expected.",
-      "On sports jersey fabrics, I would check recovery and surface feel first, not only the weight.",
-      "For mesh tops, the balance between breathability and structure is usually where the sample succeeds or fails.",
+      "For mesh or sports tops, the sample brief should define fit, opacity, recovery and decoration compatibility.",
+      "On a sports jersey style, I would check movement, recovery and surface feel on-body, not only the material weight.",
+      "For mesh tops, breathability and structure need to be reviewed in the finished silhouette.",
     ][candidateVariantIndex(candidate, 3)];
   }
   if (/stretch|spandex|elastane|fitted/i.test(text)) {
     return [
-      "For stretch jersey, recovery after washing matters as much as the spandex percentage.",
-      "On fitted or stretch pieces, I would test recovery and torque early so the sample does not twist after washing.",
-      "For stretch knits, the fabric has to feel soft but still come back well after wear and washing.",
+      "For a fitted stretch style, recovery, torque and post-wash measurements should be checked on the finished sample.",
+      "On fitted pieces, the size spec and material recovery need to be reviewed together so the fit remains consistent.",
+      "For stretch garments, comfort and recovery both need physical sample approval before bulk.",
     ][candidateVariantIndex(candidate, 3)];
   }
   return [
-    "One thing I would check early is whether the fabric structure, hand feel and finishing really match the fit you want.",
-    "For a new knit style, it helps to choose the fabric direction before spending time on a full garment sample.",
-    "The main fabric choice can quietly decide the final fit, hand feel and wash result, so I like to check that early.",
+    "For a new garment style, I would define the target fit, material, decoration and approval standard before asking for a bulk quote.",
+    "A clear first sample brief usually saves more time than comparing prices before the fit and construction are fixed.",
+    "The reference image is a useful start, but measurements, material and decoration still need to be confirmed on a physical sample.",
   ][candidateVariantIndex(candidate, 3)];
 }
 
@@ -2025,8 +2047,8 @@ async function runSmtpTest(to, args, env) {
   const whatsapp = contact.whatsappUrl;
   const wechat = contact.wechat;
   const phone = contact.phoneDisplay;
-  const subject = "SMTP test from Bingo Textile outreach";
-  const text = `This is a one-email SMTP test from the Bingo Textile outreach script.
+  const subject = "SMTP test from Bingo garment outreach";
+  const text = `This is a one-email SMTP test from the Bingo garment outreach script.
 
 If you received this email, QQ SMTP sending is working.
 

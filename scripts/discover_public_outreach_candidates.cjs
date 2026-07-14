@@ -716,7 +716,7 @@ async function candidateFromSeed(seed, args) {
       checkedPages: checkedPages.join("; "),
       emailSource: emailInfo.source,
       score,
-      whyFit: `Matches Bingo Textile because ${country} brand has ${productType}, ${recentSignal}, and a verified public contact email on the official website.`,
+      whyFit: `Matches Bingo garment-development outreach because ${country} brand has ${productType}, ${recentSignal}, and a verified public contact email on the official website.`,
       searchQuery: seed.query,
       notes: cleanText([seed.snippet, snippetAround(pageEvidenceText, emailInfo.email)].join(" ")).slice(0, 500),
       approvalStatus: "approved",

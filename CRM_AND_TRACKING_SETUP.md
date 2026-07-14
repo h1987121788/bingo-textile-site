@@ -74,7 +74,7 @@ Manual setup:
 2. Open Extensions -> Apps Script.
 3. Paste the contents of `scripts/google_apps_script_lead_webhook.gs`.
 4. Open Project Settings -> Script properties.
-5. Add `CRM_WEBHOOK_TOKEN` with a long random value. Do not commit this value to Git.
+5. Add `CRM_WEBHOOK_TOKEN` with a random value. Do not commit the production value to Git.
 6. Deploy -> New deployment -> Web app.
 7. Execute as: Me.
 8. Who has access: Anyone.
@@ -89,11 +89,22 @@ crmWebhookUrl: "PASTE_WEB_APP_URL"
 crmSubmitToken: "SAME_TOKEN_AS_APPS_SCRIPT"
 ```
 
-`scripts/google_apps_script_lead_webhook.gs` checks `crmSubmitToken` before appending to the Sheet. Keep the token in `config/marketing-config.js` and the Apps Script `CRM_WEBHOOK_TOKEN` script property aligned.
+`scripts/google_apps_script_lead_webhook.gs` checks `crmSubmitToken` before appending to the Sheet. Keep the value in the deployed site configuration and the Apps Script `CRM_WEBHOOK_TOKEN` script property aligned. Because a static website must send this value from the browser, it is an abuse filter, not a private server-to-server secret. Rotate it if it is copied or abused.
 
 When a visitor submits a valid form, the site sends the lead payload to the webhook and still opens WhatsApp.
 
-If the webhook is not configured, the site stores recent lead payloads in browser localStorage as a temporary fallback only.
+In local preview, or when the webhook is not configured, the site stores at most five recent lead drafts in browser localStorage. The CRM token is removed from those drafts. A configured production site does not keep CRM lead copies in browser localStorage.
+
+The current form and Apps Script also apply basic anti-spam controls:
+
+- A visually hidden honeypot field on every lead form.
+- A minimum form completion time checked by both browser and webhook.
+- Server-side required field, email, phone digit, payload size, and field length checks.
+- Five accepted attempts per identity per ten minutes through Apps Script CacheService.
+- Apps Script LockService around rate checking and row creation.
+- Spreadsheet formula-injection escaping for values beginning with `=`, `+`, `-`, or `@`.
+
+These controls reduce basic automated abuse; they do not replace a server-held secret, CAPTCHA, WAF, or consent/legal review.
 
 ### Sales Pipeline Fields
 
@@ -107,6 +118,10 @@ The Apps Script keeps the existing lead columns and adds CRM pipeline fields whe
 - `utm_campaign`: campaign value from the landing URL.
 - `reply_owner`: default `Jason Huang`.
 - `reference_links`: Google Drive, Instagram post, Dropbox, product URL, or tech pack link supplied by the buyer.
+- `email`: optional business email.
+- `service_type` and `page_topic`: distinguish garment and fabric landing-page leads.
+- `development_route`, `size_range`, `decoration`, `target_cost`, `destination`, and `delivery_date`: garment brief details when supplied.
+- `submittedAt` and `form_started_at`: submission timing used by the anti-spam check.
 
 Recommended status flow:
 
@@ -120,6 +135,10 @@ Use `next_action_at` as the daily follow-up queue. A row should not stay in `new
 ### Reference Image / Tech Pack Links
 
 Static hosting does not store uploaded files. The website form now accepts a link field for buyer-supplied references, including Google Drive, Dropbox, Instagram posts, product pages, or tech packs. Keep file permissions viewable before quoting.
+
+### Apps Script Deployment Boundary
+
+Updating GitHub Pages does not update the deployed Google Apps Script Web App. After changing `scripts/google_apps_script_lead_webhook.gs`, paste or sync that file into the existing Apps Script project, create a new Web App deployment version, and keep the same production URL in the site configuration. Until that manual deployment is complete, the live Sheet will continue using the previous validation and column logic.
 
 ### Weekly Conversion Report
 
@@ -158,7 +177,7 @@ After deployment:
 3. Submit a test sourcing brief.
 4. Confirm WhatsApp opens with a prefilled message.
 5. Confirm the lead row appears in Google Sheets.
-6. Confirm the Sheet row includes `lead_status`, `next_action_at`, `source_channel`, `sample_requested`, and `reference_links`.
+6. Confirm the Sheet row includes `lead_status`, `next_action_at`, `source_channel`, `sample_requested`, `reference_links`, `email`, `service_type`, and `form_started_at`.
 7. Confirm GA4 Realtime shows activity.
 8. Confirm Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
 9. Confirm Search Console verifies the site and the sitemap is submitted.

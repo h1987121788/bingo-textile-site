@@ -1,8 +1,8 @@
 # Social Media Acquisition Automation
 
-This document defines the operating version for social acquisition content for Bingo Textile.
+This document defines the guarded social-content workflow for Bingo Garments / Bingo Textile.
 
-Status as of 2026-06-28: Facebook Page publishing is enabled by operator request. Instagram and X publishing remain disabled. Every publishing run must still pass `config/automation-control.json`, contact validation, media license, and caption gates.
+Status as of 2026-07-14: Facebook, Instagram, and X publishing are all paused by the operator's latest instruction. Drafting and dry-run validation are allowed; no channel may publish until the operator explicitly re-enables it in a reviewed change.
 
 Runtime guard:
 
@@ -12,19 +12,19 @@ Runtime guard:
 
 ## Objective
 
-Drive qualified streetwear brand prospects to the Bingo Textile website and WhatsApp Business.
+Prepare accurate garment-first content that can drive qualified streetwear brand prospects to the website and WhatsApp Business after manual approval.
 
 Positioning:
 
-> China knit fabric sourcing for streetwear brands that cannot visit China. Send a reference photo, tech pack, or fabric brief. We help match, source, sample, and quote knit fabrics.
+> Private-label streetwear sourcing and development coordination from Guangzhou. Send a garment reference, tech pack, quantity and target market so feasibility and a sample route can be checked before quotation.
 
 Primary CTA:
 
-> Send a reference photo, fabric spec, or tech pack using the clean WhatsApp link in `config/social-contact.json`.
+> Send a garment reference, tech pack or product link using the clean WhatsApp link in `config/social-contact.json`.
 
 Secondary CTA:
 
-> View fabric options: https://www.bingofabric.com/
+> View garment style references: https://www.bingofabric.com/garments.html
 
 ## Contact Information Gate
 
@@ -78,9 +78,9 @@ Excluded:
 
 Do not publicly say that some regions are excluded. Filter by targeting, lead score, and manual qualification.
 
-## Daily Posting Schedule
+## Dormant Timing Reference
 
-Use Asia/Shanghai as the control timezone.
+No daily publishing job is active. The times below are planning references only if the operator later re-enables a channel through a reviewed configuration change. Use Asia/Shanghai as the control timezone.
 
 - APAC post: 08:30 China time
   - Japan/Korea: 09:30
@@ -93,15 +93,12 @@ Use Asia/Shanghai as the control timezone.
   - New York summer: 09:00
   - Los Angeles summer: 06:00
 
-Frequency:
+Possible future cadence after explicit reactivation:
 
-- 2 publishing runs per day
-- Each run publishes to Facebook Page only
-- Each run must publish one Facebook photo post with one new topic-matched image
-- Text-only Facebook posts are not allowed for the daily automation
-- Each run should produce a completion report
-- Published post copy should be in English
-- Operator feedback reports should be in Chinese
+- Prepare up to 2 reviewed drafts per day, one for APAC and one for Europe/North America.
+- Publishing remains a separate approved action; generating a draft never authorizes posting.
+- A future post should use one new topic-matched image and produce a completion report.
+- Public copy should be in English; operator feedback reports should be in Chinese.
 
 ## Platform Publishing Path
 
@@ -219,7 +216,7 @@ Disallowed:
 
 Working rule:
 
-Use the internet for topic discovery, then write an original post from the buyer's point of view. Every post should be about fabric choice, product development, sampling, or sourcing risk.
+Use the internet for topic discovery, then write an original post from the buyer's point of view. Every draft should be about garment development, sample approval, private-label ordering, material choice, or sourcing risk.
 
 Fashion and brand references are allowed only as trend context:
 
@@ -227,68 +224,68 @@ Fashion and brand references are allowed only as trend context:
 - You may mention brand names only as market examples, such as "rugby shirts seen across streetwear drops" or "workwear-inspired fleece and jersey layers".
 - Do not imply Bingo Textile supplies, works with, is endorsed by, or can reproduce any named brand.
 - Do not say "same as Supreme/Stussy/Aime Leon Dore/Fear of God" or similar copycat wording.
-- Translate every brand reference into a fabric development angle: structure, GSM, rib, terry loop, interlock, pique, stretch recovery, wash effect, or trim matching.
+- Translate every brand reference into a garment-development angle: silhouette, measurement, construction, wash, decoration, material structure, rib recovery, or trim matching.
 - Record source URL, garment type, visible fabric cues, image/license status, and why it supports the post topic in the report.
 
 ## Approved Content Themes
 
 Rotate these themes:
 
-1. Fabric education
-   - Plain jersey vs double yarn jersey
-   - Brushed vs unbrushed french terry
-   - Why rib collars wave after washing
-   - How GSM changes hoodie structure
+1. Garment development
+   - How to brief an oversized tee fit
+   - What a hoodie sample should prove before bulk
+   - Why wash approval must include post-wash measurements
+   - How decoration placement changes sample approval
 
 2. Buyer checklist
    - What to send before asking for a quote
-   - How to brief a mill when you cannot visit China
-   - How to request swatches for a streetwear drop
+   - How to brief garment development when you cannot visit China
+   - How to organize reference images, size specs and quantity by color
 
-3. Product application
-   - Boxy tee fabric choices
-   - Heavyweight hoodie fabric choices
-   - Vintage wash and garment dye fabric risks
-   - Stretch jersey recovery for fitted tops
+3. Product and sample application
+   - Boxy tee fit, collar and material balance
+   - Heavyweight hoodie silhouette and wash checks
+   - Vintage wash and garment dye sample risks
+   - Stretch top recovery and size-spec checks
 
-4. New fabric drop
-   - Current fabric option
-   - Specs
-   - Suitable garments
-   - Sample availability
+4. New garment direction
+   - Current catalog style reference
+   - Known and still-unverified fields
+   - Intended fit or product use
+   - Physical-sample requirement
    - CTA to WhatsApp
 
-5. Sourcing service
-   - Send a reference fabric photo
-   - We match structure, GSM, hand feel, composition, and price target
+5. Development coordination
+   - Send a garment photo, link or tech pack
+   - Convert the reference into a fit, material, decoration and quantity brief
    - Suitable for brands that cannot visit China
 
 6. Fashion / streetwear trend bridge
-   - Connect public fashion and streetwear trends to fabric choices
+   - Connect public fashion and streetwear trends to garment-development decisions
    - Examples: rugby shirts, knit polos, heavyweight boxy tees, cropped hoodies, vintage-wash sweats, mesh jerseys, workwear fleece, fitted stretch tops
    - Reference brands, retailers, or fashion publications only as trend context
-   - Explain what fabric detail a buyer should check before sampling
-   - CTA: send a reference photo, garment link, or tech pack for fabric matching
+   - Explain what fit, construction, wash or material detail a buyer should check before sampling
+   - CTA: send a reference photo, garment link, or tech pack for a development brief
 
 Suggested content mix:
 
-- 50% fabric education and buyer checklist
+- 40% garment development and buyer checklist
 - 25% fashion / streetwear trend bridge
-- 15% product application
-- 10% new fabric drop or sourcing service
+- 20% product and sample application
+- 15% material education or sourcing support
 
 ## Content Quality Standard
 
-Every auto-published post must pass the quality gate below. If the post does not pass, do not publish it automatically; save a report and request operator review.
+Every draft prepared for future review must pass the quality gate below. A passing score does not authorize publication; the channel controls must also be explicitly re-enabled by the operator.
 
 Minimum score: 80 / 100.
 
 Core content rule:
 
-- Every post must be about a fabric selection problem, sampling risk, or buyer decision.
+- Every draft must be about a garment-development problem, sampling risk, material decision, or buyer decision.
 - Do not publish product-picture-only posts.
 - The image supports the fabric topic; it is not the topic by itself.
-- The hook should name the decision or risk first, such as shrinkage, GSM, recovery, opacity, pilling, drape, rib stability, loop density, surface snagging, or print support.
+- The hook should name the decision or risk first, such as fit, measurements, shrinkage, wash result, collar balance, decoration placement, GSM, recovery, or sample approval.
 - The final copy must include the clean website and WhatsApp lines from `config/social-contact.json`.
 - Use only 2-3 focused hashtags.
 
@@ -298,9 +295,9 @@ Scoring:
   - Speaks to apparel brands, product developers, founders, sourcing managers, or creative directors
   - Names a real development problem such as shrinkage, GSM choice, hand feel, rib recovery, sample matching, MOQ, or quotation clarity
   - Avoids generic textile slogans
-- Fabric insight: 20 points
-  - Gives one useful fabric decision rule
-  - Connects trend language to actual knit fabric development
+- Development insight: 20 points
+  - Gives one useful garment, sample, or material decision rule
+  - Connects trend language to an actual development checkpoint
   - Avoids unsupported technical claims
 - Click intent: 20 points
   - Uses one clear CTA
@@ -324,8 +321,8 @@ Reject automatically if any of these appear:
 - Claims such as "best", "guaranteed", "certified", or exact performance numbers without source proof
 - Automated like/follow/comment/DM language
 - Too many hashtags or repeated CTA links
-- Content about finished garments only, without fabric sourcing relevance
-- Product photo or product display copy without a fabric selection problem
+- Product photo or display copy without a garment-development, sample, or material decision
+- Catalog imagery presented as a physical sample, verified stock, factory proof, or completed production
 - Brand names used as endorsement, customer proof, or copycat language
 
 ## CTR-Oriented Post Structure
@@ -546,7 +543,9 @@ Recommended fields in the completion report:
 - Next suggested action
 - Next content test idea
 
-## Automation Flow
+## Future Automation Flow
+
+This flow is documentation only while publishing controls are off. Reaching step 7 in a dry run does not authorize step 8.
 
 1. Fetch sources
    - Use approved RSS/news/search sources
@@ -591,6 +590,7 @@ Recommended fields in the completion report:
    - If token, permission, account, quota, DNS, or media URL checks fail, skip publishing and save a Chinese report
 
 8. Publish
+   - Proceed only after a new explicit operator instruction and reviewed channel-control change
    - Use official platform API
    - Use `scripts/facebook_publish.js` for Facebook Page
    - Pass `--media-source-url`, `--license-status`, and `--relevance-note`
@@ -657,14 +657,14 @@ If this check fails, do not publish. Regenerate a short-lived User token and run
 
 X credentials may remain in a local secret file for future use, but they are not required and should not be loaded by the current publishing job.
 
-## Active Implementation
+## Paused Implementation
 
-Run in auto-publishing mode for Facebook Page only:
+No automatic publishing schedule is active. The former Facebook schedule is retained below only as a planning reference and must not be installed or run while the total-control switches are off:
 
-- Current status: active after `config/social-contact.json` confirmation. Contact validation remains a hard gate.
-- APAC slot publishes once per day at 08:30 China time, targeting Japan, South Korea, Singapore, Australia, and New Zealand.
-- EU/US slot publishes once per day at 21:00 China time.
-- Each run publishes one English photo post to Facebook Page.
+- Former APAC planning slot: 08:30 China time for Japan, South Korea, Singapore, Australia, and New Zealand.
+- Former EU/US planning slot: 21:00 China time.
+- Any future run requires a new explicit operator instruction, reviewed content and a reviewed `config/automation-control.json` change.
+- A permitted dry run may validate one English photo-post draft but must not call a publishing endpoint.
 - Each run must use one new relevant image and must not reuse media listed in `data/social_media_history.jsonl`.
 - Each run records the exact text, source links, media URL, image source/license/relevance, platform IDs/URLs, API status, errors, and next action in `reports/`.
 - Successful publishes append the media URL and post ID to `data/social_media_history.jsonl`.

@@ -7,6 +7,7 @@ const productGrid = document.querySelector("[data-product-grid]");
 const leadForms = document.querySelectorAll("[data-lead-form]");
 const salesWhatsApp = "8613827719946";
 const salesEmail = "57317996@qq.com";
+const minimumFormFillMs = 1800;
 const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 const catalogProducts = Array.isArray(window.bingoProductCatalog) ? window.bingoProductCatalog : [];
 const marketingConfig = window.bingoMarketingConfig || {};
@@ -272,9 +273,12 @@ const getLeadPayload = (form, fields) => {
 
   const serviceType = String(fieldPayload.service_type || "");
   const isGarmentLead = /garment|private label/i.test(serviceType);
+  const startedAt = new Date(Number(form.dataset.startedAt || 0));
+  const formStartedAt = Number.isNaN(startedAt.getTime()) ? "" : startedAt.toISOString();
 
   const payload = {
     submittedAt: new Date().toISOString(),
+    form_started_at: formStartedAt,
     lead_status: isGarmentLead ? "new_garment_lead" : "new_fabric_lead",
     next_action_at: isoDateAfterDays(1),
     quoted_value: "",
@@ -291,9 +295,11 @@ const getLeadPayload = (form, fields) => {
 };
 
 const submitLeadToCrm = (payload) => {
-  safeLocalAppend("bingoWebsiteLeadDrafts", payload);
+  const localPayload = { ...payload };
+  delete localPayload.crmSubmitToken;
 
   if (isPreviewMode || !isConfiguredValue(marketingConfig.crmWebhookUrl)) {
+    safeLocalAppend("bingoWebsiteLeadDrafts", localPayload, 5);
     return;
   }
 
@@ -312,21 +318,41 @@ const submitLeadToCrm = (payload) => {
     },
     body
   }).catch(() => {
-    // The local fallback above preserves the payload for manual inspection.
+    // WhatsApp remains the visible fallback if the background CRM request fails.
   });
 };
 
 leadForms.forEach((form) => {
+  form.dataset.startedAt = String(Date.now());
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const message = form.querySelector("[data-form-message]");
-    const fields = [...form.querySelectorAll("input[name], select[name], textarea[name]")];
+    const honeypot = form.querySelector('[name="fax_number"]');
+
+    if (honeypot?.value.trim()) {
+      message.textContent = "The form could not be submitted. Please refresh the page and try again.";
+      message.style.color = "#b66a7d";
+      form.reset();
+      form.dataset.startedAt = String(Date.now());
+      return;
+    }
+
+    const elapsedMs = Date.now() - Number(form.dataset.startedAt || 0);
+    if (!Number.isFinite(elapsedMs) || elapsedMs < minimumFormFillMs) {
+      message.textContent = "Please review your details, then submit the form again.";
+      message.style.color = "#b66a7d";
+      return;
+    }
+
+    const fields = [...form.querySelectorAll("input[name], select[name], textarea[name]")]
+      .filter((field) => field.name !== "fax_number");
     const requiredFields = fields.filter((field) => field.required);
     const isComplete = requiredFields.every((field) => getFieldValue(field).length > 0);
 
-    if (!isComplete) {
-      message.textContent = "Please complete the required fields first.";
+    if (!isComplete || !form.checkValidity()) {
+      message.textContent = "Please check the required fields and input formats.";
       message.style.color = "#b66a7d";
       form.reportValidity?.();
       return;
@@ -374,10 +400,11 @@ leadForms.forEach((form) => {
       message.textContent = "Local preview: the test brief was saved in this browser only. Nothing was sent externally.";
       message.style.color = "#3f8f7c";
       form.reset();
+      form.dataset.startedAt = String(Date.now());
       return;
     }
 
-    message.textContent = "Saving your brief and opening WhatsApp. If it does not open, ";
+    message.textContent = "Submitting your brief and opening WhatsApp. If it does not open, ";
     const fallbackLink = document.createElement("a");
     fallbackLink.href = emailUrl;
     fallbackLink.textContent = "email this inquiry instead";
@@ -387,6 +414,7 @@ leadForms.forEach((form) => {
 
     window.open(whatsappUrl, "_blank", "noopener");
     form.reset();
+    form.dataset.startedAt = String(Date.now());
   });
 });
 

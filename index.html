@@ -352,17 +352,25 @@
 
           <form class="contact-form garment-inquiry-form" data-lead-form data-form-name="Garment wholesale inquiry">
             <input name="service_type" type="hidden" value="Private label garments" />
+            <label class="form-honeypot" aria-hidden="true">
+              <span>Fax number</span>
+              <input name="fax_number" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            </label>
             <label>
               <span>Brand / company / Instagram</span>
-              <input name="brand" type="text" placeholder="Brand name, website or Instagram" required />
+              <input name="brand" type="text" maxlength="160" autocomplete="organization" placeholder="Brand name, website or Instagram" required />
             </label>
             <label>
               <span>Company country / market</span>
-              <input name="country" type="text" placeholder="United States, Japan, Korea, Singapore..." required />
+              <input name="country" type="text" maxlength="100" autocomplete="country-name" placeholder="United States, Japan, Korea, Singapore..." required />
             </label>
             <label>
-              <span>Development route</span>
-              <select name="development_route" required>
+              <span>Business email (optional)</span>
+              <input name="email" type="email" maxlength="254" autocomplete="email" placeholder="name@brand.com" />
+            </label>
+            <label>
+              <span>Development route (optional)</span>
+              <select name="development_route">
                 <option value="">Select route</option>
                 <option>Ready-to-brand blank</option>
                 <option>Semi-custom private label</option>
@@ -383,19 +391,19 @@
             </label>
             <label>
               <span>Catalog style or target specification</span>
-              <input name="reference" type="text" placeholder="BG-GM-006, 275gsm boxy tee, custom wash..." required />
+              <input name="reference" type="text" maxlength="500" placeholder="BG-GM-006, 275gsm boxy tee, custom wash..." required />
             </label>
             <label>
               <span>Reference photo / tech pack link</span>
-              <input name="reference_links" type="url" placeholder="Google Drive, Dropbox, Figma or product URL" />
+              <input name="reference_links" type="url" maxlength="1000" placeholder="Google Drive, Dropbox, Figma or product URL" />
             </label>
             <label>
               <span>Estimated quantity by style / color</span>
-              <input name="quantity" type="text" placeholder="100pcs per color, 300pcs first order..." required />
+              <input name="quantity" type="text" maxlength="160" placeholder="100pcs per color, 300pcs first order..." required />
             </label>
             <label>
-              <span>Size range</span>
-              <input name="size_range" type="text" placeholder="S-XXL with quantity by size" required />
+              <span>Size range (optional)</span>
+              <input name="size_range" type="text" maxlength="160" placeholder="S-XXL with quantity by size" />
             </label>
             <label>
               <span>Decoration and brand details</span>
@@ -406,24 +414,24 @@
               <input name="target_cost" type="text" placeholder="USD per piece and preferred trade term" />
             </label>
             <label>
-              <span>Delivery destination</span>
-              <input name="destination" type="text" placeholder="City / country / postal code" required />
+              <span>Delivery destination (optional)</span>
+              <input name="destination" type="text" maxlength="200" autocomplete="shipping country-name" placeholder="City / country / postal code" />
             </label>
             <label>
-              <span>Required delivery date</span>
-              <input name="delivery_date" type="date" required />
+              <span>Required delivery date (optional)</span>
+              <input name="delivery_date" type="date" />
             </label>
             <label>
               <span>WhatsApp number</span>
-              <input name="whatsapp" type="tel" placeholder="+1 555..., +81..., +82..., +65..." required />
+              <input name="whatsapp" type="tel" maxlength="40" autocomplete="tel" placeholder="+1 555..., +81..., +82..., +65..." required />
             </label>
             <label class="checkbox-field">
               <input name="sample_requested" type="checkbox" data-label="Garment sample requested" />
               <span>I want to start with a paid garment development sample.</span>
             </label>
             <label>
-              <span>Project notes</span>
-              <textarea name="message" rows="5" placeholder="Fit, colors, wash, fabric preference, compliance needs and any non-negotiable details." required></textarea>
+              <span>Project notes (optional)</span>
+              <textarea name="message" rows="5" maxlength="3000" placeholder="Fit, colors, wash, fabric preference, compliance needs and any non-negotiable details."></textarea>
             </label>
             <label class="checkbox-field">
               <input name="whatsapp_consent" type="checkbox" required data-label="WhatsApp consent" />

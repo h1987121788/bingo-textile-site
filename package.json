@@ -2,6 +2,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "report:weekly-conversion": "node scripts/weekly_conversion_report.js"
+    "report:weekly-conversion": "node scripts/weekly_conversion_report.js",
+    "validate": "node scripts/validate_safety_state.js && node scripts/validate_garment_catalog.js && node scripts/validate_site.js && node scripts/test_lead_webhook.js",
+    "validate:safety": "node scripts/validate_safety_state.js",
+    "validate:catalog": "node scripts/validate_garment_catalog.js",
+    "validate:catalog:strict": "node scripts/validate_garment_catalog.js --strict-commercial",
+    "validate:site": "node scripts/validate_site.js",
+    "validate:webhook": "node scripts/test_lead_webhook.js"
   }
 }

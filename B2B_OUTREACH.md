@@ -1,6 +1,6 @@
 # B2B Lead Outreach Automation
 
-这个模块用于每天半自动筛选街头服饰品牌客户，并为 QQ 邮箱开发信生成审核报告。默认只生成候选名单和邮件草稿，不自动发送。
+这个模块用于每天半自动筛选街头服饰品牌客户，并为“成衣开发为主、针织面料配套”的 QQ 邮箱开发信生成审核报告。默认只生成候选名单和邮件草稿，不自动发送。
 
 ## 合规边界
 
@@ -29,7 +29,7 @@ OUTREACH_FROM_NAME=Jason Huang
 OUTREACH_FROM_EMAIL=你的QQ邮箱
 OUTREACH_REPLY_TO=你的QQ邮箱
 OUTREACH_PHYSICAL_ADDRESS=Guangzhou, China
-OUTREACH_DISABLE_PRODUCT_INTRO_ATTACHMENT=false
+OUTREACH_DISABLE_PRODUCT_INTRO_ATTACHMENT=true
 QQ_SMTP_USER=你的QQ邮箱
 QQ_SMTP_AUTH_CODE=QQ邮箱SMTP授权码
 ```
@@ -52,17 +52,15 @@ config/automation-control.json
 config/social-contact.json
 ```
 
-`config/social-contact.json` 也记录标准产品介绍附件：
+干净部署仓库不包含已核验的产品介绍附件，当前 `config/social-contact.json` 也没有配置附件路径。因此草稿只引用网站成衣目录，不会写“已附产品介绍”。只有本地配置的文件真实存在时，脚本才允许正文出现附件说明。
 
-```text
-outputs/manual-20260611-bingo-adapt/presentations/bingo-jufeng-adapt/output/Bingo_Textile_One_Page_Product_Intro_EN.pptx
-```
-
-正式发送开发信时，脚本会默认把这个一页英文产品介绍作为 PPTX 附件一起发送。临时不想带附件时，在环境变量里设置：
+默认保持：
 
 ```text
 OUTREACH_DISABLE_PRODUCT_INTRO_ATTACHMENT=true
 ```
+
+需要附件时，在本地 `.env.outreach.local` 设置 `OUTREACH_PRODUCT_INTRO_ATTACHMENT`，人工核对文件内容后再生成新草稿。附件和真实运营配置不提交到部署仓库。
 
 每次生成开发信、SMTP 测试或正式发送前，先运行：
 
@@ -82,9 +80,9 @@ node scripts/validate_social_contacts.js
 
 1. 称呼。
 2. 一句话说明观察到的品牌、产品或近期 drop。
-3. 一个具体面料价值点，例如 GSM、缩水、回弹、手感、rib 稳定性、garment dye 适配。
-4. 简短介绍 Bingo Textile：广州针织面料供应商，可协助 jersey、French terry、fleece、rib、stretch knits 的选样、开发和寄样。
-5. 说明已附产品介绍，并引导对方通过 WhatsApp 发送参考图片、链接或 tech pack。
+3. 一个具体成衣开发检查点，例如版型、领口、洗后尺寸、工艺位置或样衣批准标准。
+4. 简短介绍 Bingo Textile：在广州协调 T 恤、卫衣、卫裤和针织套装的 private-label garment brief，面料采购作为开发配套。
+5. 没有真实附件时给出网站成衣目录；只有已核验附件真实存在时才写附件说明。引导对方通过 WhatsApp 发送参考图片、链接或 tech pack。
 6. 退订句：不相关可回复 `no`。
 7. 最后单独显示联系方式，不夹在正文中间。
 
@@ -218,7 +216,7 @@ node scripts/b2b_outreach.js --input data/outreach_candidates.example.csv --limi
 node scripts/b2b_outreach.js --from-report reports/outreach-YYYY-MM-DD-HHMM.json --send
 ```
 
-正式发送时会自动附上 `Bingo_Textile_One_Page_Product_Intro_EN.pptx`，正文也会提示对方可查看一页产品介绍。
+正式发送不会自动假定存在附件。只有本地已配置、文件存在且人工复核过的附件才会发送；否则正文只给出网站成衣目录链接。
 
 同一轮直接发送也支持，但只建议测试时使用：
 
@@ -257,7 +255,7 @@ QQ IMAP 默认使用 `imap.qq.com:993`，优先读取 `QQ_IMAP_USER` / `QQ_IMAP_
 总分 100：
 
 - 目标地区：20 分
-- 产品匹配：25 分，重点是 T 恤、hoodie、sweatshirt、polo、rib、jersey、French terry、interlock、mesh、stretch jersey
+- 产品匹配：25 分，重点是重磅/宽松 T 恤、washed tee、hoodie、sweatshirt、sweatpants、套装、polo 和 rugby shirt
 - 品牌价格层级：20 分
 - 最近新品/drop：15 分
 - 官网/商务邮箱：10 分
@@ -272,7 +270,7 @@ QQ IMAP 默认使用 `imap.qq.com:993`，优先读取 `QQ_IMAP_USER` / `QQ_IMAP_
 data/outreach_keyword_bank.json
 ```
 
-这份 JSON 是提交到部署仓库的干净 seed 关键词库，来源是当前产品网页的核心业务：针织面料、平纹、重磅 T 恤、French terry 卫衣毛圈、拉架平纹、样布、lab dips、GSM、打样和批量面料订单。真实发送后的学习数据应写入本地 ignored 文件，例如 `data/outreach_keyword_bank.local.json`。
+这份 JSON 是提交到部署仓库的干净 seed 关键词库，来源是当前网站的成衣主业务：重磅/宽松 T 恤、washed tee、hoodie、sweatshirt、sweatpants、套装、polo、private label、tech pack 和 sample development。真实发送后的学习数据应写入本地 ignored 文件，例如 `data/outreach_keyword_bank.local.json`。
 
 同时保存了一份表格版：
 
@@ -282,11 +280,11 @@ data/outreach_keywords.csv
 
 这份 CSV 是干净 seed 表，方便人工维护，可以用 Excel、Numbers 或 Google Sheets 打开。真实发送后的追加规则应写入本地 ignored 文件，例如 `data/outreach_keywords.local.csv`。主要分类：
 
-- `product`：产品/面料关键词，例如 `plain jersey`、`heavyweight tee`、`French terry`、`stretch jersey`
-- `garment`：成衣应用关键词，例如 `streetwear hoodie`、`oversized t-shirt`、`jogger set`
+- `product`：成衣产品关键词，例如 `heavyweight tee`、`vintage wash tee`、`oversized hoodie`、`jogger set`
+- `garment`：开发模式关键词，例如 `private label garment`、`cut and sew`、`small batch clothing`
 - `buyer`：潜在客户类型，例如 `streetwear brand`、`premium basics brand`、`independent clothing brand`
 - `buyer` / `decision maker`：高价值联系人，例如 `brand founder`、`brand owner`、`creative director`、`fashion designer`
-- `intent`：采购意图，例如 `fabric sourcing`、`swatches`、`lab dips`、`tech pack`、`bulk order`
+- `intent`：采购意图，例如 `garment development`、`private label`、`fit sample`、`tech pack`、`bulk order`
 - `recent`：近期开发线索，例如 `latest drop`、`preorder`、`collection launch`
 - `region`：日本、韩国等本地语言关键词
 - `exclude`：排除词，例如 marketplace、招聘、教程类结果

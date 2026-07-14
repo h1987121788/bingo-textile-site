@@ -486,6 +486,18 @@ h3 {
   gap: 14px;
 }
 
+.contact-form {
+  position: relative;
+}
+
+.form-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 label {
   display: grid;
   gap: 7px;

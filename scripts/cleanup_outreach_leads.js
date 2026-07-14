@@ -129,7 +129,7 @@ const LOW_QUALITY_RULES = [
   {
     id: "resale_or_marketplace",
     pattern: /\b(preowned|pre-owned|resale|reseller|consignment|thrift|vintage shop|marketplace|sneaker marketplace|stadium goods)\b/i,
-    reason: "resale/marketplace signal, low fabric sourcing fit",
+    reason: "resale/marketplace signal, low private-label garment development fit",
   },
   {
     id: "generic_retail_or_boutique",

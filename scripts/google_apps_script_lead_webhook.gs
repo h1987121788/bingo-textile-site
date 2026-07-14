@@ -3,16 +3,32 @@ const SPREADSHEET_NAME = 'Bingo Textile Website Leads';
 const SPREADSHEET_ID_PROPERTY = 'LEAD_SPREADSHEET_ID';
 const CRM_WEBHOOK_TOKEN_PROPERTY = 'CRM_WEBHOOK_TOKEN';
 const DEFAULT_CRM_WEBHOOK_TOKEN = '';
+const MAX_PAYLOAD_CHARS = 24000;
+const RATE_LIMIT_SECONDS = 600;
+const RATE_LIMIT_MAX = 5;
+const MIN_FORM_FILL_MS = 1500;
+const MAX_FORM_AGE_MS = 24 * 60 * 60 * 1000;
 
 const CRM_HEADERS = [
   'receivedAt',
+  'submittedAt',
+  'form_started_at',
   'formName',
+  'service_type',
+  'page_topic',
   'brand',
   'country',
+  'email',
+  'development_route',
   'garmentType',
   'reference',
   'reference_links',
   'quantity',
+  'size_range',
+  'decoration',
+  'target_cost',
+  'destination',
+  'delivery_date',
   'timeline',
   'whatsapp',
   'whatsappConsent',
@@ -42,9 +58,27 @@ function doPost(e) {
     return jsonOutput_({ ok: false, error: 'unauthorized' });
   }
 
-  const crm = getLeadSheet_();
-  const now = new Date();
-  crm.sheet.appendRow(rowFromPayload_(payload, now, crm.headers));
+  const validation = validatePayload_(payload);
+  if (!validation.ok) {
+    return jsonOutput_({ ok: false, error: 'invalid_payload', field: validation.field || '' });
+  }
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(5000)) {
+    return jsonOutput_({ ok: false, error: 'busy' });
+  }
+
+  try {
+    if (!consumeRateLimit_(payload)) {
+      return jsonOutput_({ ok: false, error: 'rate_limited' });
+    }
+
+    const crm = getLeadSheet_();
+    const now = new Date();
+    crm.sheet.appendRow(rowFromPayload_(payload, now, crm.headers));
+  } finally {
+    lock.releaseLock();
+  }
 
   return jsonOutput_({ ok: true });
 }
@@ -81,23 +115,37 @@ function ensureHeaders_(sheet) {
 function rowFromPayload_(payload, now, headers) {
   const values = valueMapFromPayload_(payload, now);
   return headers.map((header) => {
-    if (Object.prototype.hasOwnProperty.call(values, header)) {
-      return values[header];
+    if (header === 'crmSubmitToken' || header === 'fax_number') {
+      return '';
     }
-    return payload[header] || '';
+    if (Object.prototype.hasOwnProperty.call(values, header)) {
+      return safeSheetValue_(values[header]);
+    }
+    return safeSheetValue_(Object.prototype.hasOwnProperty.call(payload, header) ? payload[header] : '');
   });
 }
 
 function valueMapFromPayload_(payload, now) {
   return {
     receivedAt: now,
+    submittedAt: payload.submittedAt || '',
+    form_started_at: payload.form_started_at || '',
     formName: payload.formName || '',
+    service_type: payload.service_type || '',
+    page_topic: payload.page_topic || '',
     brand: payload.brand || '',
     country: payload.country || '',
+    email: payload.email || '',
+    development_route: payload.development_route || '',
     garmentType: payload.garment_type || payload.garmentType || '',
     reference: payload.reference || '',
     reference_links: payload.reference_links || payload.referenceLinks || '',
     quantity: payload.quantity || '',
+    size_range: payload.size_range || '',
+    decoration: payload.decoration || '',
+    target_cost: payload.target_cost || '',
+    destination: payload.destination || '',
+    delivery_date: payload.delivery_date || '',
     timeline: payload.timeline || '',
     whatsapp: payload.whatsapp || '',
     whatsappConsent: payload.whatsapp_consent || payload.whatsappConsent || '',
@@ -120,6 +168,122 @@ function valueMapFromPayload_(payload, now) {
     quoted_value: payload.quoted_value || '',
     reply_owner: payload.reply_owner || 'Jason Huang'
   };
+}
+
+function validatePayload_(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return { ok: false, field: 'payload' };
+  }
+
+  let serialized = '';
+  try {
+    serialized = JSON.stringify(payload);
+  } catch (error) {
+    return { ok: false, field: 'payload' };
+  }
+
+  if (serialized.length > MAX_PAYLOAD_CHARS) {
+    return { ok: false, field: 'payload_size' };
+  }
+
+  if (textValue_(payload.fax_number)) {
+    return { ok: false, field: 'fax_number' };
+  }
+
+  const fieldLimits = {
+    brand: 160,
+    country: 100,
+    email: 254,
+    garment_type: 200,
+    garmentType: 200,
+    reference: 500,
+    reference_links: 1000,
+    referenceLinks: 1000,
+    quantity: 160,
+    size_range: 160,
+    decoration: 500,
+    target_cost: 160,
+    destination: 200,
+    whatsapp: 40,
+    message: 3000
+  };
+
+  const limitedFields = Object.keys(fieldLimits);
+  for (let index = 0; index < limitedFields.length; index += 1) {
+    const field = limitedFields[index];
+    const value = payload[field];
+    if (value !== undefined && value !== null && typeof value === 'object') {
+      return { ok: false, field };
+    }
+    if (textValue_(value).length > fieldLimits[field]) {
+      return { ok: false, field };
+    }
+  }
+
+  const requiredFields = ['brand', 'country', 'reference', 'quantity', 'whatsapp'];
+  for (let index = 0; index < requiredFields.length; index += 1) {
+    const field = requiredFields[index];
+    if (!textValue_(payload[field])) {
+      return { ok: false, field };
+    }
+  }
+
+  const serviceType = textValue_(payload.service_type);
+  const isGarmentLead = /garment|private label/i.test(serviceType) || Boolean(textValue_(payload.garment_type || payload.garmentType));
+  if (isGarmentLead && !textValue_(payload.garment_type || payload.garmentType)) {
+    return { ok: false, field: 'garment_type' };
+  }
+
+  if (!/^(yes|true|1|on)$/i.test(textValue_(payload.whatsapp_consent || payload.whatsappConsent))) {
+    return { ok: false, field: 'whatsapp_consent' };
+  }
+
+  const email = textValue_(payload.email);
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, field: 'email' };
+  }
+
+  const whatsappDigits = textValue_(payload.whatsapp).replace(/\D/g, '');
+  if (whatsappDigits.length < 7 || whatsappDigits.length > 18) {
+    return { ok: false, field: 'whatsapp' };
+  }
+
+  const startedAt = Date.parse(textValue_(payload.form_started_at));
+  const submittedAt = Date.parse(textValue_(payload.submittedAt));
+  const fillTime = submittedAt - startedAt;
+  if (!Number.isFinite(startedAt) || !Number.isFinite(submittedAt) || fillTime < MIN_FORM_FILL_MS || fillTime > MAX_FORM_AGE_MS) {
+    return { ok: false, field: 'form_timing' };
+  }
+
+  return { ok: true };
+}
+
+function consumeRateLimit_(payload) {
+  const identity = [payload.whatsapp, payload.email, payload.brand, payload.country]
+    .map((value) => textValue_(value).toLowerCase())
+    .join('|');
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, identity, Utilities.Charset.UTF_8);
+  const key = 'lead_' + Utilities.base64EncodeWebSafe(digest).replace(/=+$/, '').slice(0, 32);
+  const cache = CacheService.getScriptCache();
+  const current = Number(cache.get(key) || 0);
+
+  if (current >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  cache.put(key, String(current + 1), RATE_LIMIT_SECONDS);
+  return true;
+}
+
+function textValue_(value) {
+  if (value === undefined || value === null) return '';
+  return String(value).trim();
+}
+
+function safeSheetValue_(value) {
+  if (value instanceof Date) return value;
+  const text = textValue_(value).slice(0, 5000);
+  return /^[=+\-@]/.test(text) ? "'" + text : text;
 }
 
 function defaultNextActionDate_(now) {

@@ -1,9 +1,9 @@
 {
-  "version": 1,
-  "generatedAt": "2026-06-28",
+  "version": 2,
+  "generatedAt": "2026-07-14",
   "template": true,
   "sourceWebsite": "https://www.bingofabric.com/",
-  "purpose": "Seed rules for finding qualified small and mid-size streetwear brands that may need knit fabric sourcing, sampling, swatches, lab dips, dyeing, and bulk fabric production.",
+  "purpose": "Seed rules for finding qualified small and mid-size streetwear brands that may need private-label garment development, sample coordination, and knit material sourcing.",
   "targetMarkets": [
     "United States",
     "Canada",
@@ -17,89 +17,73 @@
   ],
   "productFamilies": [
     {
-      "id": "plain_jersey",
-      "label": "plain jersey / single jersey",
-      "priority": 5,
-      "keywords": [
-        "plain jersey",
-        "single jersey",
-        "cotton jersey",
-        "modal jersey",
-        "jersey knit",
-        "t-shirt fabric",
-        "tee fabric",
-        "140gsm",
-        "160gsm",
-        "180gsm",
-        "200gsm",
-        "220gsm"
-      ]
-    },
-    {
       "id": "heavyweight_tee",
-      "label": "heavyweight T-shirt fabric",
+      "label": "heavyweight / boxy T-shirt",
       "priority": 5,
       "keywords": [
         "heavyweight tee",
         "heavyweight t-shirt",
-        "premium basics",
         "boxy tee",
         "oversized tee",
         "structured tee",
-        "220gsm",
-        "240gsm",
-        "260gsm",
-        "280gsm",
-        "300gsm"
+        "premium basics",
+        "graphic tee",
+        "drop shoulder tee"
       ]
     },
     {
-      "id": "french_terry",
-      "label": "French terry / hoodie fabric",
+      "id": "washed_tee",
+      "label": "washed / garment-dyed T-shirt",
       "priority": 5,
       "keywords": [
-        "French terry",
-        "loopback terry",
-        "hoodie fabric",
-        "sweatshirt fabric",
-        "sweatpants fabric",
-        "brushed terry",
-        "unbrushed terry",
-        "280gsm",
-        "320gsm",
-        "360gsm",
-        "400gsm"
+        "garment dyed tee",
+        "pigment dyed tee",
+        "vintage wash tee",
+        "washed t-shirt",
+        "acid wash tee",
+        "faded tee",
+        "distressed tee"
       ]
     },
     {
-      "id": "stretch_jersey",
-      "label": "stretch jersey / spandex jersey",
+      "id": "hoodie_sweatshirt",
+      "label": "hoodie / sweatshirt",
+      "priority": 5,
+      "keywords": [
+        "streetwear hoodie",
+        "heavyweight hoodie",
+        "oversized hoodie",
+        "boxy hoodie",
+        "zip hoodie",
+        "pullover hoodie",
+        "crewneck sweatshirt",
+        "washed hoodie"
+      ]
+    },
+    {
+      "id": "sweatpants_sets",
+      "label": "sweatpants / coordinated set",
       "priority": 4,
       "keywords": [
-        "stretch jersey",
-        "spandex jersey",
-        "elastane jersey",
-        "fitted tee",
-        "active top",
-        "160gsm",
-        "180gsm",
-        "200gsm",
-        "220gsm"
+        "streetwear sweatpants",
+        "wide leg sweatpants",
+        "jogger set",
+        "hoodie set",
+        "coordinated set",
+        "matching sweatsuit",
+        "tracksuit"
       ]
     },
     {
-      "id": "rib_trim",
-      "label": "rib knit / collar and cuff trim",
+      "id": "polo_rugby",
+      "label": "polo / rugby shirt",
       "priority": 3,
       "keywords": [
-        "rib knit",
-        "rib trim",
-        "rib cuff",
-        "rib collar",
-        "neck rib",
-        "waist rib",
-        "1x1 rib",
-        "2x2 rib"
+        "knit polo",
+        "oversized polo",
+        "rugby shirt",
+        "long sleeve polo",
+        "streetwear polo"
       ]
     }
   ],
@@ -107,17 +91,18 @@
     "\"Contact information\" \"Email\" \"streetwear\" \"Powered by Shopify\"",
     "\"Contact information\" \"Email\" \"hoodie\" \"Powered by Shopify\"",
     "\"heavyweight tee\" \"contact information\" \"brand\"",
-    "\"French terry\" \"streetwear\" \"contact information\"",
+    "\"oversized hoodie\" \"streetwear\" \"contact information\"",
     "\"garment dyed\" \"tee\" \"contact information\" \"brand\"",
-    "\"streetwear brand\" \"sourcing\" \"email\"",
+    "\"streetwear brand\" \"private label\" \"email\"",
     "\"independent clothing brand\" \"contact\" \"hoodie\"",
-    "\"premium basics\" \"contact\" \"t-shirt\""
+    "\"premium basics\" \"contact\" \"t-shirt\"",
+    "\"streetwear brand\" \"latest drop\" \"contact\""
   ],
   "positiveQualitySignals": [
     "Official brand website with current apparel products.",
     "Public contact page or wholesale page with visible email.",
     "Recent drop, new arrivals, preorder, back-in-stock, or collection update.",
-    "Product language mentions heavyweight tees, hoodies, sweatshirts, French terry, jersey, rib trim, garment dye, or cut-and-sew.",
+    "Product language mentions heavyweight tees, hoodies, sweatshirts, sweatpants, coordinated sets, garment dye, or cut-and-sew.",
     "Founder, owner, designer, creative director, production, or sourcing contact is public.",
     "Physical address or clear market proof in a target market.",
     "Public free-mail address appears on the official brand website and has country/product proof."
