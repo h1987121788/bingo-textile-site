@@ -17,6 +17,9 @@ for (const file of contentPages) {
   for (const required of [/<title>[^<]+<\/title>/i, /name=["']description["']/i, /rel=["']canonical["']/i]) {
     if (!required.test(html)) errors.push(`${file} is missing required SEO metadata`);
   }
+  if (/script\.js\?v=20260715-p0["']/.test(html)) {
+    errors.push(`${file} still references the pre-receipt-fix script.js cache key`);
+  }
 
   for (const match of html.matchAll(/(?:href|src)=["']([^"']+)["']/g)) {
     const reference = match[1];
