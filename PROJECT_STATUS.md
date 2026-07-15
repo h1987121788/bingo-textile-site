@@ -3,6 +3,7 @@
 ## Garment-First Production Release
 
 - Production baseline before P0 deployment: `origin/main` at `911fcf8504b28a84dc43c00d011757ca5956df0e`.
+- P0 production commit after deployment: `origin/main` at `c3898cf79633a79f091b7671e10e8dc1578dc26b`.
 - Safety remediation worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`.
 - Safety remediation branch: `codex/automation-safe-foundation-20260714`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
@@ -57,9 +58,11 @@ Do not keep in the deployment repository:
 
 The Apps Script webhook requires the matching `CRM_WEBHOOK_TOKEN` in Apps Script project properties. The Apps Script source file must not contain a reusable fallback token. Stronger protection requires server-side rate limiting, validation or a challenge mechanism; a browser token alone is not authentication.
 
-The repository contains the updated Apps Script source, but GitHub Pages cannot deploy it into Google Apps Script. The live webhook must not be described as upgraded until the operator syncs `scripts/google_apps_script_lead_webhook.gs`, creates a new Web App version and verifies one test row.
+The repository Apps Script source was synced to the existing Google Apps Script project on 2026-07-15. The existing Web App deployment ID and URL were preserved and updated from version 3 to version 4, `P0 confirmable CRM receipt and validation 2026-07-15`.
 
-Production tracking or CRM capture should be considered active only after these checks pass:
+Production verification confirmed that version 4 rejects an authorized honeypot request without creating a lead and returns a nonce-matched iframe receipt. A real successful website-form row has not yet been created during this rollout verification, so the full website-to-Google-Sheet success path remains pending an explicitly approved test submission.
+
+Production tracking and CRM success-path verification remain complete only after these checks pass:
 
 - GA4 Realtime receives a visit.
 - Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
