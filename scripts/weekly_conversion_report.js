@@ -208,6 +208,10 @@ function countTruth(records, names) {
   return records.filter((record) => /^(1|true|yes|y|on)$/i.test(String(field(record, names) || "").trim())).length;
 }
 
+function isTestRecord(record) {
+  return /^(1|true|yes|y|on|test)$/i.test(String(field(record, ["is_test", "isTest"]) || "").trim());
+}
+
 function sumQuotedValue(records) {
   let sum = 0;
   let count = 0;
@@ -250,9 +254,11 @@ function main() {
   const startLabel = isoDate(start);
   const endLabel = isoDate(end);
 
-  const crmRows = readCsvRecords(args.crmCsv).filter((record) =>
+  const datedCrmRows = readCsvRecords(args.crmCsv).filter((record) =>
     inRange(field(record, ["receivedAt", "submittedAt", "createdAt", "date"]), start, endExclusive)
   );
+  const testCrmRows = datedCrmRows.filter(isTestRecord);
+  const crmRows = datedCrmRows.filter((record) => !isTestRecord(record));
   const sentRows = readCsvRecords(DEFAULT_SENT_LOG).filter((record) =>
     inRange(field(record, ["sentAt", "date"]), start, endExclusive)
   );
@@ -273,9 +279,9 @@ function main() {
 
   const funnelRows = [
     ["Visits", args.visits ?? "N/A", args.visits === null ? "Add GA4 value with --visits" : "Manual GA4 input"],
-    ["Form submissions", crmRows.length || "N/A", args.crmCsv ? args.crmCsv : "Export Google Sheet CSV with --crm-csv"],
+    ["Form submissions", args.crmCsv ? crmRows.length : "N/A", args.crmCsv ? args.crmCsv : "Export Google Sheet CSV with --crm-csv"],
     ["WhatsApp clicks", args.whatsappClicks ?? "N/A", args.whatsappClicks === null ? "Add GA4/Meta Contact count with --whatsapp-clicks" : "Manual GA4/Meta input"],
-    ["Sheet rows", crmRows.length || "N/A", args.crmCsv ? args.crmCsv : "CRM CSV not provided"],
+    ["Sheet rows", args.crmCsv ? crmRows.length : "N/A", args.crmCsv ? args.crmCsv : "CRM CSV not provided"],
     ["Replies", replyRows.length + crmReplyRows.length, "outreach_reply_log + CRM status"],
     ["Sample requests", sampleRequests, "CRM sample_requested"],
     ["Quotes", Math.max(quoted.count, quoteRows.length), "CRM quoted_value or quote status"],
@@ -287,6 +293,8 @@ function main() {
     "## Funnel",
     "",
     markdownTable(["Step", "Count", "Source"], funnelRows),
+    "",
+    `- Test CRM rows excluded: ${testCrmRows.length}`,
     "",
     "## CRM Pipeline",
     "",
@@ -332,4 +340,12 @@ function main() {
   console.log(JSON.stringify({ ok: true, output, weekStart: startLabel, weekEnd: endLabel }, null, 2));
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  isTestRecord,
+  readCsvRecords,
+  sumQuotedValue,
+};

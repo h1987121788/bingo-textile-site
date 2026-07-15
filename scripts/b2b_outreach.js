@@ -6,6 +6,10 @@ const tls = require("tls");
 const crypto = require("crypto");
 const { spawnSync } = require("child_process");
 const { requireAutomationEnabled } = require("./automation_guard");
+const {
+  qualityIssues: outreachQualityIssues,
+  selectQualifiedCandidates,
+} = require("./outreach_quality.cjs");
 
 const DEFAULT_ENV_PATH = ".env.outreach.local";
 const DEFAULT_REPORT_DIR = "reports";
@@ -33,6 +37,7 @@ const LEAD_DB_FIELDS = [
   "contactRole",
   "contactSource",
   "personalEmailAllowed",
+  "independentBrandEvidence",
   "productType",
   "priceTier",
   "recentSignal",
@@ -418,7 +423,7 @@ Options:
   --no-bounce-check           Do not check bounces after sending.
   --bounce-lookback-days N    Days of mailbox history to inspect. Default: 3.
   --bounce-wait-seconds N     Wait before post-send bounce check. Default: 30.
-  --approve-send              Allow same-run sending without editing approvalStatus.
+  --approve-send              Disabled. Approval must be recorded in a reviewed JSON report.
   --no-enrich                 Skip website contact-page checks.
   --env PATH                  Env file. Default: .env.outreach.local.
   --report-dir PATH           Report directory. Default: reports.
@@ -460,7 +465,6 @@ function parseArgs(argv) {
     checkBouncesAfterSend: true,
     bounceLookbackDays: 3,
     bounceWaitSeconds: 30,
-    approveSend: false,
     dryRun: false,
     enrich: true,
     followUpMode: false,
@@ -499,14 +503,16 @@ function parseArgs(argv) {
     else if (arg === "--no-bounce-check") args.checkBouncesAfterSend = false;
     else if (arg === "--bounce-lookback-days") args.bounceLookbackDays = numberArg(requireValue(argv, ++i, arg), arg);
     else if (arg === "--bounce-wait-seconds") args.bounceWaitSeconds = numberArg(requireValue(argv, ++i, arg), arg);
-    else if (arg === "--approve-send") args.approveSend = true;
+    else if (arg === "--approve-send") {
+      die("--approve-send is disabled. Generate a report, review it, set approvalStatus to approved, then use --from-report ... --send.");
+    }
     else if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--no-enrich") args.enrich = false;
     else if (arg === "--follow-up") args.followUpMode = true;
     else die(`Unknown option: ${arg}`);
   }
 
-  if (args.limit < 1 || args.limit > 100) die("--limit must be between 1 and 100.");
+  if (args.limit < 1 || args.limit > 5) die("--limit must be between 1 and 5.");
   if (args.poolSize < args.limit) args.poolSize = args.limit;
   if (args.bounceLookbackDays < 1 || args.bounceLookbackDays > 30) die("--bounce-lookback-days must be between 1 and 30.");
   if (args.bounceWaitSeconds < 0 || args.bounceWaitSeconds > 600) die("--bounce-wait-seconds must be between 0 and 600.");
@@ -698,6 +704,7 @@ async function main() {
   let pool = [];
   let selected = [];
   let marketRejected = [];
+  let qualityRejected = [];
   let sourceMode = "new-run";
 
   if (args.fromReport) {
@@ -728,14 +735,16 @@ async function main() {
       .filter((candidate) => args.followUpMode || !isAlreadyContacted(candidate, alreadyContacted))
       .map((candidate) => finalizeCandidate(candidate, env));
     const marketFilteredPool = filterCandidatesByTargetMarket(finalizedPool);
+    const qualityFilteredPool = filterCandidatesByQuality(marketFilteredPool.accepted, suppression);
     pool = args.followUpMode
-      ? marketFilteredPool.accepted
-      : marketFilteredPool.accepted.sort((a, b) => b.score - a.score || String(a.brandName).localeCompare(String(b.brandName)));
+      ? qualityFilteredPool.accepted
+      : qualityFilteredPool.accepted.sort((a, b) => b.score - a.score || String(a.brandName).localeCompare(String(b.brandName)));
     marketRejected = marketFilteredPool.rejected;
+    qualityRejected = qualityFilteredPool.rejected;
 
     selected = selectDailyLeads(pool, args.limit).map((candidate) => ({
       ...candidate,
-      approvalStatus: "pending",
+      approvalStatus: "pending_review",
     }));
   }
 
@@ -745,8 +754,10 @@ async function main() {
   }
   if (args.fromReport) {
     const marketFilteredSelected = filterCandidatesByTargetMarket(selected);
-    selected = marketFilteredSelected.accepted;
+    const qualityFilteredSelected = filterCandidatesByQuality(marketFilteredSelected.accepted, suppression);
+    selected = qualityFilteredSelected.accepted;
     marketRejected = marketFilteredSelected.rejected;
+    qualityRejected = qualityFilteredSelected.rejected;
   }
 
   let sendResults = [];
@@ -801,6 +812,22 @@ async function main() {
       excludedMarkets: EXCLUDED_MARKET_LABEL,
       rejectedCount: marketRejected.length,
       rejected: marketRejected.slice(0, 50),
+    },
+    qualityGate: {
+      enabled: true,
+      required: [
+        "target_country",
+        "independent_brand",
+        "official_website",
+        "public_business_email",
+        "source_evidence",
+        "public_email_evidence",
+      ],
+      requestedCount: args.limit,
+      selectedCount: selected.length,
+      shortfall: Math.max(0, args.limit - selected.length),
+      rejectedCount: qualityRejected.length,
+      rejected: qualityRejected.slice(0, 50),
     },
     postRunLearning: {
       enabled: Boolean(args.postRunLearning),
@@ -1134,6 +1161,8 @@ function canonicalField(header) {
     contactsource: "contactSource",
     personal_email_allowed: "personalEmailAllowed",
     personalemailallowed: "personalEmailAllowed",
+    independent_brand_evidence: "independentBrandEvidence",
+    independentbrandevidence: "independentBrandEvidence",
     product: "productType",
     product_type: "productType",
     producttype: "productType",
@@ -1165,6 +1194,7 @@ function normalizeCandidate(raw) {
   candidate.contactRole = cleanText(candidate.contactRole || candidate.role || candidate.title || "");
   candidate.contactSource = cleanUrl(candidate.contactSource || "");
   candidate.personalEmailAllowed = boolishText(candidate.personalEmailAllowed || "");
+  candidate.independentBrandEvidence = cleanText(candidate.independentBrandEvidence || "");
   candidate.productType = cleanText(candidate.productType || candidate.product || "");
   candidate.priceTier = cleanText(candidate.priceTier || candidate.price || "");
   candidate.recentSignal = cleanText(candidate.recentSignal || candidate.recent || "");
@@ -1217,6 +1247,7 @@ function mergeCandidate(a, b) {
     "contactRole",
     "contactSource",
     "personalEmailAllowed",
+    "independentBrandEvidence",
     "productType",
     "priceTier",
     "recentSignal",
@@ -1290,6 +1321,9 @@ async function enrichCandidate(candidate, args, env) {
   }
 
   candidate.businessEmail = cleanEmail(candidate.businessEmail || businessEmails[0] || "");
+  if (candidate.businessEmail && FREE_EMAIL_DOMAINS.has(domainFromEmail(candidate.businessEmail))) {
+    candidate.personalEmailAllowed = candidate.emailSource ? "true" : candidate.personalEmailAllowed;
+  }
   const profile = [
     candidate.brandName,
     candidate.notes,
@@ -1352,6 +1386,28 @@ function filterCandidatesByTargetMarket(candidates) {
         reason: market.reason,
       });
     }
+  }
+
+  return { accepted, rejected };
+}
+
+function filterCandidatesByQuality(candidates, suppression = new Set()) {
+  const accepted = [];
+  const rejected = [];
+
+  for (const candidate of candidates) {
+    const issues = outreachQualityIssues(candidate, { suppression });
+    if (!issues.length) {
+      accepted.push(candidate);
+      continue;
+    }
+    rejected.push({
+      brandName: candidate.brandName || "",
+      country: candidate.country || "",
+      website: candidate.website || "",
+      businessEmail: candidate.businessEmail || "",
+      reason: issues.join("; "),
+    });
   }
 
   return { accepted, rejected };
@@ -1530,9 +1586,7 @@ function finalizeCandidate(candidate, env) {
 }
 
 function selectDailyLeads(pool, limit) {
-  const withEmail = pool.filter((candidate) => candidate.businessEmail && !emailDomainMismatchRisk(candidate));
-  const withoutEmail = pool.filter((candidate) => !candidate.businessEmail);
-  return [...withEmail, ...withoutEmail].slice(0, limit);
+  return selectQualifiedCandidates(pool, limit);
 }
 
 function scoreCandidate(candidate, sourceText) {
@@ -2085,19 +2139,19 @@ This test does not update the outreach lead database.`;
 
 async function sendSelected(selected, args, env, suppression) {
   if (args.dryRun || boolEnv(env.OUTREACH_DRY_RUN)) return [];
-  const dailyLimit = Number(env.OUTREACH_DAILY_SEND_LIMIT || 5);
+  const dailyLimit = Math.min(5, Number(env.OUTREACH_DAILY_SEND_LIMIT || 5));
   validateSendEnv(env);
   const productIntroAttachment = productIntroAttachmentFromContact(loadConfirmedContactInfo(), env);
 
-  let sendable = selected.filter((candidate) => candidate.businessEmail && !isSuppressed(candidate, suppression));
-  if (args.fromReport) {
-    sendable = sendable.filter((candidate) => candidate.approvalStatus === "approved");
-  } else if (!args.approveSend) {
-    die("Same-run sending requires --approve-send. Safer flow: generate report, edit JSON approvalStatus to approved, then --from-report ... --send.");
+  if (!args.fromReport) {
+    die("Sending requires a reviewed JSON report. Use --from-report reports/outreach-...json --send.");
   }
+  const sendable = selected.filter(
+    (candidate) => outreachQualityIssues(candidate, { suppression, requireApproval: true }).length === 0
+  );
 
   if (!sendable.length) {
-    die("No approved leads with businessEmail to send.");
+    die("No manually approved leads passed the target-country, brand, website, email, evidence, and suppression gates.");
   }
   if (sendable.length > dailyLimit) {
     die(`Refusing to send ${sendable.length} emails because OUTREACH_DAILY_SEND_LIMIT=${dailyLimit}.`);
@@ -2697,6 +2751,7 @@ function buildLeadRow(existingRow, candidate, context) {
     contactRole: candidate.contactRole || existingRow.contactRole || "",
     contactSource: candidate.contactSource || existingRow.contactSource || "",
     personalEmailAllowed: candidate.personalEmailAllowed || existingRow.personalEmailAllowed || "",
+    independentBrandEvidence: candidate.independentBrandEvidence || existingRow.independentBrandEvidence || "",
     productType: candidate.productType || existingRow.productType || "",
     priceTier: candidate.priceTier || existingRow.priceTier || "",
     recentSignal: candidate.recentSignal || existingRow.recentSignal || "",
@@ -2708,7 +2763,7 @@ function buildLeadRow(existingRow, candidate, context) {
     firstFoundDate: existingRow.firstFoundDate || context.today,
     lastFoundDate: context.today,
     developmentDate: existingRow.developmentDate || context.today,
-    approvalStatus: candidate.approvalStatus || existingRow.approvalStatus || "pending",
+    approvalStatus: candidate.approvalStatus || existingRow.approvalStatus || "pending_review",
     doNotContact: existingRow.doNotContact || "",
     status,
     emailSubject: candidate.emailSubject || existingRow.emailSubject || "",
@@ -2873,6 +2928,12 @@ function buildMarkdownReport(report, jsonPath) {
     lines.push(`- 地区硬过滤: 目标市场 ${report.marketFilter.targetMarkets}；排除 ${report.marketFilter.excludedMarkets}。`);
     lines.push(`- 地区过滤剔除: ${report.marketFilter.rejectedCount || 0} 条`);
   }
+  if (report.qualityGate && report.qualityGate.enabled) {
+    lines.push(`- 五项质量门槛剔除: ${report.qualityGate.rejectedCount || 0} 条`);
+    if (report.qualityGate.shortfall > 0) {
+      lines.push(`- 今日数量不足: 请求 ${report.qualityGate.requestedCount} 条，实际合格 ${report.qualityGate.selectedCount} 条，不以低质量候选补齐。`);
+    }
+  }
   lines.push("");
   if (report.marketFilter && report.marketFilter.rejected && report.marketFilter.rejected.length) {
     lines.push("## 地区过滤剔除");
@@ -2888,6 +2949,15 @@ function buildMarkdownReport(report, jsonPath) {
     if (report.marketFilter.rejectedCount > 20) {
       lines.push(`- 其余 ${report.marketFilter.rejectedCount - 20} 条见 JSON 报告。`);
     }
+    lines.push("");
+  }
+  if (report.qualityGate && report.qualityGate.rejected && report.qualityGate.rejected.length) {
+    lines.push("## 五项质量门槛剔除");
+    lines.push("");
+    report.qualityGate.rejected.slice(0, 20).forEach((candidate, index) => {
+      lines.push(`${index + 1}. ${candidate.brandName || "Unknown Brand"} - ${candidate.reason || "blocked"}`);
+      if (candidate.website) lines.push(`   ${candidate.website}`);
+    });
     lines.push("");
   }
   if (report.searchQueries.length) {
@@ -2909,6 +2979,7 @@ function buildMarkdownReport(report, jsonPath) {
     lines.push(`- 联系人角色: ${candidate.contactRole || "未记录"}`);
     lines.push(`- 联系人来源: ${candidate.contactSource || "未记录"}`);
     lines.push(`- 个人邮箱使用边界: ${candidate.personalEmailAllowed === "true" ? "公开商务用途，可用" : "未标记，需人工确认"}`);
+    lines.push(`- 独立品牌证据: ${candidate.independentBrandEvidence || "缺失"}`);
     lines.push(`- 产品类型: ${candidate.productType || "未知"}`);
     lines.push(`- 价格层级: ${candidate.priceTier || "未知"}`);
     lines.push(`- 新品/drop 线索: ${candidate.recentSignal || "未发现"}`);
@@ -2926,7 +2997,7 @@ function buildMarkdownReport(report, jsonPath) {
     lines.push(candidate.emailBody);
     lines.push("```");
     lines.push("");
-    lines.push(`- approvalStatus: ${candidate.approvalStatus || "pending"}`);
+    lines.push(`- approvalStatus: ${candidate.approvalStatus || "pending_review"}`);
     lines.push("");
   });
 
@@ -2938,7 +3009,7 @@ function buildMarkdownReport(report, jsonPath) {
   lines.push(`node scripts/b2b_outreach.js --from-report ${jsonPath} --send`);
   lines.push("```");
   lines.push("");
-  lines.push("如果要测试同一轮直接发送，必须显式加 `--send --approve-send`，并确保发送总量不超过 `OUTREACH_DAILY_SEND_LIMIT`。");
+  lines.push("同一轮直接发送已禁用；必须先生成报告并人工复核，再从已批准报告发送。");
   return `${lines.join("\n")}\n`;
 }
 
@@ -3309,7 +3380,19 @@ function singleLineText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
 
-main().catch((error) => {
-  console.error(JSON.stringify({ ok: false, error: error.message }, null, 2));
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(JSON.stringify({ ok: false, error: error.message }, null, 2));
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  filterCandidatesByQuality,
+  filterCandidatesByTargetMarket,
+  isSuppressed,
+  mergeCandidates,
+  normalizeCandidate,
+  selectDailyLeads,
+  targetMarketForCandidate,
+};

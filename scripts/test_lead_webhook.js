@@ -166,11 +166,15 @@ const fullPayload = {
   submissionId: "full_submission_20260715",
   crmSubmitToken: "test-token",
   brand: "Full Flow Brand",
-  whatsapp: "+1 415 555 0199"
+  whatsapp: "+1 415 555 0199",
+  is_test: "yes"
 };
 const acceptedResponse = doPost({ parameter: { payload: JSON.stringify(fullPayload) } });
 assert.strictEqual(appendedRows.length, 2);
 assert.match(acceptedResponse.html, /"ok":true/);
+const isTestColumn = appendedRows[0].indexOf("is_test");
+assert.notStrictEqual(isTestColumn, -1);
+assert.strictEqual(appendedRows[1][isTestColumn], "yes");
 
 const duplicateResponse = doPost({ parameter: { payload: JSON.stringify(fullPayload) } });
 assert.strictEqual(appendedRows.length, 2);
@@ -181,4 +185,4 @@ const durableDuplicateResponse = doPost({ parameter: { payload: JSON.stringify(f
 assert.strictEqual(appendedRows.length, 2);
 assert.match(durableDuplicateResponse.html, /"duplicate":true/);
 
-console.log(JSON.stringify({ ok: true, tests: 23 }, null, 2));
+console.log(JSON.stringify({ ok: true, tests: 25 }, null, 2));

@@ -3,11 +3,14 @@
   "type": "module",
   "scripts": {
     "report:weekly-conversion": "node scripts/weekly_conversion_report.js",
-    "validate": "node scripts/validate_safety_state.js && node scripts/validate_garment_catalog.js && node scripts/validate_site.js && node scripts/test_lead_webhook.js",
+    "validate": "node scripts/validate_safety_state.js && node scripts/validate_garment_catalog.js && node scripts/validate_site.js && node scripts/test_lead_webhook.js && node scripts/test_outreach_quality.js && node scripts/test_outreach_discovery_source.js && node scripts/test_weekly_conversion_report.js && node scripts/test_marketing_tracking.js",
     "validate:safety": "node scripts/validate_safety_state.js",
     "validate:catalog": "node scripts/validate_garment_catalog.js",
     "validate:catalog:strict": "node scripts/validate_garment_catalog.js --strict-commercial",
     "validate:site": "node scripts/validate_site.js",
-    "validate:webhook": "node scripts/test_lead_webhook.js"
+    "validate:webhook": "node scripts/test_lead_webhook.js",
+    "validate:outreach": "node scripts/test_outreach_quality.js && node scripts/test_outreach_discovery_source.js",
+    "validate:tracking": "node scripts/test_marketing_tracking.js",
+    "validate:reporting": "node scripts/test_weekly_conversion_report.js"
   }
 }

@@ -58,6 +58,9 @@ for (const marker of [
 ]) {
   if (!formScript.includes(marker)) errors.push(`script.js is missing form anti-spam marker ${marker}`);
 }
+if (!formScript.includes("isCrmTestMode") || !/is_test:\s*isCrmTestMode/.test(formScript)) {
+  errors.push("script.js must mark explicit crm_test=1 submissions as is_test");
+}
 if (/mode:\s*["']no-cors["']|navigator\.sendBeacon/.test(formScript)) {
   errors.push("script.js must not claim CRM success through an unreadable no-cors or beacon request");
 }
@@ -74,6 +77,9 @@ for (const marker of [
 ]) {
   if (!webhookScript.includes(marker)) errors.push(`Apps Script webhook is missing server control ${marker}`);
 }
+if (!/'is_test'/.test(webhookScript) || !/normalizeBooleanText_/.test(webhookScript)) {
+  errors.push("Apps Script webhook must persist the is_test CRM field");
+}
 if (!/const DEFAULT_CRM_WEBHOOK_TOKEN\s*=\s*(["'])\1;/.test(webhookScript)) {
   errors.push("Apps Script webhook must not contain a default CRM token");
 }
@@ -81,6 +87,20 @@ if (!/const DEFAULT_CRM_WEBHOOK_TOKEN\s*=\s*(["'])\1;/.test(webhookScript)) {
 const garmentPage = fs.readFileSync(path.join(ROOT, "garments.html"), "utf8");
 if (!/AI style references, not production photography/i.test(garmentPage)) {
   errors.push("garments.html must retain the AI-image disclosure");
+}
+
+const marketingConfig = fs.readFileSync(path.join(ROOT, "config/marketing-config.js"), "utf8");
+if (!/ga4MeasurementId:\s*["']G-[A-Z0-9]{6,}["']/.test(marketingConfig) || /G-XXXXXXXXXX/.test(marketingConfig)) {
+  errors.push("config/marketing-config.js is missing a configured GA4 Measurement ID");
+}
+if (!/metaPixelId:\s*["']\d{10,20}["']/.test(marketingConfig) || /PIXEL_ID/.test(marketingConfig)) {
+  errors.push("config/marketing-config.js is missing a configured Meta Pixel ID");
+}
+const trackingScript = fs.readFileSync(path.join(ROOT, "scripts/marketing-tracking.js"), "utf8");
+for (const eventName of ["generate_lead", "contact_whatsapp", "product_interest"]) {
+  if (!trackingScript.includes(eventName) || !formScript.includes(eventName)) {
+    errors.push(`marketing event wiring is missing ${eventName}`);
+  }
 }
 if (/\bARTIE\b|artieshop|detail\.1688\.com/i.test(garmentPage)) {
   errors.push("garments.html exposes a source brand or source marketplace URL");

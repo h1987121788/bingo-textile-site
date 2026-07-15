@@ -3,11 +3,15 @@
 const fs = require("fs");
 const path = require("path");
 const dns = require("dns").promises;
-const { URL, URLSearchParams } = require("url");
+const { URL } = require("url");
+const { qualityIssues: outreachQualityIssues } = require("./outreach_quality.cjs");
 
 const WORKDIR = process.cwd();
 const NODE_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36 BingoTextileOutreach/1.0";
+const INDEPENDENT_BRAND_EVIDENCE_PATTERN =
+  /\b(independent(?:ly)?(?: owned| operated| run)?|founder[- ]led|owner[- ]operated|family[- ]owned|woman[- ]owned|women[- ]owned|minority[- ]owned|black[- ]owned|latino[- ]owned|asian[- ]owned|small[- ]business|self[- ]funded|bootstrapped)\b/i;
+const BRAND_CONTEXT_PATTERN = /\b(brand|label|streetwear|apparel|clothing|fashion|studio|company|business)\b/i;
 const FREE_EMAIL_DOMAINS = new Set(["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "me.com", "aol.com"]);
 const BAD_EMAIL_LOCAL_PARTS = [
   "privacy",
@@ -253,6 +257,7 @@ const FIELD_NAMES = [
   "contactRole",
   "contactSource",
   "personalEmailAllowed",
+  "independentBrandEvidence",
   "productType",
   "priceTier",
   "recentSignal",
@@ -268,6 +273,12 @@ const FIELD_NAMES = [
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  const env = { ...loadEnvFile(args.envPath), ...process.env };
+  if (!env.BRAVE_SEARCH_API_KEY) {
+    throw new Error(
+      `BRAVE_SEARCH_API_KEY is required in ${args.envPath} or the process environment. HTML search-page scraping is disabled.`
+    );
+  }
   const localDate = todayLocal();
   const batch = args.batch || `${localDate}-manual`;
   const outPrefix = args.outPrefix || `outreach_candidates_active_${batch}`;
@@ -281,7 +292,7 @@ async function main() {
   const searchStats = [];
 
   for (const query of queries) {
-    const seeds = await searchForSeeds(query, args.searchTimeoutMs);
+    const seeds = await searchForSeeds(query, args.searchTimeoutMs, env);
     searchStats.push({ query, seeds: seeds.length });
     for (const seed of seeds) {
       const url = toUrl(seed.url);
@@ -336,7 +347,7 @@ async function main() {
   cleaned.sort((a, b) => b.score - a.score || String(a.brandName).localeCompare(String(b.brandName)));
   const selected = cleaned.slice(0, args.limit).map((candidate) => ({
     ...candidate,
-    approvalStatus: "approved",
+    approvalStatus: "pending_review",
   }));
 
   const files = {
@@ -344,7 +355,7 @@ async function main() {
     cleanCandidates: path.resolve(WORKDIR, `data/${outPrefix}-clean.csv`),
     discovery: path.resolve(WORKDIR, `reports/outreach-${batch}-discovery.json`),
     cleaning: path.resolve(WORKDIR, `reports/outreach-${batch}-cleaning.json`),
-    approvedManifest: path.resolve(WORKDIR, `reports/outreach-${batch}-approved-manifest.json`),
+    reviewManifest: path.resolve(WORKDIR, `reports/outreach-${batch}-review-manifest.json`),
     summaryJson: path.resolve(WORKDIR, `reports/outreach-${batch}-summary.json`),
     summaryMarkdown: path.resolve(WORKDIR, `reports/outreach-${batch}-summary.md`),
   };
@@ -353,7 +364,7 @@ async function main() {
   writeCsv(files.cleanCandidates, selected, FIELD_NAMES);
   const discovery = {
     generatedAt: new Date().toISOString(),
-    source: "brave-html+duckduckgo-html+public-brand-pages",
+    source: "brave-search-api+official-brand-pages",
     batch,
     localDate,
     queries: queries.length,
@@ -378,7 +389,7 @@ async function main() {
     runAt: new Date().toISOString(),
     localDate,
     mode: `public-discovery:${batch}`,
-    dryRun: false,
+    dryRun: true,
     sendRequested: false,
     selectedCount: selected.length,
     candidatePoolCount: merged.length,
@@ -389,7 +400,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     localDate,
     batch,
-    request: "全网查找100个高活跃潜在客户，发送开发信，引导客户添加WhatsApp；触发550即停止；两分钟一封。",
+    request: "使用授权搜索 API 查找最多 5 个合格潜在客户，生成 pending_review 审核清单，不自动发送。",
     files,
     totals: {
       searchQueries: queries.length,
@@ -412,7 +423,7 @@ async function main() {
 
   fs.writeFileSync(files.discovery, `${JSON.stringify(discovery, null, 2)}\n`);
   fs.writeFileSync(files.cleaning, `${JSON.stringify(cleaning, null, 2)}\n`);
-  fs.writeFileSync(files.approvedManifest, `${JSON.stringify(manifest, null, 2)}\n`);
+  fs.writeFileSync(files.reviewManifest, `${JSON.stringify(manifest, null, 2)}\n`);
   fs.writeFileSync(files.summaryJson, `${JSON.stringify(summary, null, 2)}\n`);
   fs.writeFileSync(files.summaryMarkdown, buildSummaryMarkdown(summary));
 
@@ -421,7 +432,7 @@ async function main() {
 
 function parseArgs(argv) {
   const args = {
-    limit: 100,
+    limit: 5,
     maxQueries: 70,
     maxSeeds: 900,
     queryOffset: 0,
@@ -431,6 +442,7 @@ function parseArgs(argv) {
     fetchTimeoutMs: 18000,
     candidateTimeoutMs: 90000,
     queryFile: "",
+    envPath: ".env.outreach.local",
     batch: "",
     outPrefix: "",
     suppressionFile: "data/outreach_suppression.csv",
@@ -453,8 +465,10 @@ function parseArgs(argv) {
     else if (arg === "--batch") args.batch = requireValue(argv[++i], arg);
     else if (arg === "--out-prefix") args.outPrefix = requireValue(argv[++i], arg);
     else if (arg === "--query-file") args.queryFile = requireValue(argv[++i], arg);
+    else if (arg === "--env") args.envPath = requireValue(argv[++i], arg);
     else throw new Error(`Unknown argument: ${arg}`);
   }
+  if (args.limit > 5) throw new Error("--limit cannot exceed the daily review limit of 5.");
   return args;
 }
 
@@ -467,6 +481,24 @@ function numberArg(value, flag) {
   const number = Number(value);
   if (!Number.isFinite(number) || number < 1) throw new Error(`${flag} requires a positive number.`);
   return number;
+}
+
+function loadEnvFile(file) {
+  if (!file || !fs.existsSync(file)) return {};
+  const env = {};
+  for (const rawLine of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const separator = line.indexOf("=");
+    if (separator < 1) continue;
+    const key = line.slice(0, separator).trim();
+    let value = line.slice(separator + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    env[key] = value;
+  }
+  return env;
 }
 
 function buildQueries(file, maxQueries, queryOffset = 0) {
@@ -528,16 +560,8 @@ function buildQueries(file, maxQueries, queryOffset = 0) {
   return unique([...learned, ...manual]).slice(queryOffset, queryOffset + maxQueries);
 }
 
-async function searchForSeeds(query, timeoutMs) {
-  const results = [];
-  const [brave, ddg, bing] = await Promise.allSettled([
-    searchBrave(query, timeoutMs),
-    searchDuckDuckGo(query, timeoutMs),
-    searchBing(query, timeoutMs),
-  ]);
-  if (brave.status === "fulfilled") results.push(...brave.value);
-  if (ddg.status === "fulfilled") results.push(...ddg.value);
-  if (bing.status === "fulfilled") results.push(...bing.value);
+async function searchForSeeds(query, timeoutMs, env) {
+  const results = await searchBraveApi(query, timeoutMs, env);
   const byUrl = new Map();
   for (const item of results) {
     const url = cleanResultUrl(item.url);
@@ -556,69 +580,33 @@ async function searchForSeeds(query, timeoutMs) {
   return [...byUrl.values()].slice(0, 20);
 }
 
-async function searchBrave(query, timeoutMs) {
-  const url = `https://search.brave.com/search?${new URLSearchParams({ q: query, source: "web" })}`;
-  const html = await fetchText(url, timeoutMs);
-  const results = [];
-  for (const item of extractBraveObjects(html)) {
-    if (!item.url) continue;
-    results.push(item);
-  }
-  for (const found of extractUrlsFromText(html)) {
-    results.push({ url: found, title: "", snippet: "" });
-  }
-  return results;
-}
+async function searchBraveApi(query, timeoutMs, env) {
+  const endpoint = env.BRAVE_SEARCH_API_URL || "https://api.search.brave.com/res/v1/web/search";
+  const url = new URL(endpoint);
+  url.searchParams.set("q", query);
+  url.searchParams.set("count", "20");
+  url.searchParams.set("search_lang", env.SEARCH_LANG || "en");
+  url.searchParams.set("country", env.SEARCH_COUNTRY || "US");
+  url.searchParams.set("safesearch", "moderate");
 
-function extractBraveObjects(html) {
-  const text = String(html || "");
-  const results = [];
-  const objectRe = /\{title:"([\s\S]*?)",url:"(https?:[\s\S]*?)",full_title:[\s\S]*?description:"([\s\S]*?)",page_age:/g;
-  for (const match of text.matchAll(objectRe)) {
-    results.push({
-      title: decodeJsString(match[1]),
-      url: decodeJsString(match[2]),
-      snippet: decodeJsString(match[3]).replace(/\\u003C[^>]+\\u003E/g, " "),
-    });
+  const response = await fetch(url, {
+    headers: {
+      accept: "application/json",
+      "X-Subscription-Token": env.BRAVE_SEARCH_API_KEY,
+      "User-Agent": "BingoTextileOutreach/1.0 (+https://www.bingofabric.com/)",
+    },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(`Brave Search API failed (${response.status}): ${body.slice(0, 300)}`);
   }
-  return results;
-}
-
-async function searchDuckDuckGo(query, timeoutMs) {
-  const url = `https://duckduckgo.com/html/?${new URLSearchParams({ q: query, kl: "us-en" })}`;
-  const html = await fetchText(url, timeoutMs);
-  const results = [];
-  const linkRe = /class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
-  for (const match of html.matchAll(linkRe)) {
-    results.push({
-      url: cleanResultUrl(decodeEntities(match[1])),
-      title: htmlToText(match[2]),
-      snippet: htmlToText(match[3]),
-    });
-  }
-  for (const match of html.matchAll(/uddg=([^&"']+)/g)) {
-    results.push({ url: decodeURIComponent(match[1]), title: "", snippet: "" });
-  }
-  return results;
-}
-
-async function searchBing(query, timeoutMs) {
-  const url = `https://www.bing.com/search?${new URLSearchParams({ q: query, mkt: "en-US", cc: "US" })}`;
-  const html = await fetchText(url, timeoutMs);
-  const results = [];
-  const blockRe = /<li class="b_algo"[\s\S]*?<\/li>/gi;
-  for (const blockMatch of html.matchAll(blockRe)) {
-    const block = blockMatch[0];
-    const linkMatch = block.match(/<h2[\s\S]*?<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
-    if (!linkMatch) continue;
-    const snippetMatch = block.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
-    results.push({
-      url: decodeEntities(linkMatch[1]),
-      title: htmlToText(linkMatch[2]),
-      snippet: snippetMatch ? htmlToText(snippetMatch[1]) : "",
-    });
-  }
-  return results;
+  const json = await response.json();
+  return (json.web && Array.isArray(json.web.results) ? json.web.results : []).map((item) => ({
+    title: cleanText(item.title || ""),
+    url: cleanUrl(item.url || ""),
+    snippet: cleanText(item.description || ""),
+  }));
 }
 
 async function candidateFromSeed(seed, args) {
@@ -677,6 +665,9 @@ async function candidateFromSeed(seed, args) {
   const productType = productSignalFrom(pageEvidenceText);
   if (!productType) return { reason: "weak product signal" };
 
+  const independentBrandEvidence = independentEvidenceFromOfficialPages(pageTexts);
+  if (!independentBrandEvidence) return { reason: "no explicit independent-brand evidence on official website" };
+
   const country = inferCountry(origin, combinedText);
   if (!country) return { reason: "market unknown" };
   const excluded = excludedMarket(combinedText, country);
@@ -709,6 +700,7 @@ async function candidateFromSeed(seed, args) {
       contactRole: "",
       contactSource: emailInfo.source,
       personalEmailAllowed: FREE_EMAIL_DOMAINS.has(emailDomain(emailInfo.email)) ? "true" : "false",
+      independentBrandEvidence,
       productType,
       priceTier,
       recentSignal,
@@ -719,7 +711,7 @@ async function candidateFromSeed(seed, args) {
       whyFit: `Matches Bingo garment-development outreach because ${country} brand has ${productType}, ${recentSignal}, and a verified public contact email on the official website.`,
       searchQuery: seed.query,
       notes: cleanText([seed.snippet, snippetAround(pageEvidenceText, emailInfo.email)].join(" ")).slice(0, 500),
-      approvalStatus: "approved",
+      approvalStatus: "pending_review",
     },
   };
 }
@@ -727,10 +719,20 @@ async function candidateFromSeed(seed, args) {
 async function fetchReadablePage(url, timeoutMs) {
   const direct = await fetchText(url, timeoutMs).catch(() => "");
   if (direct && usefulPageText(direct)) return direct.slice(0, 250000);
-  const jinaUrl = `https://r.jina.ai/http://${url}`;
-  const viaJina = await fetchText(jinaUrl, timeoutMs).catch(() => "");
-  if (viaJina && usefulPageText(viaJina)) return viaJina.slice(0, 250000);
-  return direct || viaJina || "";
+  return direct || "";
+}
+
+function independentEvidenceFromOfficialPages(pageTexts) {
+  for (const [source, rawText] of pageTexts.entries()) {
+    const text = cleanText(rawText);
+    const matches = text.matchAll(new RegExp(INDEPENDENT_BRAND_EVIDENCE_PATTERN.source, "gi"));
+    for (const match of matches) {
+      const snippet = snippetAround(text, match[0]);
+      if (!BRAND_CONTEXT_PATTERN.test(snippet)) continue;
+      return `${source} | ${snippet}`;
+    }
+  }
+  return "";
 }
 
 function usefulPageText(text) {
@@ -794,6 +796,8 @@ function emailRejectReason(email, host) {
 }
 
 async function qualityRejectReason(candidate, suppression, alreadyContacted) {
+  const gateIssues = outreachQualityIssues(candidate, { suppression });
+  if (gateIssues.length) return gateIssues.join("; ");
   if (!candidate.businessEmail) return "missing email";
   const email = candidate.businessEmail.toLowerCase();
   const domain = emailDomain(email);
@@ -1259,7 +1263,13 @@ function todayLocal() {
   return `${data.year}-${data.month}-${data.day}`;
 }
 
-main().catch((error) => {
-  console.error(JSON.stringify({ ok: false, error: error.message, stack: error.stack }, null, 2));
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(JSON.stringify({ ok: false, error: error.message, stack: error.stack }, null, 2));
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  independentEvidenceFromOfficialPages,
+};

@@ -47,6 +47,7 @@ const CRM_HEADERS = [
   'utmContent',
   'utmTerm',
   'sourceLabel',
+  'is_test',
   'lead_status',
   'next_action_at',
   'sample_requested',
@@ -172,6 +173,7 @@ function valueMapFromPayload_(payload, now) {
     utmContent: payload.utm_content || payload.utmContent || '',
     utmTerm: payload.utm_term || payload.utmTerm || '',
     sourceLabel: payload.sourceLabel || '',
+    is_test: normalizeBooleanText_(payload.is_test || payload.isTest),
     lead_status: payload.lead_status || 'new_inquiry',
     next_action_at: payload.next_action_at || defaultNextActionDate_(now),
     sample_requested: normalizeSampleRequested_(payload.sample_requested),
@@ -352,6 +354,10 @@ function normalizeSampleRequested_(value) {
   const text = String(value || '').trim().toLowerCase();
   if (!text) return '';
   return /^(1|true|yes|y|on|sample|samples|swatch|swatches)$/i.test(text) ? 'yes' : String(value);
+}
+
+function normalizeBooleanText_(value) {
+  return /^(1|true|yes|y|on)$/i.test(textValue_(value)) ? 'yes' : 'no';
 }
 
 function fallbackSourceChannel_(payload) {

@@ -2,10 +2,9 @@
 
 ## Garment-First Production Release
 
-- Production baseline before P0 deployment: `origin/main` at `911fcf8504b28a84dc43c00d011757ca5956df0e`.
-- P0 production commit after deployment: `origin/main` at `c3898cf79633a79f091b7671e10e8dc1578dc26b`.
-- Safety remediation worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`.
-- Safety remediation branch: `codex/automation-safe-foundation-20260714`.
+- Production baseline for this release: `origin/main` at `8ac1e87e51e23c9ca55103bcdb6eee1478cbd7d7`.
+- Clean deployment worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`.
+- P0 acquisition-safety branch: `codex/p0-acquisition-safety-20260715`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
 - The customer-facing catalog contains 46 garment styles; the homepage features six of them.
@@ -20,6 +19,16 @@
 - The clean repository does not contain a verified source-to-public SKU map. Supplier specifications, physical samples and commercial prices must remain marked unverified until evidence is recorded.
 - `data/garment_review_status.json` records that boundary for all 46 SKUs, and `garment-review-status.js` exposes only sanitized effective statuses to the browser. The normal catalog validator enforces that mirror; strict commercial validation intentionally fails until dated evidence is added.
 - GitHub validation now checks automation safety, catalog integrity, public site structure and webhook controls on pull requests and `main` pushes.
+
+## P0 Acquisition Safety
+
+- Newly discovered outreach candidates default to `pending_review`; discovery cannot mark a candidate approved.
+- A daily review report contains at most five candidates and may contain fewer. A candidate must have a target country, an official-website URL proving explicit independent ownership or founder-led status, an official website, a public business email with source evidence, and general source evidence. A storefront alone is not independent-brand evidence.
+- Region exclusion, email validation, suppression matching, domain-first deduplication and manual approval are enforced again immediately before any reviewed send.
+- Discovery uses the authorized Brave Search API plus official brand websites. Search-engine result HTML and proxy-reader fallbacks are not used.
+- `BRAVE_SEARCH_API_KEY` is not stored in Git. The runtime must supply it through an ignored local environment file before live discovery can run.
+- Social publishing, real outreach sending and SMTP test sending remain disabled. P0 does not re-enable any outbound action.
+- Automated tests cover outreach qualification, discovery sources, suppression, deduplication, manual approval, CRM test-row handling, weekly-report exclusion and marketing-event wiring.
 
 ## Source of Truth
 
@@ -54,20 +63,23 @@ Do not keep in the deployment repository:
 
 ## Configuration Status
 
-`config/marketing-config.js` currently contains the production Google Apps Script webhook URL and browser submit token so the static GitHub Pages form can reach CRM. Both values are publicly readable in the browser and must not be treated as secrets. GA4 and Meta Pixel remain placeholders.
+`config/marketing-config.js` contains the production GA4 measurement ID, Meta Pixel ID, Search Console verification value, Google Apps Script webhook URL and browser submit token. These values are publicly readable in the static site and must not be treated as secrets.
 
 The Apps Script webhook requires the matching `CRM_WEBHOOK_TOKEN` in Apps Script project properties. The Apps Script source file must not contain a reusable fallback token. Stronger protection requires server-side rate limiting, validation or a challenge mechanism; a browser token alone is not authentication.
 
-The repository Apps Script source was synced to the existing Google Apps Script project on 2026-07-15. The existing Web App deployment ID and URL were preserved and updated from version 3 to version 4, `P0 confirmable CRM receipt and validation 2026-07-15`.
+The repository Apps Script source was synced to the bound `Bingo Textile CRM Webhook` project on 2026-07-15. Web App version 1 was deployed for anyone-access submission, while execution remains under the spreadsheet owner's account. The matching token and spreadsheet ID are stored in Apps Script Properties, not in the Apps Script source.
 
-Production verification confirmed that version 4 rejects an authorized honeypot request without creating a lead and returns a nonce-matched iframe receipt. A real successful website-form row has not yet been created during this rollout verification, so the full website-to-Google-Sheet success path remains pending an explicitly approved test submission.
+Deployment verification confirmed that a request without the token is rejected and that a valid request receives a nonce-matched iframe receipt. The valid test request created a `Website Leads` row with `is_test=yes`; a repeated submission ID returned `duplicate=true` without creating another row.
 
-Production tracking and CRM success-path verification remain complete only after these checks pass:
+The website sets `is_test=yes` only when loaded with `?crm_test=1`; normal visitors are stored with `is_test=no`. Weekly conversion reporting excludes test rows and reports the excluded count separately.
 
-- GA4 Realtime receives a visit.
-- Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
-- A test website form creates one Google Sheet row.
-- WhatsApp opens with the prefilled sourcing brief.
+Source-level tracking validation covers these mappings:
+
+- Product interest: GA4 `product_interest` and Meta `ViewContent`.
+- WhatsApp click: GA4 `contact_whatsapp` and Meta `Contact`.
+- Confirmed CRM form receipt: GA4 `generate_lead` and Meta `Lead`.
+
+GA4 Realtime and Meta Events Manager account-side receipt still require observation in their dashboards after the production page is deployed and visited; source configuration alone does not prove vendor-side receipt.
 
 ## Automation Status
 
@@ -76,7 +88,7 @@ As of `config/automation-control.json` dated 2026-07-14:
 - Facebook publishing: disabled by the operator's latest instruction.
 - Instagram publishing: disabled.
 - X publishing: disabled.
-- B2B discovery and review reports: enabled.
+- B2B discovery and review reports: enabled only when the runtime supplies `BRAVE_SEARCH_API_KEY`; no fallback HTML scraping is permitted.
 - Real QQ SMTP outreach sending: disabled by default.
 - QQ SMTP test emails: disabled by default.
 - CRM webhook capture: enabled with the current public browser configuration and Apps Script property check.

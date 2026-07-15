@@ -122,6 +122,8 @@ Address: Zhujiang Textile City, Haizhu District, Guangzhou, Guangdong Province, 
 node scripts/b2b_outreach.js --search --pool-size 30 --limit 5
 ```
 
+`BRAVE_SEARCH_API_KEY` 是必需项。系统不会回退到 Brave、DuckDuckGo 或 Bing 搜索结果 HTML；没有授权 API 密钥时会明确失败。搜索结果只用于发现官网，邮箱、产品和品牌证据必须再次从品牌官方网站核验。独立品牌证据必须来自同域官网，并包含明确事实，例如 `independently owned`、`founder-led` 或 `family-owned`；只有独立站或商品页不算证据。
+
 或者先人工整理候选 CSV，再让系统打分和生成开发信：
 
 ```bash
@@ -135,6 +137,8 @@ node scripts/b2b_outreach.js --input data/outreach_candidates.example.csv --limi
 - `data/outreach_leads.csv`：长期客户数据表，每天自动抓取后会写入或更新
 
 报告包含品牌名、国家/地区、官网、公开商务邮箱、产品类型、价格层级、最近新品/drop 线索、匹配理由、邮件标题和正文。
+
+每天最多输出 5 个候选，并同时要求：目标国家、独立服装品牌证据、官方网站、公开商务邮箱、官网来源证据。合格数量不足 5 个时报告显示实际数量，不用无邮箱或证据不完整的候选补位。所有新候选默认是 `pending_review`。
 
 ## 地区硬过滤
 
@@ -167,6 +171,7 @@ data/outreach_leads.csv
 - `contactRole`：联系人角色
 - `contactSource`：联系人来源链接
 - `personalEmailAllowed`：个人式邮箱是否公开用于商务联系，`true` 代表可开发，空值代表需人工确认
+- `independentBrandEvidence`：同域官网 About 等页面的 URL 加原文事实摘要，必须明确说明独立持有、创始人主导、家族持有等身份
 - `productType`：匹配的产品类型
 - `priceTier`：价格层级
 - `recentSignal`：新品、drop、collection 线索
@@ -174,7 +179,7 @@ data/outreach_leads.csv
 - `firstFoundDate`：第一次被系统发现的日期
 - `lastFoundDate`：最近一次被系统发现的日期
 - `developmentDate`：进入开发名单的日期
-- `approvalStatus`：`pending` 或 `approved`
+- `approvalStatus`：`pending_review` 或人工复核后的 `approved`
 - `status`：`pending_review`、`approved`、`sent`、`send_failed`、`do_not_contact`
 - `emailSubject`：开发信标题
 - `sentAt`：实际发送时间
@@ -182,7 +187,7 @@ data/outreach_leads.csv
 - `nextFollowUpDate`：建议下次跟进日期
 - `lastReportJson` / `lastReportMarkdown`：对应的日报文件
 
-同一个客户不会每天重复新增。脚本会按公开邮箱优先、官网域名其次、品牌名兜底来识别同一条客户记录；如果再次抓到同一品牌，只更新最近发现日期、评分、线索、报告路径等信息。
+同一个客户不会每天重复新增。脚本优先按官网域名识别同一品牌，再用公开邮箱和品牌名兜底；如果再次抓到同一品牌，只更新最近发现日期、评分、线索、报告路径等信息。
 
 如果要换客户库位置：
 
@@ -201,7 +206,7 @@ node scripts/b2b_outreach.js --input data/outreach_candidates.example.csv --limi
 在 JSON 报告中，把要发送客户的：
 
 ```json
-"approvalStatus": "pending"
+"approvalStatus": "pending_review"
 ```
 
 改成：
@@ -218,11 +223,7 @@ node scripts/b2b_outreach.js --from-report reports/outreach-YYYY-MM-DD-HHMM.json
 
 正式发送不会自动假定存在附件。只有本地已配置、文件存在且人工复核过的附件才会发送；否则正文只给出网站成衣目录链接。
 
-同一轮直接发送也支持，但只建议测试时使用：
-
-```bash
-node scripts/b2b_outreach.js --input data/outreach_candidates.example.csv --limit 1 --send --approve-send
-```
+同一轮直接发送和 `--approve-send` 已禁用。发送前系统会再次检查五项质量门槛、suppression 和 `approvalStatus`，旧报告也不能绕过这些规则。
 
 如果 `.env.outreach.local` 里 `OUTREACH_DRY_RUN=true`，脚本不会真正发信。
 

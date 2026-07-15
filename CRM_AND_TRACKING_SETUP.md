@@ -4,19 +4,10 @@ This project now supports GA4, Search Console, Meta Pixel, and CRM lead capture.
 
 ## 1. Google Analytics 4
 
-Manual step:
-
-1. Open Google Analytics.
-2. Create or select the Bingo Textile property.
-3. Add a Web data stream for `https://www.bingofabric.com/`.
-4. Copy the Measurement ID, such as `G-XXXXXXXXXX`.
-
-Project step:
-
-Edit `config/marketing-config.js`:
+The production configuration currently uses the previously provisioned Bingo web stream:
 
 ```js
-ga4MeasurementId: "G-XXXXXXXXXX"
+ga4MeasurementId: "G-4W8V1TXJGH"
 ```
 
 The website will load GA4 after the visitor accepts the analytics banner.
@@ -43,18 +34,10 @@ https://www.bingofabric.com/sitemap.xml
 
 ## 3. Meta Pixel
 
-Manual step:
-
-1. Open Meta Events Manager.
-2. Create or select a Web data source.
-3. Copy the Pixel ID.
-
-Project step:
-
-Edit `config/marketing-config.js`:
+The production configuration currently uses the previously provisioned Bingo Pixel:
 
 ```js
-metaPixelId: "PIXEL_ID"
+metaPixelId: "2252311015604509"
 ```
 
 Tracked website actions:
@@ -120,6 +103,7 @@ The Apps Script keeps the existing lead columns and adds CRM pipeline fields whe
 - `source_channel`: direct, organic search, social, referral, or campaign source.
 - `utm_campaign`: campaign value from the landing URL.
 - `reply_owner`: default `Jason Huang`.
+- `is_test`: `yes` only for an explicit test submission; weekly business metrics exclude these rows.
 - `reference_links`: Google Drive, Instagram post, Dropbox, product URL, or tech pack link supplied by the buyer.
 - `email`: optional business email.
 - `service_type` and `page_topic`: distinguish garment and fabric landing-page leads.
@@ -145,7 +129,7 @@ Updating GitHub Pages does not update the deployed Google Apps Script Web App. A
 
 ### Weekly Conversion Report
 
-Export the Website Leads Google Sheet as CSV into `data/website_leads_export_YYYY-MM-DD.csv`, then run:
+Export the Website Leads Google Sheet as CSV into `data/website_leads_export_YYYY-MM-DD.csv`, then run. Rows with `is_test=yes` are reported separately and excluded from every funnel and quote metric:
 
 ```bash
 node scripts/weekly_conversion_report.js --crm-csv data/website_leads_export_YYYY-MM-DD.csv --visits 120 --whatsapp-clicks 18
@@ -177,21 +161,14 @@ After deployment:
 
 1. Open the live site in an incognito window.
 2. Accept analytics consent.
-3. Submit a test sourcing brief.
+3. Add `?crm_test=1` to the page URL and submit a test sourcing brief.
 4. Confirm WhatsApp opens with a prefilled message.
 5. Confirm the lead row appears in Google Sheets.
-6. Confirm the Sheet row includes `lead_status`, `next_action_at`, `source_channel`, `sample_requested`, `reference_links`, `email`, `service_type`, and `form_started_at`.
+6. Confirm the Sheet row includes `is_test=yes`, `lead_status`, `next_action_at`, `source_channel`, `sample_requested`, `reference_links`, `email`, `service_type`, and `form_started_at`.
 7. Confirm GA4 Realtime shows activity.
 8. Confirm Meta Events Manager receives `PageView`, `Lead`, and `Contact`.
 9. Confirm Search Console verifies the site and the sitemap is submitted.
 
-## Manual Values Needed
+## Remaining Account Checks
 
-Send these values back to Codex when ready:
-
-```text
-GA4 Measurement ID:
-Search Console verification code or DNS status:
-Meta Pixel ID:
-Google Apps Script Web App URL:
-```
+The repository can verify that the correct IDs load and that the three event mappings fire. GA4 Realtime and Meta Events Manager receipt still require access to their account dashboards. Any Apps Script source change must also be copied into the Apps Script project and deployed as a new Web App version.
