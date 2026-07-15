@@ -8,9 +8,11 @@ const RATE_LIMIT_SECONDS = 600;
 const RATE_LIMIT_MAX = 5;
 const MIN_FORM_FILL_MS = 1500;
 const MAX_FORM_AGE_MS = 24 * 60 * 60 * 1000;
+const SUBMISSION_CACHE_SECONDS = 6 * 60 * 60;
 
 const CRM_HEADERS = [
   'receivedAt',
+  'submissionId',
   'submittedAt',
   'form_started_at',
   'formName',
@@ -55,32 +57,39 @@ const CRM_HEADERS = [
 function doPost(e) {
   const payload = parsePayload_(e);
   if (!isAuthorizedPayload_(payload)) {
-    return jsonOutput_({ ok: false, error: 'unauthorized' });
+    return responseOutput_(payload, { ok: false, error: 'unauthorized' });
   }
 
   const validation = validatePayload_(payload);
   if (!validation.ok) {
-    return jsonOutput_({ ok: false, error: 'invalid_payload', field: validation.field || '' });
+    return responseOutput_(payload, { ok: false, error: 'invalid_payload', field: validation.field || '' });
   }
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(5000)) {
-    return jsonOutput_({ ok: false, error: 'busy' });
+    return responseOutput_(payload, { ok: false, error: 'busy' });
   }
 
   try {
-    if (!consumeRateLimit_(payload)) {
-      return jsonOutput_({ ok: false, error: 'rate_limited' });
+    const crm = getLeadSheet_();
+    if (isDuplicateSubmission_(payload, crm)) {
+      return responseOutput_(payload, { ok: true, duplicate: true });
     }
 
-    const crm = getLeadSheet_();
+    if (!consumeRateLimit_(payload)) {
+      return responseOutput_(payload, { ok: false, error: 'rate_limited' });
+    }
+
     const now = new Date();
     crm.sheet.appendRow(rowFromPayload_(payload, now, crm.headers));
+    rememberSubmission_(payload);
+  } catch (error) {
+    return responseOutput_(payload, { ok: false, error: 'server_error' });
   } finally {
     lock.releaseLock();
   }
 
-  return jsonOutput_({ ok: true });
+  return responseOutput_(payload, { ok: true });
 }
 
 function getLeadSheet_() {
@@ -128,6 +137,7 @@ function rowFromPayload_(payload, now, headers) {
 function valueMapFromPayload_(payload, now) {
   return {
     receivedAt: now,
+    submissionId: payload.submissionId || '',
     submittedAt: payload.submittedAt || '',
     form_started_at: payload.form_started_at || '',
     formName: payload.formName || '',
@@ -228,6 +238,14 @@ function validatePayload_(payload) {
     }
   }
 
+  if (!/^[a-zA-Z0-9_-]{16,80}$/.test(textValue_(payload.submissionId))) {
+    return { ok: false, field: 'submissionId' };
+  }
+
+  if (payload.responseMode && textValue_(payload.responseMode) !== 'iframe') {
+    return { ok: false, field: 'responseMode' };
+  }
+
   const serviceType = textValue_(payload.service_type);
   const isGarmentLead = /garment|private label/i.test(serviceType) || Boolean(textValue_(payload.garment_type || payload.garmentType));
   if (isGarmentLead && !textValue_(payload.garment_type || payload.garmentType)) {
@@ -273,6 +291,41 @@ function consumeRateLimit_(payload) {
 
   cache.put(key, String(current + 1), RATE_LIMIT_SECONDS);
   return true;
+}
+
+function submissionCacheKey_(payload) {
+  const digest = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    textValue_(payload.submissionId),
+    Utilities.Charset.UTF_8
+  );
+  return 'submission_' + Utilities.base64EncodeWebSafe(digest).replace(/=+$/, '').slice(0, 40);
+}
+
+function isDuplicateSubmission_(payload, crm) {
+  if (CacheService.getScriptCache().get(submissionCacheKey_(payload)) === 'accepted') {
+    return true;
+  }
+
+  if (!crm || !crm.sheet || !Array.isArray(crm.headers)) return false;
+  const columnIndex = crm.headers.indexOf('submissionId');
+  const lastRow = crm.sheet.getLastRow();
+  if (columnIndex < 0 || lastRow < 2) return false;
+
+  const match = crm.sheet
+    .getRange(2, columnIndex + 1, lastRow - 1, 1)
+    .createTextFinder(textValue_(payload.submissionId))
+    .matchEntireCell(true)
+    .findNext();
+  return Boolean(match);
+}
+
+function rememberSubmission_(payload) {
+  try {
+    CacheService.getScriptCache().put(submissionCacheKey_(payload), 'accepted', SUBMISSION_CACHE_SECONDS);
+  } catch (error) {
+    // The Sheet submissionId column remains the durable idempotency check.
+  }
 }
 
 function textValue_(value) {
@@ -330,6 +383,14 @@ function getExpectedWebhookToken_() {
 }
 
 function parsePayload_(e) {
+  if (e && e.parameter && e.parameter.payload) {
+    try {
+      return JSON.parse(e.parameter.payload);
+    } catch (error) {
+      return { raw: e.parameter.payload };
+    }
+  }
+
   if (!e || !e.postData || !e.postData.contents) {
     return {};
   }
@@ -339,6 +400,34 @@ function parsePayload_(e) {
   } catch (error) {
     return { raw: e.postData.contents };
   }
+}
+
+function responseOutput_(requestPayload, responsePayload) {
+  const payload = {
+    type: 'bingo-crm-result',
+    submissionId: textValue_(requestPayload && requestPayload.submissionId),
+    ...responsePayload
+  };
+
+  if (requestPayload && requestPayload.responseMode === 'iframe') {
+    return iframeOutput_(payload);
+  }
+
+  return jsonOutput_(payload);
+}
+
+function iframeOutput_(payload) {
+  const safePayload = JSON.stringify(payload)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+  const html = '<!doctype html><meta charset="utf-8"><script>' +
+    'window.parent.postMessage(' + safePayload + ', "*");' +
+    '</script>';
+
+  return HtmlService
+    .createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function jsonOutput_(payload) {

@@ -48,12 +48,30 @@ for (const file of contentPages) {
 }
 
 const formScript = fs.readFileSync(path.join(ROOT, "script.js"), "utf8");
-for (const marker of ["minimumFormFillMs", "fax_number", "form_started_at"]) {
+for (const marker of [
+  "minimumFormFillMs",
+  "fax_number",
+  "form_started_at",
+  "submissionId",
+  "bingo-crm-result",
+  "CRM confirmation timed out"
+]) {
   if (!formScript.includes(marker)) errors.push(`script.js is missing form anti-spam marker ${marker}`);
+}
+if (/mode:\s*["']no-cors["']|navigator\.sendBeacon/.test(formScript)) {
+  errors.push("script.js must not claim CRM success through an unreadable no-cors or beacon request");
 }
 
 const webhookScript = fs.readFileSync(path.join(ROOT, "scripts/google_apps_script_lead_webhook.gs"), "utf8");
-for (const marker of ["validatePayload_", "consumeRateLimit_", "safeSheetValue_", "LockService.getScriptLock"]) {
+for (const marker of [
+  "validatePayload_",
+  "consumeRateLimit_",
+  "safeSheetValue_",
+  "LockService.getScriptLock",
+  "isDuplicateSubmission_",
+  "responseOutput_",
+  "HtmlService.XFrameOptionsMode.ALLOWALL"
+]) {
   if (!webhookScript.includes(marker)) errors.push(`Apps Script webhook is missing server control ${marker}`);
 }
 if (!/const DEFAULT_CRM_WEBHOOK_TOKEN\s*=\s*(["'])\1;/.test(webhookScript)) {
@@ -66,6 +84,12 @@ if (!/AI style references, not production photography/i.test(garmentPage)) {
 }
 if (/\bARTIE\b|artieshop|detail\.1688\.com/i.test(garmentPage)) {
   errors.push("garments.html exposes a source brand or source marketplace URL");
+}
+if (!/garment-review-status\.js/i.test(garmentPage)) {
+  errors.push("garments.html must load the public garment review gate");
+}
+if (/public USD prices|USD settlement prices|compare base-style prices/i.test(garmentPage)) {
+  errors.push("garments.html advertises unverified public prices");
 }
 
 const sitemap = fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8");

@@ -91,7 +91,7 @@ crmSubmitToken: "SAME_TOKEN_AS_APPS_SCRIPT"
 
 `scripts/google_apps_script_lead_webhook.gs` checks `crmSubmitToken` before appending to the Sheet. Keep the value in the deployed site configuration and the Apps Script `CRM_WEBHOOK_TOKEN` script property aligned. Because a static website must send this value from the browser, it is an abuse filter, not a private server-to-server secret. Rotate it if it is copied or abused.
 
-When a visitor submits a valid form, the site sends the lead payload to the webhook and still opens WhatsApp.
+When a visitor submits a valid form, the site opens WhatsApp and posts the lead through a hidden response frame. The Apps Script returns a nonce-matched `postMessage` receipt. The website only reports that the inquiry was saved after receiving that receipt; otherwise it keeps the form values and shows the WhatsApp/email fallback.
 
 In local preview, or when the webhook is not configured, the site stores at most five recent lead drafts in browser localStorage. The CRM token is removed from those drafts. A configured production site does not keep CRM lead copies in browser localStorage.
 
@@ -102,6 +102,7 @@ The current form and Apps Script also apply basic anti-spam controls:
 - Server-side required field, email, phone digit, payload size, and field length checks.
 - Five accepted attempts per identity per ten minutes through Apps Script CacheService.
 - Apps Script LockService around rate checking and row creation.
+- A per-submission ID used to suppress immediate duplicate rows and match the browser receipt.
 - Spreadsheet formula-injection escaping for values beginning with `=`, `+`, `-`, or `@`.
 
 These controls reduce basic automated abuse; they do not replace a server-held secret, CAPTCHA, WAF, or consent/legal review.

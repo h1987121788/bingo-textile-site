@@ -1,5 +1,6 @@
 const body = document.body;
-const isPreviewMode = body?.dataset.previewMode === "true";
+const isLocalPreviewHost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+const isPreviewMode = body?.dataset.previewMode === "true" || isLocalPreviewHost || window.location.protocol === "file:";
 const navToggle = document.querySelector(".nav-toggle");
 const navLinks = document.querySelectorAll(".site-nav a");
 const filterButtons = document.querySelectorAll("[data-filter]");
@@ -8,6 +9,7 @@ const leadForms = document.querySelectorAll("[data-lead-form]");
 const salesWhatsApp = "8613827719946";
 const salesEmail = "57317996@qq.com";
 const minimumFormFillMs = 1800;
+const crmResponseTimeoutMs = 15000;
 const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 const catalogProducts = Array.isArray(window.bingoProductCatalog) ? window.bingoProductCatalog : [];
 const marketingConfig = window.bingoMarketingConfig || {};
@@ -275,8 +277,14 @@ const getLeadPayload = (form, fields) => {
   const isGarmentLead = /garment|private label/i.test(serviceType);
   const startedAt = new Date(Number(form.dataset.startedAt || 0));
   const formStartedAt = Number.isNaN(startedAt.getTime()) ? "" : startedAt.toISOString();
+  if (!form.dataset.submissionId) {
+    const randomId = window.crypto?.randomUUID?.() || [Date.now(), Math.random().toString(36).slice(2)].join("_");
+    form.dataset.submissionId = String(randomId).replace(/[^a-zA-Z0-9_-]/g, "_");
+  }
 
   const payload = {
+    submissionId: form.dataset.submissionId,
+    responseMode: "iframe",
     submittedAt: new Date().toISOString(),
     form_started_at: formStartedAt,
     lead_status: isGarmentLead ? "new_garment_lead" : "new_fabric_lead",
@@ -298,38 +306,78 @@ const submitLeadToCrm = (payload) => {
   const localPayload = { ...payload };
   delete localPayload.crmSubmitToken;
 
-  if (isPreviewMode || !isConfiguredValue(marketingConfig.crmWebhookUrl)) {
+  if (isPreviewMode) {
     safeLocalAppend("bingoWebsiteLeadDrafts", localPayload, 5);
-    return;
+    return Promise.resolve({ ok: true, preview: true });
   }
 
-  const body = JSON.stringify(payload);
-  const blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
-
-  if (navigator.sendBeacon && navigator.sendBeacon(marketingConfig.crmWebhookUrl, blob)) {
-    return;
+  if (!isConfiguredValue(marketingConfig.crmWebhookUrl)) {
+    return Promise.reject(new Error("CRM endpoint is not configured"));
   }
 
-  fetch(marketingConfig.crmWebhookUrl, {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "text/plain;charset=UTF-8"
-    },
-    body
-  }).catch(() => {
-    // WhatsApp remains the visible fallback if the background CRM request fails.
+  return new Promise((resolve, reject) => {
+    const frameName = `bingo-crm-${payload.submissionId}`;
+    const iframe = document.createElement("iframe");
+    iframe.name = frameName;
+    iframe.title = "CRM submission response";
+    iframe.hidden = true;
+
+    const relayForm = document.createElement("form");
+    relayForm.method = "POST";
+    relayForm.action = marketingConfig.crmWebhookUrl;
+    relayForm.target = frameName;
+    relayForm.hidden = true;
+
+    const payloadField = document.createElement("input");
+    payloadField.type = "hidden";
+    payloadField.name = "payload";
+    payloadField.value = JSON.stringify(payload);
+    relayForm.append(payloadField);
+
+    let settled = false;
+    const cleanup = () => {
+      window.removeEventListener("message", handleMessage);
+      window.clearTimeout(timeoutId);
+      relayForm.remove();
+      iframe.remove();
+    };
+    const finish = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      callback(value);
+    };
+    const handleMessage = (event) => {
+      const response = event.data;
+      if (event.source !== iframe.contentWindow) return;
+      if (!response || response.type !== "bingo-crm-result") return;
+      if (response.submissionId !== payload.submissionId) return;
+
+      if (response.ok) {
+        finish(resolve, response);
+      } else {
+        finish(reject, new Error(response.error || "CRM rejected the submission"));
+      }
+    };
+    const timeoutId = window.setTimeout(() => {
+      finish(reject, new Error("CRM confirmation timed out"));
+    }, crmResponseTimeoutMs);
+
+    window.addEventListener("message", handleMessage);
+    document.body.append(iframe, relayForm);
+    relayForm.submit();
   });
 };
 
 leadForms.forEach((form) => {
   form.dataset.startedAt = String(Date.now());
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const message = form.querySelector("[data-form-message]");
     const honeypot = form.querySelector('[name="fax_number"]');
+    const submitButton = form.querySelector('[type="submit"]');
 
     if (honeypot?.value.trim()) {
       message.textContent = "The form could not be submitted. Please refresh the page and try again.";
@@ -383,38 +431,65 @@ leadForms.forEach((form) => {
     const whatsappUrl = `https://wa.me/${salesWhatsApp}?text=${encodeURIComponent(inquiryText)}`;
     const emailUrl = `mailto:${salesEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(inquiryText)}`;
 
-    submitLeadToCrm(leadPayload);
-    trackMarketingEvent("generate_lead", {
-      form_name: leadPayload.formName,
-      garment_type: leadPayload.garment_type || "",
-      country: leadPayload.country || "",
-      timeline: leadPayload.timeline || "",
-      development_route: leadPayload.development_route || "",
-      destination: leadPayload.destination || "",
-      product_interest: leadPayload.productInterest || "",
-      source_channel: leadPayload.source_channel || "",
-      sample_requested: leadPayload.sample_requested || ""
-    });
-
     if (isPreviewMode) {
+      await submitLeadToCrm(leadPayload);
       message.textContent = "Local preview: the test brief was saved in this browser only. Nothing was sent externally.";
       message.style.color = "#3f8f7c";
       form.reset();
       form.dataset.startedAt = String(Date.now());
+      delete form.dataset.submissionId;
       return;
     }
 
-    message.textContent = "Submitting your brief and opening WhatsApp. If it does not open, ";
-    const fallbackLink = document.createElement("a");
-    fallbackLink.href = emailUrl;
-    fallbackLink.textContent = "email this inquiry instead";
-    message.appendChild(fallbackLink);
-    message.append(".");
+    const whatsappWindow = window.open(whatsappUrl, "_blank");
+    if (whatsappWindow) whatsappWindow.opener = null;
+    message.textContent = "Opening WhatsApp and confirming that your inquiry is saved...";
     message.style.color = "#3f8f7c";
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.setAttribute("aria-busy", "true");
+    }
 
-    window.open(whatsappUrl, "_blank", "noopener");
-    form.reset();
-    form.dataset.startedAt = String(Date.now());
+    try {
+      await submitLeadToCrm(leadPayload);
+      trackMarketingEvent("generate_lead", {
+        form_name: leadPayload.formName,
+        garment_type: leadPayload.garment_type || "",
+        country: leadPayload.country || "",
+        timeline: leadPayload.timeline || "",
+        development_route: leadPayload.development_route || "",
+        destination: leadPayload.destination || "",
+        product_interest: leadPayload.productInterest || "",
+        source_channel: leadPayload.source_channel || "",
+        sample_requested: leadPayload.sample_requested || ""
+      });
+
+      message.textContent = "Inquiry saved. Continue in WhatsApp to send the prepared sourcing brief.";
+      if (!whatsappWindow) {
+        message.append(" ");
+        const whatsappFallback = document.createElement("a");
+        whatsappFallback.href = whatsappUrl;
+        whatsappFallback.target = "_blank";
+        whatsappFallback.rel = "noopener";
+        whatsappFallback.textContent = "Open WhatsApp";
+        message.append(whatsappFallback, ".");
+      }
+      form.reset();
+      form.dataset.startedAt = String(Date.now());
+      delete form.dataset.submissionId;
+    } catch (error) {
+      message.textContent = "WhatsApp opened, but the CRM save could not be confirmed. Your form has been kept. Please send the prepared brief in WhatsApp or ";
+      const fallbackLink = document.createElement("a");
+      fallbackLink.href = emailUrl;
+      fallbackLink.textContent = "email this inquiry";
+      message.append(fallbackLink, ".");
+      message.style.color = "#b66a7d";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.removeAttribute("aria-busy");
+      }
+    }
   });
 });
 

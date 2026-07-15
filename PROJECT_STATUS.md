@@ -1,23 +1,23 @@
-# Project Status - 2026-07-14
+# Project Status - 2026-07-15
 
 ## Garment-First Production Release
 
-- Production baseline: `origin/main` at `911fcf8504b28a84dc43c00d011757ca5956df0e` before the 2026-07-14 safety remediation.
+- Production baseline before P0 deployment: `origin/main` at `911fcf8504b28a84dc43c00d011757ca5956df0e`.
 - Safety remediation worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`.
 - Safety remediation branch: `codex/automation-safe-foundation-20260714`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
 - The customer-facing catalog contains 46 garment styles; the homepage features six of them.
-- All 46 styles have public USD settlement prices calculated from source list price plus `CNY 20` at the fixed rate `USD 1 = CNY 6.5`. Source costs and supplier records remain in the operations workspace and are not committed.
+- All 46 styles remain available as sourcing references, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated review evidence marks it verified.
 - All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
-- Each catalog style includes an all-English detail board with construction and fabric zooms; no supplier logo, Chinese copy, or supplier style number is published.
+- All-English detail-board assets remain available for review, but the website does not link them until supplier specification and physical-sample evidence are verified.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
-- Website forms keep at most seven required inputs, add an optional business email, send the existing CRM webhook payload and open a prepared WhatsApp inquiry.
-- Every lead form now has a honeypot and minimum-fill-time check. The updated Apps Script source adds payload validation, per-identity rate limiting, locking and spreadsheet formula-injection protection.
+- Website forms keep at most seven required inputs, add an optional business email, open a prepared WhatsApp inquiry and wait for a nonce-matched CRM receipt before reporting that the lead was saved.
+- Every lead form now has a honeypot and minimum-fill-time check. The updated Apps Script source adds payload validation, per-identity rate limiting, locking, durable submission-ID duplicate checks and spreadsheet formula-injection protection.
 - The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
 - AI concepts remain labelled on the public pages. Replace them with approved physical-sample photography as samples become available.
 - The clean repository does not contain a verified source-to-public SKU map. Supplier specifications, physical samples and commercial prices must remain marked unverified until evidence is recorded.
-- `data/garment_review_status.json` records that boundary for all 46 SKUs. The normal catalog validator reports unknown fields; strict commercial validation intentionally fails until dated evidence is added.
+- `data/garment_review_status.json` records that boundary for all 46 SKUs, and `garment-review-status.js` exposes only sanitized effective statuses to the browser. The normal catalog validator enforces that mirror; strict commercial validation intentionally fails until dated evidence is added.
 - GitHub validation now checks automation safety, catalog integrity, public site structure and webhook controls on pull requests and `main` pushes.
 
 ## Source of Truth

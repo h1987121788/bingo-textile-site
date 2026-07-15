@@ -7,9 +7,11 @@ const strictCommercial = process.argv.includes("--strict-commercial");
 const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "garment-data.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(ROOT, "garment-review-status.js"), "utf8"), context);
 
 const catalog = context.window.bingoGarmentCatalog;
 const pricing = context.window.bingoGarmentPricing;
+const publicRegistry = context.window.bingoGarmentReviewStatus;
 const registry = JSON.parse(
   fs.readFileSync(path.join(ROOT, "data", "garment_review_status.json"), "utf8")
 );
@@ -31,10 +33,31 @@ const requiredFields = [
   "description"
 ];
 const verifiedValues = new Set(["recorded", "verified", "approved_sample_photo"]);
+const publicReviewFields = [
+  "sourceMapping",
+  "supplierSpecification",
+  "physicalSample",
+  "commercialPrice",
+  "publicImage",
+  "reviewedAt"
+];
 
 if (!Array.isArray(catalog)) errors.push("window.bingoGarmentCatalog must be an array");
 if (!pricing || pricing.currency !== "USD" || pricing.cnyPerUsd !== 6.5) {
   errors.push("catalog pricing must explicitly retain USD and CNY 6.5 conversion metadata");
+}
+if (!publicRegistry || !publicRegistry.defaultReview || !publicRegistry.products) {
+  errors.push("public garment review status is missing or invalid");
+}
+
+const rendererSource = fs.readFileSync(path.join(ROOT, "garments.js"), "utf8");
+for (const marker of [
+  'review.commercialPrice !== "verified"',
+  'review.supplierSpecification === "verified"',
+  'review.physicalSample === "verified"',
+  'data-commercial-status="quote-required"'
+]) {
+  if (!rendererSource.includes(marker)) errors.push(`garment renderer is missing commercial gate: ${marker}`);
 }
 
 const products = Array.isArray(catalog) ? catalog : [];
@@ -77,6 +100,15 @@ for (let index = 0; index < products.length; index += 1) {
   }
 
   const review = { ...registry.defaultReview, ...registry.products[product.code] };
+  const publicReview = {
+    ...(publicRegistry?.defaultReview || {}),
+    ...((publicRegistry?.products || {})[product.code] || {})
+  };
+  for (const field of publicReviewFields) {
+    if (String(publicReview[field] || "") !== String(review[field] || "")) {
+      errors.push(`${product.code} public review status does not match ${field}`);
+    }
+  }
   const hasVerifiedStatus = [
     review.sourceMapping,
     review.supplierSpecification,
@@ -101,6 +133,14 @@ const allDefaultUnverified = products.filter((product) => {
   const review = { ...registry.defaultReview, ...registry.products[product.code] };
   return review.physicalSample !== "verified" || review.supplierSpecification !== "verified";
 }).length;
+const publiclyQuotedCount = products.filter((product) => {
+  const review = { ...registry.defaultReview, ...registry.products[product.code] };
+  return review.commercialPrice === "verified";
+}).length;
+const publiclySpecifiedCount = products.filter((product) => {
+  const review = { ...registry.defaultReview, ...registry.products[product.code] };
+  return review.supplierSpecification === "verified" && review.physicalSample === "verified";
+}).length;
 
 if (allDefaultUnverified) {
   warnings.push(`${allDefaultUnverified} products remain explicitly unverified for sample or supplier specifications`);
@@ -112,6 +152,8 @@ const result = {
   strictCommercial,
   catalogCount: products.length,
   reviewRegistryCount: Object.keys(registry.products || {}).length,
+  publiclyQuotedCount,
+  publiclySpecifiedCount,
   unconfirmedFields: {
     composition: unconfirmed("composition"),
     gsm: unconfirmed("gsm"),

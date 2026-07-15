@@ -1,5 +1,9 @@
 const garmentCatalog = Array.isArray(window.bingoGarmentCatalog) ? window.bingoGarmentCatalog : [];
 const garmentPricing = window.bingoGarmentPricing || {};
+const garmentReviewRegistry = window.bingoGarmentReviewStatus || {
+  defaultReview: {},
+  products: {}
+};
 const garmentLaunchCodes = new Set(
   Array.isArray(window.bingoGarmentLaunchCodes) ? window.bingoGarmentLaunchCodes : []
 );
@@ -17,7 +21,35 @@ const escapeGarmentHtml = (value) =>
     return entities[character];
   });
 
-const renderGarmentPrice = (product) => {
+const getGarmentReview = (product) => ({
+  ...(garmentReviewRegistry.defaultReview || {}),
+  ...((garmentReviewRegistry.products || {})[product.code] || {})
+});
+
+const hasVerifiedSpecifications = (review) =>
+  review.supplierSpecification === "verified" && review.physicalSample === "verified";
+
+const getPublicGarmentName = (product, review) => {
+  if (hasVerifiedSpecifications(review)) return product.name;
+
+  const withoutUnverifiedWeight = String(product.name || "")
+    .replace(/\b\d{2,4}\s*gsm\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  return withoutUnverifiedWeight || "Streetwear style reference";
+};
+
+const renderGarmentPrice = (product, review) => {
+  if (review.commercialPrice !== "verified") {
+    return `
+      <div class="garment-price-block is-unverified" data-commercial-status="quote-required">
+        <span>Current quote required</span>
+        <p><strong>Request verified price</strong></p>
+        <em>Confirmed against the current supplier quote, MOQ, customization and destination.</em>
+      </div>
+    `;
+  }
+
   const priceCny = Number(product.priceCny);
   const cnyPerUsd = Number(garmentPricing.cnyPerUsd);
   const decimalPlaces = Number.isInteger(garmentPricing.decimalPlaces)
@@ -38,7 +70,7 @@ const renderGarmentPrice = (product) => {
     <div class="garment-price-block">
       <span>USD settlement price</span>
       <p>
-        <strong>USD ${escapeGarmentHtml(formattedPrice)}</strong>
+        <strong>${escapeGarmentHtml(formattedPrice)}</strong>
         <small>/ ${escapeGarmentHtml(product.unit || "piece")}</small>
       </p>
       <em>Fixed conversion: USD 1 = CNY ${escapeGarmentHtml(cnyPerUsd)}. Customization, freight, duties and taxes are separate.</em>
@@ -50,7 +82,13 @@ const getGarmentDetailImage = (product) =>
   `./assets/garments/details/${String(product.code || "").toLowerCase()}-detail.webp`;
 
 const renderGarmentCard = (product, contactTarget) => {
+  const review = getGarmentReview(product);
+  const verifiedSpecifications = hasVerifiedSpecifications(review);
+  const publicName = getPublicGarmentName(product, review);
   const detailImage = getGarmentDetailImage(product);
+  const publicComposition = verifiedSpecifications ? product.composition : "To confirm by physical sample";
+  const publicGsm = verifiedSpecifications ? product.gsm : "To confirm by physical sample";
+  const publicSizes = verifiedSpecifications ? product.sizes : "To confirm before quotation";
 
   return `
   <article class="product-card garment-card" data-category="${escapeGarmentHtml(product.category)}" data-product-code="${escapeGarmentHtml(product.code)}">
@@ -59,11 +97,10 @@ const renderGarmentCard = (product, contactTarget) => {
         ? `<img
             class="product-photo garment-photo"
             src="${escapeGarmentHtml(product.image)}"
-            alt="Unbranded style reference for ${escapeGarmentHtml(product.name)}"
+            alt="Unbranded style reference for ${escapeGarmentHtml(publicName)}"
             data-primary-src="${escapeGarmentHtml(product.image)}"
-            data-primary-alt="Unbranded style reference for ${escapeGarmentHtml(product.name)}"
-            data-detail-src="${escapeGarmentHtml(detailImage)}"
-            data-detail-alt="English detail board for ${escapeGarmentHtml(product.name)}"
+            data-primary-alt="Unbranded style reference for ${escapeGarmentHtml(publicName)}"
+            ${verifiedSpecifications ? `data-detail-src="${escapeGarmentHtml(detailImage)}" data-detail-alt="Verified detail board for ${escapeGarmentHtml(publicName)}"` : ""}
             loading="lazy"
             decoding="async"
           />`
@@ -76,13 +113,15 @@ const renderGarmentCard = (product, contactTarget) => {
             <span class="garment-shape" aria-hidden="true"></span>
             <small>Style reference pending</small>
           </div>`}
-      <div class="garment-image-switch" role="group" aria-label="Image view for ${escapeGarmentHtml(product.name)}">
-        <button class="active" type="button" data-garment-view="product" aria-pressed="true">Product</button>
-        <button type="button" data-garment-view="details" aria-pressed="false">Details</button>
-      </div>
+      ${verifiedSpecifications
+        ? `<div class="garment-image-switch" role="group" aria-label="Image view for ${escapeGarmentHtml(publicName)}">
+            <button class="active" type="button" data-garment-view="product" aria-pressed="true">Product</button>
+            <button type="button" data-garment-view="details" aria-pressed="false">Details</button>
+          </div>`
+        : `<div class="garment-image-status">AI style reference</div>`}
       <figcaption>
         <span data-garment-caption>${escapeGarmentHtml(product.code)} / Style reference</span>
-        ${escapeGarmentHtml(product.categoryLabel)} / ${escapeGarmentHtml(product.gsm)}
+        ${escapeGarmentHtml(product.categoryLabel)} / ${verifiedSpecifications ? escapeGarmentHtml(product.gsm) : "Specifications pending"}
       </figcaption>
     </figure>
     <div class="card-body">
@@ -90,22 +129,26 @@ const renderGarmentCard = (product, contactTarget) => {
         <p class="tag">${escapeGarmentHtml(product.categoryLabel)}</p>
         <span class="sample-gate">Sample first</span>
       </div>
-      <h3>${escapeGarmentHtml(product.name)}</h3>
+      <h3>${escapeGarmentHtml(publicName)}</h3>
       <p>${escapeGarmentHtml(product.description)}</p>
-      ${renderGarmentPrice(product)}
+      ${renderGarmentPrice(product, review)}
       <dl class="product-specs garment-specs">
-        <div><dt>Fabric</dt><dd>${escapeGarmentHtml(product.composition)}</dd></div>
-        <div><dt>Weight</dt><dd>${escapeGarmentHtml(product.gsm)}</dd></div>
+        <div><dt>Fabric</dt><dd>${escapeGarmentHtml(publicComposition)}</dd></div>
+        <div><dt>Weight</dt><dd>${escapeGarmentHtml(publicGsm)}</dd></div>
         <div><dt>Fit</dt><dd>${escapeGarmentHtml(product.fit)}</dd></div>
-        <div><dt>Sizes</dt><dd>${escapeGarmentHtml(product.sizes)}</dd></div>
+        <div><dt>Sizes</dt><dd>${escapeGarmentHtml(publicSizes)}</dd></div>
         <div><dt>Season</dt><dd>${escapeGarmentHtml(product.season)}</dd></div>
       </dl>
-      <p class="verification-note">Confirm stock, color, size, quantity and the physical sample before ordering.</p>
+      <p class="verification-note">${verifiedSpecifications
+        ? "Verified specifications still require current stock, color, quantity and order confirmation."
+        : "Supplier specifications, physical sample, stock and order terms are not yet verified."}</p>
       <div class="garment-card-actions">
-        <a href="${escapeGarmentHtml(detailImage)}" target="_blank" rel="noopener">Open full-size details</a>
+        ${verifiedSpecifications
+          ? `<a href="${escapeGarmentHtml(detailImage)}" target="_blank" rel="noopener">Open verified details</a>`
+          : `<span>Technical details pending sample review</span>`}
         <a
           href="${escapeGarmentHtml(contactTarget)}"
-          data-product-interest="${escapeGarmentHtml(`${product.code} ${product.name}`)}"
+          data-product-interest="${escapeGarmentHtml(`${product.code} ${publicName}`)}"
         >Ask about this style</a>
       </div>
     </div>
@@ -143,7 +186,7 @@ document.querySelectorAll("[data-garment-media]").forEach((media) => {
   const image = media.querySelector("[data-primary-src]");
   const caption = media.querySelector("[data-garment-caption]");
   const buttons = media.querySelectorAll("[data-garment-view]");
-  if (!image) return;
+  if (!image || !image.dataset.detailSrc) return;
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
