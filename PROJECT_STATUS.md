@@ -73,6 +73,8 @@ Deployment verification confirmed that a request without the token is rejected a
 
 The website sets `is_test=yes` only when loaded with `?crm_test=1`; normal visitors are stored with `is_test=no`. Weekly conversion reporting excludes test rows and reports the excluded count separately.
 
+The five legacy CRM verification rows that predated the `is_test` column were backfilled to `is_test=yes` on 2026-07-15. At verification time, all nine existing `Website Leads` data rows were explicit test records and `AP2:AP10` contained `yes`, so none belongs in business conversion metrics.
+
 Source-level tracking validation covers these mappings:
 
 - Product interest: GA4 `product_interest` and Meta `ViewContent`.
