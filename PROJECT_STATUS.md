@@ -69,7 +69,7 @@ The Apps Script webhook requires the matching `CRM_WEBHOOK_TOKEN` in Apps Script
 
 The repository Apps Script source was synced to the bound `Bingo Textile CRM Webhook` project on 2026-07-15. Web App version 1 was deployed for anyone-access submission, while execution remains under the spreadsheet owner's account. The matching token and spreadsheet ID are stored in Apps Script Properties, not in the Apps Script source.
 
-Deployment verification confirmed that a request without the token is rejected and that a valid request receives a nonce-matched iframe receipt. The valid test request created a `Website Leads` row with `is_test=yes`; a repeated submission ID returned `duplicate=true` without creating another row.
+Deployment verification confirmed that a request without the token is rejected and that a valid request receives a nonce-matched iframe receipt. The iframe receipt targets the website's top window so the Apps Script sandbox wrapper cannot intercept it. The website accepts the receipt only from the HTTPS Apps Script or `-script.googleusercontent.com` sandbox origin and only when its type and random submission ID match. The valid test request created a `Website Leads` row with `is_test=yes`; a repeated submission ID returned `duplicate=true` without creating another row.
 
 The website sets `is_test=yes` only when loaded with `?crm_test=1`; normal visitors are stored with `is_test=no`. Weekly conversion reporting excludes test rows and reports the excluded count separately.
 

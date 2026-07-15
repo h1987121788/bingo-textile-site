@@ -160,6 +160,7 @@ const iframeResponse = responseOutput_(basePayload, { ok: true });
 assert.strictEqual(iframeResponse.frameMode, "ALLOWALL");
 assert.match(iframeResponse.html, /bingo-crm-result/);
 assert.match(iframeResponse.html, /test_submission_20260715/);
+assert.match(iframeResponse.html, /window\.top\.postMessage/);
 
 const fullPayload = {
   ...basePayload,
@@ -185,4 +186,4 @@ const durableDuplicateResponse = doPost({ parameter: { payload: JSON.stringify(f
 assert.strictEqual(appendedRows.length, 2);
 assert.match(durableDuplicateResponse.html, /"duplicate":true/);
 
-console.log(JSON.stringify({ ok: true, tests: 25 }, null, 2));
+console.log(JSON.stringify({ ok: true, tests: 26 }, null, 2));

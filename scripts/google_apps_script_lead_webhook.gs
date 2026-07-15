@@ -432,7 +432,7 @@ function iframeOutput_(payload) {
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029');
   const html = '<!doctype html><meta charset="utf-8"><script>' +
-    'window.parent.postMessage(' + safePayload + ', "*");' +
+    'window.top.postMessage(' + safePayload + ', "*");' +
     '</script>';
 
   return HtmlService

@@ -304,6 +304,16 @@ const getLeadPayload = (form, fields) => {
   return payload;
 };
 
+const isTrustedCrmResponseOrigin = (origin) => {
+  try {
+    const url = new URL(origin);
+    return url.protocol === "https:" &&
+      (url.hostname === "script.google.com" || url.hostname.endsWith("-script.googleusercontent.com"));
+  } catch (_error) {
+    return false;
+  }
+};
+
 const submitLeadToCrm = (payload) => {
   const localPayload = { ...payload };
   delete localPayload.crmSubmitToken;
@@ -351,7 +361,7 @@ const submitLeadToCrm = (payload) => {
     };
     const handleMessage = (event) => {
       const response = event.data;
-      if (event.source !== iframe.contentWindow) return;
+      if (!isTrustedCrmResponseOrigin(event.origin)) return;
       if (!response || response.type !== "bingo-crm-result") return;
       if (response.submissionId !== payload.submissionId) return;
 

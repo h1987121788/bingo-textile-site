@@ -64,6 +64,9 @@ if (!formScript.includes("isCrmTestMode") || !/is_test:\s*isCrmTestMode/.test(fo
 if (/mode:\s*["']no-cors["']|navigator\.sendBeacon/.test(formScript)) {
   errors.push("script.js must not claim CRM success through an unreadable no-cors or beacon request");
 }
+if (!formScript.includes("isTrustedCrmResponseOrigin") || /event\.source\s*!==\s*iframe\.contentWindow/.test(formScript)) {
+  errors.push("script.js must validate the Apps Script sandbox origin instead of requiring the outer iframe as event.source");
+}
 
 const webhookScript = fs.readFileSync(path.join(ROOT, "scripts/google_apps_script_lead_webhook.gs"), "utf8");
 for (const marker of [
