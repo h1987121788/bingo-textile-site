@@ -121,6 +121,10 @@ const basePayload = {
 
 assert.strictEqual(validatePayload_(basePayload).ok, true);
 assert.strictEqual(validatePayload_({ ...basePayload, submissionId: "" }).field, "submissionId");
+const legacyPayload = { ...basePayload };
+delete legacyPayload.submissionId;
+delete legacyPayload.responseMode;
+assert.strictEqual(validatePayload_(legacyPayload).ok, true);
 assert.strictEqual(
   validatePayload_({ ...basePayload, service_type: "", garment_type: "", page_topic: "Heavyweight T-shirt fabric" }).ok,
   true
@@ -177,4 +181,4 @@ const durableDuplicateResponse = doPost({ parameter: { payload: JSON.stringify(f
 assert.strictEqual(appendedRows.length, 2);
 assert.match(durableDuplicateResponse.html, /"duplicate":true/);
 
-console.log(JSON.stringify({ ok: true, tests: 22 }, null, 2));
+console.log(JSON.stringify({ ok: true, tests: 23 }, null, 2));

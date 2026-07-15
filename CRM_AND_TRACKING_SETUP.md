@@ -93,6 +93,8 @@ crmSubmitToken: "SAME_TOKEN_AS_APPS_SCRIPT"
 
 When a visitor submits a valid form, the site opens WhatsApp and posts the lead through a hidden response frame. The Apps Script returns a nonce-matched `postMessage` receipt. The website only reports that the inquiry was saved after receiving that receipt; otherwise it keeps the form values and shows the WhatsApp/email fallback.
 
+The Apps Script temporarily accepts the previous JSON request format without a submission ID so the backend can be deployed before the GitHub Pages frontend without interrupting existing lead capture. Receipt-mode requests always require the submission ID.
+
 In local preview, or when the webhook is not configured, the site stores at most five recent lead drafts in browser localStorage. The CRM token is removed from those drafts. A configured production site does not keep CRM lead copies in browser localStorage.
 
 The current form and Apps Script also apply basic anti-spam controls:

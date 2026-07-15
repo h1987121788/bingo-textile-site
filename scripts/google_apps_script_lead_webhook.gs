@@ -72,7 +72,7 @@ function doPost(e) {
 
   try {
     const crm = getLeadSheet_();
-    if (isDuplicateSubmission_(payload, crm)) {
+    if (payload.submissionId && isDuplicateSubmission_(payload, crm)) {
       return responseOutput_(payload, { ok: true, duplicate: true });
     }
 
@@ -82,7 +82,7 @@ function doPost(e) {
 
     const now = new Date();
     crm.sheet.appendRow(rowFromPayload_(payload, now, crm.headers));
-    rememberSubmission_(payload);
+    if (payload.submissionId) rememberSubmission_(payload);
   } catch (error) {
     return responseOutput_(payload, { ok: false, error: 'server_error' });
   } finally {
@@ -238,12 +238,16 @@ function validatePayload_(payload) {
     }
   }
 
-  if (!/^[a-zA-Z0-9_-]{16,80}$/.test(textValue_(payload.submissionId))) {
+  const submissionId = textValue_(payload.submissionId);
+  if (submissionId && !/^[a-zA-Z0-9_-]{16,80}$/.test(submissionId)) {
     return { ok: false, field: 'submissionId' };
   }
 
   if (payload.responseMode && textValue_(payload.responseMode) !== 'iframe') {
     return { ok: false, field: 'responseMode' };
+  }
+  if (textValue_(payload.responseMode) === 'iframe' && !submissionId) {
+    return { ok: false, field: 'submissionId' };
   }
 
   const serviceType = textValue_(payload.service_type);
