@@ -1934,7 +1934,7 @@ function catalogReferenceParagraph(contact, candidate, env) {
   }
 
   const catalogUrl = new URL("garments.html", contact.website).href;
-  return `Our current garment catalog is at ${catalogUrl}. The images are style references, so we confirm the physical sample, specification and order terms before any bulk commitment.`;
+  return `Our current garment catalog is at ${catalogUrl}. The listed styles correspond to finished garment samples; we reconfirm the current specification, availability and order terms before any bulk commitment.`;
 }
 
 function whatsappCtaParagraph(candidate) {

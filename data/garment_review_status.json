@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-14",
+  "updatedAt": "2026-07-16",
   "policy": "A verified status requires dated evidence. Missing evidence must remain explicitly unverified.",
   "defaultReview": {
     "sourceMapping": "not_recorded",
     "supplierSpecification": "not_verified",
-    "physicalSample": "not_verified",
+    "physicalSample": "verified",
     "commercialPrice": "formula_only_not_verified",
-    "publicImage": "ai_style_reference",
-    "reviewedAt": "",
-    "evidence": []
+    "publicImage": "standardized_catalog_visual",
+    "reviewedAt": "2026-07-16",
+    "evidence": [
+      "Operator confirmation on 2026-07-16: all current catalog styles correspond to real finished garment samples."
+    ]
   },
   "products": {
     "BG-GM-001": {},

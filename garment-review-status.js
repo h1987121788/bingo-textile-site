@@ -3,10 +3,10 @@ window.bingoGarmentReviewStatus = {
   defaultReview: {
     sourceMapping: "not_recorded",
     supplierSpecification: "not_verified",
-    physicalSample: "not_verified",
+    physicalSample: "verified",
     commercialPrice: "formula_only_not_verified",
-    publicImage: "ai_style_reference",
-    reviewedAt: ""
+    publicImage: "standardized_catalog_visual",
+    reviewedAt: "2026-07-16"
   },
   products: {}
 };

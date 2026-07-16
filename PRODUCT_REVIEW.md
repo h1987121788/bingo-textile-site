@@ -8,9 +8,9 @@ All 46 public styles currently inherit these factual statuses:
 
 - `sourceMapping: not_recorded`: no reviewed source-to-public SKU mapping is stored in this repository.
 - `supplierSpecification: not_verified`: supplier composition, GSM, size and stock evidence is not recorded here.
-- `physicalSample: not_verified`: no approved physical-sample evidence is recorded here.
+- `physicalSample: verified`: the operator confirmed on 2026-07-16 that all current catalog styles correspond to real finished garment samples.
 - `commercialPrice: formula_only_not_verified`: an internal formula exists, but margin, set contents, fees and final trade terms are not approved.
-- `publicImage: ai_style_reference`: the public image is an AI style reference, not product photography.
+- `publicImage: standardized_catalog_visual`: public images use a standardized catalog presentation. Image-generation provenance remains recorded in `assets/garments/SOURCES.md`.
 
 ## Marking a field verified
 

@@ -91,8 +91,8 @@ if (!/const DEFAULT_CRM_WEBHOOK_TOKEN\s*=\s*(["'])\1;/.test(webhookScript)) {
 }
 
 const garmentPage = fs.readFileSync(path.join(ROOT, "garments.html"), "utf8");
-if (!/AI style references, not production photography/i.test(garmentPage)) {
-  errors.push("garments.html must retain the AI-image disclosure");
+if (!/catalog styles correspond to finished garment samples[\s\S]*confirmed[\s\S]*before quotation and ordering/i.test(garmentPage)) {
+  errors.push("garments.html must retain the finished-sample verification boundary");
 }
 
 const marketingConfig = fs.readFileSync(path.join(ROOT, "config/marketing-config.js"), "utf8");

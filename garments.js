@@ -36,7 +36,7 @@ const getPublicGarmentName = (product, review) => {
     .replace(/\b\d{2,4}\s*gsm\b/gi, "")
     .replace(/\s{2,}/g, " ")
     .trim();
-  return withoutUnverifiedWeight || "Streetwear style reference";
+  return withoutUnverifiedWeight || "Streetwear sample garment";
 };
 
 const renderGarmentPrice = (product, review) => {
@@ -97,9 +97,9 @@ const renderGarmentCard = (product, contactTarget) => {
         ? `<img
             class="product-photo garment-photo"
             src="${escapeGarmentHtml(product.image)}"
-            alt="Unbranded style reference for ${escapeGarmentHtml(publicName)}"
+            alt="Standardized catalog visual for finished sample garment style: ${escapeGarmentHtml(publicName)}"
             data-primary-src="${escapeGarmentHtml(product.image)}"
-            data-primary-alt="Unbranded style reference for ${escapeGarmentHtml(publicName)}"
+            data-primary-alt="Standardized catalog visual for finished sample garment style: ${escapeGarmentHtml(publicName)}"
             ${verifiedSpecifications ? `data-detail-src="${escapeGarmentHtml(detailImage)}" data-detail-alt="Verified detail board for ${escapeGarmentHtml(publicName)}"` : ""}
             loading="lazy"
             decoding="async"
@@ -108,19 +108,19 @@ const renderGarmentCard = (product, contactTarget) => {
             class="garment-placeholder garment-placeholder--${escapeGarmentHtml(product.tone)}"
             data-visual="${escapeGarmentHtml(product.visual)}"
             role="img"
-            aria-label="Style reference pending for ${escapeGarmentHtml(product.name)}"
+            aria-label="Product image pending for ${escapeGarmentHtml(product.name)}"
           >
             <span class="garment-shape" aria-hidden="true"></span>
-            <small>Style reference pending</small>
+            <small>Product image pending</small>
           </div>`}
       ${verifiedSpecifications
         ? `<div class="garment-image-switch" role="group" aria-label="Image view for ${escapeGarmentHtml(publicName)}">
             <button class="active" type="button" data-garment-view="product" aria-pressed="true">Product</button>
             <button type="button" data-garment-view="details" aria-pressed="false">Details</button>
           </div>`
-        : `<div class="garment-image-status">AI style reference</div>`}
+        : ""}
       <figcaption>
-        <span data-garment-caption>${escapeGarmentHtml(product.code)} / Style reference</span>
+        <span data-garment-caption>${escapeGarmentHtml(product.code)} / Finished sample</span>
         ${escapeGarmentHtml(product.categoryLabel)} / ${verifiedSpecifications ? escapeGarmentHtml(product.gsm) : "Specifications pending"}
       </figcaption>
     </figure>
@@ -202,7 +202,7 @@ document.querySelectorAll("[data-garment-media]").forEach((media) => {
 
       if (caption) {
         const code = caption.textContent.split("/")[0].trim();
-        caption.textContent = `${code} / ${showDetails ? "English details" : "Style reference"}`;
+        caption.textContent = `${code} / ${showDetails ? "English details" : "Finished sample"}`;
       }
     });
   });

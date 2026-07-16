@@ -129,9 +129,17 @@ for (const code of Object.keys(registry.products || {})) {
 }
 
 const unconfirmed = (field) => products.filter((product) => /confirm/i.test(String(product[field] || ""))).length;
-const allDefaultUnverified = products.filter((product) => {
+const incompleteSpecificationCount = products.filter((product) => {
   const review = { ...registry.defaultReview, ...registry.products[product.code] };
   return review.physicalSample !== "verified" || review.supplierSpecification !== "verified";
+}).length;
+const unverifiedSampleCount = products.filter((product) => {
+  const review = { ...registry.defaultReview, ...registry.products[product.code] };
+  return review.physicalSample !== "verified";
+}).length;
+const unverifiedSupplierSpecificationCount = products.filter((product) => {
+  const review = { ...registry.defaultReview, ...registry.products[product.code] };
+  return review.supplierSpecification !== "verified";
 }).length;
 const publiclyQuotedCount = products.filter((product) => {
   const review = { ...registry.defaultReview, ...registry.products[product.code] };
@@ -142,8 +150,11 @@ const publiclySpecifiedCount = products.filter((product) => {
   return review.supplierSpecification === "verified" && review.physicalSample === "verified";
 }).length;
 
-if (allDefaultUnverified) {
-  warnings.push(`${allDefaultUnverified} products remain explicitly unverified for sample or supplier specifications`);
+if (unverifiedSampleCount) {
+  warnings.push(`${unverifiedSampleCount} products remain explicitly unverified as physical samples`);
+}
+if (unverifiedSupplierSpecificationCount) {
+  warnings.push(`${unverifiedSupplierSpecificationCount} products still require supplier specification verification`);
 }
 
 const usdPrices = products.map((product) => Number(product.priceCny) / Number(pricing.cnyPerUsd));
@@ -159,6 +170,7 @@ const result = {
     gsm: unconfirmed("gsm"),
     sizes: unconfirmed("sizes")
   },
+  incompleteSpecificationCount,
   usdPriceRange: usdPrices.length
     ? [Math.min(...usdPrices).toFixed(2), Math.max(...usdPrices).toFixed(2)]
     : [],

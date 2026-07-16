@@ -1,22 +1,23 @@
-# Project Status - 2026-07-15
+# Project Status - 2026-07-16
 
 ## Garment-First Production Release
 
-- Production baseline for this release: `origin/main` at `8ac1e87e51e23c9ca55103bcdb6eee1478cbd7d7`.
-- Clean deployment worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`.
-- P0 acquisition-safety branch: `codex/p0-acquisition-safety-20260715`.
+- Production baseline for this work: `origin/main` at `9bcd5ae8cd89ee6f806aee53e33d97f38db2f8f2`.
+- Clean worktree: `/Users/huang/Documents/poly/bingo-textile-style-reference-label-20260716`.
+- Current branch: `codex/remove-ai-badge-20260716`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
 - The customer-facing catalog contains 46 garment styles; the homepage features six of them.
-- All 46 styles remain available as sourcing references, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated review evidence marks it verified.
-- All current garment images are original unbranded AI style references, not supplier, factory, sample, or production proof.
-- All-English detail-board assets remain available for review, but the website does not link them until supplier specification and physical-sample evidence are verified.
+- All 46 finished sample styles remain available for sourcing inquiries, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated supplier evidence marks it verified.
+- The operator confirmed on 2026-07-16 that all current catalog styles correspond to real finished garment samples.
+- Current public image files use a standardized generated catalog presentation. They are not supplier-original photography, factory proof, test evidence or bulk-production guarantees.
+- All-English detail-board assets remain available for review, but the website does not link them until the supplier specification is verified against the confirmed sample style.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
 - Website forms keep at most seven required inputs, add an optional business email, open a prepared WhatsApp inquiry and wait for a nonce-matched CRM receipt before reporting that the lead was saved.
 - Every lead form now has a honeypot and minimum-fill-time check. The updated Apps Script source adds payload validation, per-identity rate limiting, locking, durable submission-ID duplicate checks and spreadsheet formula-injection protection.
 - The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
-- AI concepts remain labelled on the public pages. Replace them with approved physical-sample photography as samples become available.
-- The clean repository does not contain a verified source-to-public SKU map. Supplier specifications, physical samples and commercial prices must remain marked unverified until evidence is recorded.
+- Public pages present the products as finished sample garments without an AI badge. Current specifications, stock and commercial terms remain gated until supplier records are reviewed.
+- The clean repository does not contain a verified source-to-public SKU map. Supplier specifications and commercial prices remain unverified until evidence is recorded; physical sample existence is recorded from the operator's 2026-07-16 confirmation.
 - `data/garment_review_status.json` records that boundary for all 46 SKUs, and `garment-review-status.js` exposes only sanitized effective statuses to the browser. The normal catalog validator enforces that mirror; strict commercial validation intentionally fails until dated evidence is added.
 - GitHub validation now checks automation safety, catalog integrity, public site structure and webhook controls on pull requests and `main` pushes.
 
@@ -35,7 +36,7 @@
 - Production domain: `https://www.bingofabric.com/`
 - Remote repository: `https://github.com/h1987121788/bingo-textile-site.git`
 - Deployment source: `origin/main`
-- Current safety-remediation worktree: `/Users/huang/Documents/poly/bingo-textile-safe-automation-20260714`
+- Current website worktree: `/Users/huang/Documents/poly/bingo-textile-style-reference-label-20260716`
 - Operations workspace: `/Users/huang/Desktop/纺织`
 
 The operations workspace is not a deployment source. It contains local automation state, reports, outputs, `.env.*.local` files, and private outreach data. Deploy only from `origin/main` or a clean worktree created from `origin/main`.
