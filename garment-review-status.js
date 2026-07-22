@@ -8,5 +8,14 @@ window.bingoGarmentReviewStatus = {
     publicImage: "standardized_catalog_visual",
     reviewedAt: "2026-07-16"
   },
-  products: {}
+  products: {
+    "BG-GM-047": {
+      sourceMapping: "not_recorded",
+      supplierSpecification: "verified",
+      physicalSample: "verified",
+      commercialPrice: "verified",
+      publicImage: "approved_sample_photo",
+      reviewedAt: "2026-07-22"
+    }
+  }
 };

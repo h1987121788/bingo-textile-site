@@ -5,7 +5,7 @@ window.bingoGarmentPricing = {
 };
 
 window.bingoGarmentLaunchCodes = [
-  "BG-GM-003",
+  "BG-GM-047",
   "BG-GM-006",
   "BG-GM-008",
   "BG-GM-009",
@@ -795,5 +795,43 @@ window.bingoGarmentCatalog = [
     description: "Short athletic base for training-inspired collections and lightweight casual programs.",
     visual: "shorts",
     tone: "sky"
+  },
+  {
+    code: "BG-GM-047",
+    name: "Flagship 280gsm Cotton Oversized Tee",
+    priceCny: 39,
+    unit: "piece",
+    image: "./assets/garments/flagship-280gsm-tee/black-front.webp",
+    category: "tees",
+    categoryLabel: "T-shirts",
+    gsm: "280gsm",
+    composition: "100% cotton",
+    fit: "Oversized",
+    sizes: "S-2XL",
+    season: "Confirm by market and order",
+    description: "Flagship heavyweight blank for finished-garment printing orders. USD 6.00 per piece; freight excluded.",
+    visual: "tee",
+    tone: "mint",
+    detailPage: "./280gsm-cotton-oversized-t-shirt.html",
+    printingOrdersAccepted: true,
+    freightIncluded: false,
+    gallery: [
+      {
+        src: "./assets/garments/flagship-280gsm-tee/black-front.webp",
+        alt: "Black 280gsm oversized cotton T-shirt finished sample, front view"
+      },
+      {
+        src: "./assets/garments/flagship-280gsm-tee/black-on-body.webp",
+        alt: "Black 280gsm oversized cotton T-shirt finished sample, on-body view"
+      },
+      {
+        src: "./assets/garments/flagship-280gsm-tee/white-front.webp",
+        alt: "White 280gsm oversized cotton T-shirt finished sample, front view"
+      },
+      {
+        src: "./assets/garments/flagship-280gsm-tee/white-back.webp",
+        alt: "White 280gsm oversized cotton T-shirt finished sample, back view"
+      }
+    ]
   }
 ];

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-16",
+  "updatedAt": "2026-07-22",
   "policy": "A verified status requires dated evidence. Missing evidence must remain explicitly unverified.",
   "defaultReview": {
     "sourceMapping": "not_recorded",
@@ -59,6 +59,19 @@
     "BG-GM-043": {},
     "BG-GM-044": {},
     "BG-GM-045": {},
-    "BG-GM-046": {}
+    "BG-GM-046": {},
+    "BG-GM-047": {
+      "sourceMapping": "not_recorded",
+      "supplierSpecification": "verified",
+      "physicalSample": "verified",
+      "commercialPrice": "verified",
+      "publicImage": "approved_sample_photo",
+      "reviewedAt": "2026-07-22",
+      "evidence": [
+        "Operator-provided finished sample photos and English size chart reviewed on 2026-07-22.",
+        "Operator-confirmed specification: 100% cotton, 280gsm, sizes S-2XL.",
+        "Operator-confirmed commercial terms: USD 6.00 per piece, freight excluded, and finished-garment printing orders accepted."
+      ]
+    }
   }
 }

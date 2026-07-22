@@ -95,6 +95,23 @@ if (!/catalog styles correspond to finished garment samples[\s\S]*confirmed[\s\S
   errors.push("garments.html must retain the finished-sample verification boundary");
 }
 
+const flagshipFilename = "280gsm-cotton-oversized-t-shirt.html";
+const flagshipPage = fs.readFileSync(path.join(ROOT, flagshipFilename), "utf8");
+for (const [label, pattern] of [
+  ["100% cotton specification", /100% cotton/i],
+  ["280gsm specification", /280gsm/i],
+  ["USD 6.00 price", /USD 6\.00/i],
+  ["freight exclusion", /freight excluded/i],
+  ["printing-order offer", /finished-garment printing orders accepted/i],
+  ["S-2XL size range", /S-2XL/i],
+  ["size chart", /<table class="flagship-size-table">/i]
+]) {
+  if (!pattern.test(flagshipPage)) errors.push(`${flagshipFilename} is missing ${label}`);
+}
+if (!/280gsm-cotton-oversized-t-shirt\.html/.test(garmentPage)) {
+  errors.push("garments.html must link to the flagship product page");
+}
+
 const marketingConfig = fs.readFileSync(path.join(ROOT, "config/marketing-config.js"), "utf8");
 if (!/ga4MeasurementId:\s*["']G-[A-Z0-9]{6,}["']/.test(marketingConfig) || /G-XXXXXXXXXX/.test(marketingConfig)) {
   errors.push("config/marketing-config.js is missing a configured GA4 Measurement ID");
@@ -108,8 +125,8 @@ for (const eventName of ["generate_lead", "contact_whatsapp", "product_interest"
     errors.push(`marketing event wiring is missing ${eventName}`);
   }
 }
-if (/\bARTIE\b|artieshop|detail\.1688\.com/i.test(garmentPage)) {
-  errors.push("garments.html exposes a source brand or source marketplace URL");
+if (/\bARTIE\b|artieshop|detail\.1688\.com/i.test(`${garmentPage}\n${flagshipPage}`)) {
+  errors.push("a garment page exposes a source brand or source marketplace URL");
 }
 if (!/garment-review-status\.js/i.test(garmentPage)) {
   errors.push("garments.html must load the public garment review gate");
@@ -120,7 +137,10 @@ if (/public USD prices|USD settlement prices|compare base-style prices/i.test(ga
 
 const sitemap = fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8");
 const sitemapUrls = (sitemap.match(/<loc>/g) || []).length;
-if (sitemapUrls < 7) errors.push("sitemap.xml contains fewer than seven public URLs");
+if (sitemapUrls < 8) errors.push("sitemap.xml contains fewer than eight public URLs");
+if (!sitemap.includes("https://www.bingofabric.com/280gsm-cotton-oversized-t-shirt.html")) {
+  errors.push("sitemap.xml is missing the flagship product page");
+}
 
 const result = {
   ok: errors.length === 0,

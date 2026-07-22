@@ -4,9 +4,9 @@ const garmentReviewRegistry = window.bingoGarmentReviewStatus || {
   defaultReview: {},
   products: {}
 };
-const garmentLaunchCodes = new Set(
-  Array.isArray(window.bingoGarmentLaunchCodes) ? window.bingoGarmentLaunchCodes : []
-);
+const garmentLaunchCodes = Array.isArray(window.bingoGarmentLaunchCodes)
+  ? window.bingoGarmentLaunchCodes
+  : [];
 
 const escapeGarmentHtml = (value) =>
   String(value ?? "").replace(/[&<>"']/g, (character) => {
@@ -66,14 +66,18 @@ const renderGarmentPrice = (product, review) => {
     maximumFractionDigits: decimalPlaces
   }).format(priceUsd);
 
+  const commercialNote = product.printingOrdersAccepted
+    ? "Base garment price. Freight excluded. Printing is quoted after artwork, placement and quantity review."
+    : `Fixed conversion: USD 1 = CNY ${escapeGarmentHtml(cnyPerUsd)}. Customization, freight, duties and taxes are separate.`;
+
   return `
     <div class="garment-price-block">
-      <span>USD settlement price</span>
+      <span>${product.printingOrdersAccepted ? "Verified flagship price" : "USD settlement price"}</span>
       <p>
         <strong>${escapeGarmentHtml(formattedPrice)}</strong>
         <small>/ ${escapeGarmentHtml(product.unit || "piece")}</small>
       </p>
-      <em>Fixed conversion: USD 1 = CNY ${escapeGarmentHtml(cnyPerUsd)}. Customization, freight, duties and taxes are separate.</em>
+      <em>${commercialNote}</em>
     </div>
   `;
 };
@@ -86,20 +90,24 @@ const renderGarmentCard = (product, contactTarget) => {
   const verifiedSpecifications = hasVerifiedSpecifications(review);
   const publicName = getPublicGarmentName(product, review);
   const detailImage = getGarmentDetailImage(product);
+  const approvedSamplePhoto = review.publicImage === "approved_sample_photo";
+  const imageDescription = approvedSamplePhoto
+    ? `Finished sample photo of ${publicName}`
+    : `Standardized catalog visual for finished sample garment style: ${publicName}`;
   const publicComposition = verifiedSpecifications ? product.composition : "To confirm by physical sample";
   const publicGsm = verifiedSpecifications ? product.gsm : "To confirm by physical sample";
   const publicSizes = verifiedSpecifications ? product.sizes : "To confirm before quotation";
 
   return `
-  <article class="product-card garment-card" data-category="${escapeGarmentHtml(product.category)}" data-product-code="${escapeGarmentHtml(product.code)}">
+  <article class="product-card garment-card${product.detailPage ? " garment-card--flagship" : ""}" data-category="${escapeGarmentHtml(product.category)}" data-product-code="${escapeGarmentHtml(product.code)}">
     <figure class="product-media garment-media" data-garment-media>
       ${product.image
         ? `<img
             class="product-photo garment-photo"
             src="${escapeGarmentHtml(product.image)}"
-            alt="Standardized catalog visual for finished sample garment style: ${escapeGarmentHtml(publicName)}"
+            alt="${escapeGarmentHtml(imageDescription)}"
             data-primary-src="${escapeGarmentHtml(product.image)}"
-            data-primary-alt="Standardized catalog visual for finished sample garment style: ${escapeGarmentHtml(publicName)}"
+            data-primary-alt="${escapeGarmentHtml(imageDescription)}"
             ${verifiedSpecifications ? `data-detail-src="${escapeGarmentHtml(detailImage)}" data-detail-alt="Verified detail board for ${escapeGarmentHtml(publicName)}"` : ""}
             loading="lazy"
             decoding="async"
@@ -127,7 +135,7 @@ const renderGarmentCard = (product, contactTarget) => {
     <div class="card-body">
       <div class="garment-card-heading">
         <p class="tag">${escapeGarmentHtml(product.categoryLabel)}</p>
-        <span class="sample-gate">Sample first</span>
+        <span class="sample-gate${product.detailPage ? " is-flagship" : ""}">${product.detailPage ? "Flagship" : "Sample first"}</span>
       </div>
       <h3>${escapeGarmentHtml(publicName)}</h3>
       <p>${escapeGarmentHtml(product.description)}</p>
@@ -140,10 +148,14 @@ const renderGarmentCard = (product, contactTarget) => {
         <div><dt>Season</dt><dd>${escapeGarmentHtml(product.season)}</dd></div>
       </dl>
       <p class="verification-note">${verifiedSpecifications
-        ? "Verified specifications still require current stock, color, quantity and order confirmation."
+        ? product.printingOrdersAccepted
+          ? "Specification and base price verified on 2026-07-22. Confirm quantity, color, artwork, printing quote, stock and lead time before ordering."
+          : "Verified specifications still require current stock, color, quantity and order confirmation."
         : "Supplier specifications, physical sample, stock and order terms are not yet verified."}</p>
       <div class="garment-card-actions">
-        ${verifiedSpecifications
+        ${product.detailPage
+          ? `<a href="${escapeGarmentHtml(product.detailPage)}">View product details</a>`
+          : verifiedSpecifications
           ? `<a href="${escapeGarmentHtml(detailImage)}" target="_blank" rel="noopener">Open verified details</a>`
           : `<span>Technical details pending sample review</span>`}
         <a
@@ -160,8 +172,12 @@ document.querySelectorAll("[data-garment-grid]").forEach((garmentGrid) => {
   const launchOnly = garmentGrid.dataset.launchOnly === "true";
   const contactTarget = garmentGrid.dataset.contactTarget || "#garment-contact";
   const products = launchOnly
-    ? garmentCatalog.filter((product) => garmentLaunchCodes.has(product.code))
-    : garmentCatalog;
+    ? garmentLaunchCodes
+        .map((code) => garmentCatalog.find((product) => product.code === code))
+        .filter(Boolean)
+    : [...garmentCatalog].sort(
+        (left, right) => Number(Boolean(right.detailPage)) - Number(Boolean(left.detailPage))
+      );
 
   garmentGrid.innerHTML = products
     .map((product) => renderGarmentCard(product, contactTarget))

@@ -1,24 +1,25 @@
-# Project Status - 2026-07-16
+# Project Status - 2026-07-22
 
 ## Garment-First Production Release
 
-- Production baseline for this work: `origin/main` at `9bcd5ae8cd89ee6f806aee53e33d97f38db2f8f2`.
-- Clean worktree: `/Users/huang/Documents/poly/bingo-textile-style-reference-label-20260716`.
-- Current branch: `codex/remove-ai-badge-20260716`.
+- Production baseline for this work: `origin/main` at `74fb52e0088c7cd82c3ecb170b5e1650e58ae7cd`.
+- Clean worktree: `/Users/huang/Documents/poly/bingo-textile-flagship-tee-20260722`.
+- Current branch: `codex/flagship-tee-20260722`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
-- The customer-facing catalog contains 46 garment styles; the homepage features six of them.
-- All 46 finished sample styles remain available for sourcing inquiries, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated supplier evidence marks it verified.
-- The operator confirmed on 2026-07-16 that all current catalog styles correspond to real finished garment samples.
-- Current public image files use a standardized generated catalog presentation. They are not supplier-original photography, factory proof, test evidence or bulk-production guarantees.
+- The customer-facing catalog contains 47 garment styles; the homepage features the verified flagship plus five other directions.
+- `BG-GM-047` is the flagship 100% cotton, 280gsm oversized T-shirt in sizes S-2XL. Its operator-confirmed base price is USD 6.00 per piece with freight excluded, and finished-garment printing orders are accepted after artwork and quantity review.
+- The other 46 finished sample styles remain available for sourcing inquiries, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated supplier evidence marks it verified.
+- The operator confirmed on 2026-07-16 that the original 46 catalog styles correspond to real finished garment samples and confirmed the new flagship sample, specifications, price and supplied imagery on 2026-07-22.
+- The original 46 public image files use a standardized generated catalog presentation. `BG-GM-047` uses operator-provided finished-sample photos and an English size chart.
 - All-English detail-board assets remain available for review, but the website does not link them until the supplier specification is verified against the confirmed sample style.
 - The garment homepage, garment catalog, and five Material Library pages are indexable production pages.
 - Website forms keep at most seven required inputs, add an optional business email, open a prepared WhatsApp inquiry and wait for a nonce-matched CRM receipt before reporting that the lead was saved.
 - Every lead form now has a honeypot and minimum-fill-time check. The updated Apps Script source adds payload validation, per-identity rate limiting, locking, durable submission-ID duplicate checks and spreadsheet formula-injection protection.
 - The browser-side CRM submit token is publicly readable by design and is only a simple anti-spam parameter, not a secret credential.
-- Public pages present the products as finished sample garments without an AI badge. Current specifications, stock and commercial terms remain gated until supplier records are reviewed.
-- The clean repository does not contain a verified source-to-public SKU map. Supplier specifications and commercial prices remain unverified until evidence is recorded; physical sample existence is recorded from the operator's 2026-07-16 confirmation.
-- `data/garment_review_status.json` records that boundary for all 46 SKUs, and `garment-review-status.js` exposes only sanitized effective statuses to the browser. The normal catalog validator enforces that mirror; strict commercial validation intentionally fails until dated evidence is added.
+- Public pages present the products as finished sample garments without an AI badge. `BG-GM-047` exposes its verified fields; all other specifications, stock and commercial terms remain gated until supplier records are reviewed.
+- The clean repository does not contain a verified source-to-public supplier map. Only `BG-GM-047` has dated specification and commercial-price evidence; physical sample existence for the original catalog is recorded from the operator's 2026-07-16 confirmation.
+- `data/garment_review_status.json` records that boundary for all 47 SKUs, and `garment-review-status.js` exposes only sanitized effective statuses to the browser. The normal catalog validator enforces that mirror; strict commercial validation intentionally fails while the other 46 commercial prices remain unverified.
 - GitHub validation now checks automation safety, catalog integrity, public site structure and webhook controls on pull requests and `main` pushes.
 
 ## P0 Acquisition Safety
@@ -36,7 +37,7 @@
 - Production domain: `https://www.bingofabric.com/`
 - Remote repository: `https://github.com/h1987121788/bingo-textile-site.git`
 - Deployment source: `origin/main`
-- Current website worktree: `/Users/huang/Documents/poly/bingo-textile-style-reference-label-20260716`
+- Current website worktree: `/Users/huang/Documents/poly/bingo-textile-flagship-tee-20260722`
 - Operations workspace: `/Users/huang/Desktop/纺织`
 
 The operations workspace is not a deployment source. It contains local automation state, reports, outputs, `.env.*.local` files, and private outreach data. Deploy only from `origin/main` or a clean worktree created from `origin/main`.
@@ -96,7 +97,7 @@ As of `config/automation-control.json` dated 2026-07-14:
 - QQ SMTP test emails: disabled by default.
 - CRM webhook capture: enabled with the current public browser configuration and Apps Script property check.
 - Dry runs are allowed only for validation and must not publish posts or send emails.
-- Outreach discovery remains garment-first. Drafts only claim an attachment when a configured local file actually exists; otherwise they link to the public garment catalog and disclose that catalog imagery is style-reference material.
+- Outreach discovery remains garment-first. Drafts only claim an attachment when a configured local file actually exists; otherwise they link to the public garment catalog and retain the repository's verified/unverified product boundaries.
 - No repository scheduler, user crontab, matching LaunchAgent or running publishing process was found during the 2026-07-14 scan.
 
 ## Governance Rules

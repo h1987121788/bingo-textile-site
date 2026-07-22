@@ -1582,6 +1582,604 @@ textarea:focus {
   }
 }
 
+/* Verified flagship garment */
+body.garment-home .garment-home-hero-image {
+  object-position: 70% 38%;
+}
+
+.flagship-intro {
+  background: #eef2ed;
+}
+
+.flagship-intro-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.flagship-intro-media {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: #e7e9e6;
+  border-radius: 6px;
+}
+
+.flagship-intro-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flagship-intro-media figcaption,
+.flagship-gallery figcaption {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(216, 221, 216, 0.92);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.flagship-intro-copy h2 {
+  max-width: 15em;
+}
+
+.flagship-price-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: baseline;
+  margin: 28px 0 24px;
+  padding: 18px 0;
+  border-top: 1px solid #cbd4ce;
+  border-bottom: 1px solid #cbd4ce;
+}
+
+.flagship-price-line strong {
+  color: var(--teal-dark);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.flagship-price-line span {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.flagship-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 22px;
+  margin: 0 0 28px;
+}
+
+.flagship-spec-grid div {
+  padding: 12px 0;
+  border-bottom: 1px solid #d5ddd7;
+}
+
+.flagship-spec-grid dt,
+.flagship-spec-grid dd {
+  margin: 0;
+}
+
+.flagship-spec-grid dt {
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.flagship-spec-grid dd {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.flagship-catalog-band {
+  padding: 24px 0;
+  color: #ffffff;
+  background: #202724;
+}
+
+.flagship-catalog-band-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 28px;
+  align-items: center;
+}
+
+.flagship-catalog-band .eyebrow {
+  margin-bottom: 4px;
+  color: #b9ead9;
+}
+
+.flagship-catalog-band h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 23px;
+}
+
+.flagship-catalog-price {
+  display: grid;
+  min-width: 154px;
+}
+
+.flagship-catalog-price strong {
+  color: #b9ead9;
+  font-size: 25px;
+  line-height: 1.1;
+}
+
+.flagship-catalog-price span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+}
+
+.garment-card--flagship {
+  border-color: #8cb5a5 !important;
+  box-shadow: 0 16px 34px rgba(23, 107, 88, 0.13) !important;
+}
+
+.sample-gate.is-flagship {
+  color: #ffffff;
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+}
+
+.flagship-product-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: min(680px, calc(100svh - 76px));
+  overflow: hidden;
+  color: #ffffff;
+  background: #202724;
+  align-items: center;
+}
+
+.flagship-product-hero-image,
+.flagship-product-hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.flagship-product-hero-image {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 72% 36%;
+}
+
+.flagship-product-hero-overlay {
+  z-index: -1;
+  background: rgba(18, 24, 21, 0.76);
+}
+
+.flagship-product-hero-content {
+  padding: 56px 0 50px;
+}
+
+.flagship-product-hero-content > * {
+  max-width: 660px;
+}
+
+.flagship-product-hero .breadcrumb,
+.flagship-product-hero .breadcrumb a,
+.flagship-product-hero .eyebrow {
+  color: #b9ead9;
+}
+
+.flagship-product-hero h1 {
+  max-width: 12em;
+  color: #ffffff;
+  font-size: 52px;
+}
+
+.flagship-product-hero .hero-lede {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.flagship-product-hero .button.secondary {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.flagship-product-hero .proof-row span {
+  color: rgba(255, 255, 255, 0.76);
+  background: rgba(14, 20, 17, 0.5);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.flagship-product-hero .proof-row strong {
+  color: #b9ead9;
+}
+
+.flagship-product-price {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: baseline;
+  margin: 22px 0;
+}
+
+.flagship-product-price strong {
+  color: #b9ead9;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.flagship-product-price span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.flagship-gallery-section {
+  background: #f5f6f2;
+}
+
+#sample-gallery,
+#verified-specs,
+#size-chart,
+#printing-orders,
+#flagship-faq {
+  scroll-margin-top: 88px;
+}
+
+.flagship-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.flagship-gallery figure {
+  position: relative;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: #e7e9e6;
+  border: 1px solid #d8ddd8;
+  border-radius: 6px;
+}
+
+.flagship-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flagship-spec-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 72px;
+  align-items: start;
+}
+
+.flagship-spec-list {
+  margin: 0;
+  border-top: 1px solid #cdd5cf;
+}
+
+.flagship-spec-list div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.42fr) minmax(0, 0.58fr);
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #cdd5cf;
+}
+
+.flagship-spec-list dt,
+.flagship-spec-list dd {
+  margin: 0;
+}
+
+.flagship-spec-list dt {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.flagship-spec-list dd {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.flagship-size-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.size-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.flagship-size-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.flagship-size-table caption {
+  padding: 14px 16px;
+  color: var(--ink);
+  background: #d9e8df;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.flagship-size-table th,
+.flagship-size-table td {
+  min-width: 74px;
+  padding: 15px 13px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.flagship-size-table thead th {
+  color: var(--ink-soft);
+  background: #f0f2ef;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.flagship-size-table tbody th {
+  color: var(--teal-dark);
+}
+
+.flagship-size-table tbody tr:last-child th,
+.flagship-size-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.size-chart-image {
+  display: grid;
+  gap: 10px;
+  color: var(--teal-dark);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.size-chart-image img {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.flagship-printing-section {
+  padding: 78px 0;
+  color: #ffffff;
+  background: #202724;
+}
+
+.flagship-printing-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 72px;
+  align-items: center;
+}
+
+.flagship-printing-section .eyebrow {
+  color: #b9ead9;
+}
+
+.flagship-printing-section h2 {
+  color: #ffffff;
+}
+
+.flagship-printing-section p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.flagship-printing-section .button.secondary {
+  color: #ffffff;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.flagship-printing-steps {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.flagship-printing-steps li {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 16px;
+  padding: 19px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.flagship-printing-steps span {
+  color: #b9ead9;
+  font-weight: 800;
+}
+
+.flagship-printing-steps strong {
+  color: #ffffff;
+}
+
+.flagship-printing-steps p {
+  margin: 4px 0 0;
+}
+
+@media (max-width: 980px) {
+  .flagship-intro-layout,
+  .flagship-spec-layout,
+  .flagship-size-layout,
+  .flagship-printing-layout {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .flagship-intro-media {
+    max-width: 620px;
+  }
+
+  .flagship-catalog-band-inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .flagship-catalog-band-inner .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .flagship-size-layout {
+    align-items: start;
+  }
+
+  .size-chart-image {
+    max-width: 620px;
+  }
+}
+
+@media (max-width: 680px) {
+  body.garment-home .garment-home-hero-image {
+    object-position: 63% 36%;
+  }
+
+  .flagship-intro-layout {
+    gap: 28px;
+  }
+
+  .flagship-intro-media {
+    aspect-ratio: 4 / 5;
+  }
+
+  .flagship-price-line {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .flagship-price-line strong {
+    font-size: 30px;
+  }
+
+  .flagship-spec-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flagship-catalog-band-inner {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .flagship-catalog-band h2 {
+    font-size: 20px;
+  }
+
+  .flagship-catalog-band-inner .button {
+    width: 100%;
+  }
+
+  .flagship-product-hero {
+    min-height: auto;
+  }
+
+  .flagship-product-hero-image {
+    object-position: 63% 32%;
+  }
+
+  .flagship-product-hero-overlay {
+    background: rgba(18, 24, 21, 0.8);
+  }
+
+  .flagship-product-hero-content {
+    padding: 32px 0 26px;
+  }
+
+  .flagship-product-hero h1 {
+    font-size: 32px;
+  }
+
+  .flagship-product-price strong {
+    font-size: 31px;
+  }
+
+  .flagship-product-hero .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .flagship-product-hero .button {
+    min-height: 50px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+
+  .flagship-product-hero .proof-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .flagship-product-hero .proof-row span {
+    min-height: 64px;
+    padding: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .flagship-product-hero .proof-row strong {
+    display: block;
+  }
+
+  .flagship-product-hero .hero-visual-note {
+    display: none;
+  }
+
+  .flagship-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .flagship-spec-list div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .flagship-size-layout {
+    gap: 20px;
+  }
+
+  .flagship-size-table th,
+  .flagship-size-table td {
+    min-width: 66px;
+    padding: 12px 9px;
+    font-size: 12px;
+  }
+
+  .flagship-printing-section {
+    padding: 58px 0;
+  }
+}
+
 /* Garment-first local transition build */
 body.garment-site {
   --ink: #202724;

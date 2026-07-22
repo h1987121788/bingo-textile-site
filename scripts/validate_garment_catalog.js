@@ -11,6 +11,7 @@ vm.runInContext(fs.readFileSync(path.join(ROOT, "garment-review-status.js"), "ut
 
 const catalog = context.window.bingoGarmentCatalog;
 const pricing = context.window.bingoGarmentPricing;
+const launchCodes = context.window.bingoGarmentLaunchCodes;
 const publicRegistry = context.window.bingoGarmentReviewStatus;
 const registry = JSON.parse(
   fs.readFileSync(path.join(ROOT, "data", "garment_review_status.json"), "utf8")
@@ -63,6 +64,9 @@ for (const marker of [
 const products = Array.isArray(catalog) ? catalog : [];
 const codes = products.map((product) => product.code);
 if (new Set(codes).size !== codes.length) errors.push("duplicate garment codes found");
+if (!Array.isArray(launchCodes) || launchCodes[0] !== "BG-GM-047") {
+  errors.push("BG-GM-047 must remain the first homepage launch code");
+}
 
 for (let index = 0; index < products.length; index += 1) {
   const product = products[index];
@@ -128,6 +132,52 @@ for (const code of Object.keys(registry.products || {})) {
   if (!codes.includes(code)) errors.push(`review registry contains unknown code ${code}`);
 }
 
+const flagship = products.find((product) => product.code === "BG-GM-047");
+const flagshipReview = {
+  ...registry.defaultReview,
+  ...((registry.products || {})["BG-GM-047"] || {})
+};
+if (!flagship) {
+  errors.push("BG-GM-047 flagship product is missing");
+} else {
+  const expectedFlagshipFields = {
+    priceCny: 39,
+    unit: "piece",
+    gsm: "280gsm",
+    composition: "100% cotton",
+    sizes: "S-2XL",
+    detailPage: "./280gsm-cotton-oversized-t-shirt.html",
+    printingOrdersAccepted: true,
+    freightIncluded: false
+  };
+  for (const [field, expected] of Object.entries(expectedFlagshipFields)) {
+    if (flagship[field] !== expected) {
+      errors.push(`BG-GM-047 ${field} must be ${JSON.stringify(expected)}`);
+    }
+  }
+  if (!Array.isArray(flagship.gallery) || flagship.gallery.length !== 4) {
+    errors.push("BG-GM-047 must retain four finished-sample gallery images");
+  } else {
+    for (const entry of flagship.gallery) {
+      const galleryImage = path.resolve(ROOT, String(entry.src || "").replace(/^\.\//, ""));
+      if (!entry.alt || !fs.existsSync(galleryImage) || fs.statSync(galleryImage).size < 1024) {
+        errors.push(`BG-GM-047 has an invalid gallery entry: ${entry.src || "missing src"}`);
+      }
+    }
+  }
+}
+for (const [field, expected] of Object.entries({
+  supplierSpecification: "verified",
+  physicalSample: "verified",
+  commercialPrice: "verified",
+  publicImage: "approved_sample_photo",
+  reviewedAt: "2026-07-22"
+})) {
+  if (flagshipReview[field] !== expected) {
+    errors.push(`BG-GM-047 review ${field} must be ${expected}`);
+  }
+}
+
 const unconfirmed = (field) => products.filter((product) => /confirm/i.test(String(product[field] || ""))).length;
 const incompleteSpecificationCount = products.filter((product) => {
   const review = { ...registry.defaultReview, ...registry.products[product.code] };
@@ -171,6 +221,14 @@ const result = {
     sizes: unconfirmed("sizes")
   },
   incompleteSpecificationCount,
+  flagship: flagship
+    ? {
+        code: flagship.code,
+        priceUsd: (Number(flagship.priceCny) / Number(pricing.cnyPerUsd)).toFixed(2),
+        specificationVerified: flagshipReview.supplierSpecification === "verified",
+        commercialPriceVerified: flagshipReview.commercialPrice === "verified"
+      }
+    : null,
   usdPriceRange: usdPrices.length
     ? [Math.min(...usdPrices).toFixed(2), Math.max(...usdPrices).toFixed(2)]
     : [],

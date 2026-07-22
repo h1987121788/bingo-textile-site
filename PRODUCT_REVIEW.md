@@ -4,13 +4,21 @@
 
 ## Current baseline
 
-All 46 public styles currently inherit these factual statuses:
+The original 46 public styles currently inherit these factual statuses:
 
 - `sourceMapping: not_recorded`: no reviewed source-to-public SKU mapping is stored in this repository.
 - `supplierSpecification: not_verified`: supplier composition, GSM, size and stock evidence is not recorded here.
 - `physicalSample: verified`: the operator confirmed on 2026-07-16 that all current catalog styles correspond to real finished garment samples.
 - `commercialPrice: formula_only_not_verified`: an internal formula exists, but margin, set contents, fees and final trade terms are not approved.
 - `publicImage: standardized_catalog_visual`: public images use a standardized catalog presentation. Image-generation provenance remains recorded in `assets/garments/SOURCES.md`.
+
+`BG-GM-047` has a dated product override from 2026-07-22:
+
+- `supplierSpecification: verified`: 100% cotton, 280gsm and sizes S-2XL were confirmed by the operator.
+- `physicalSample: verified`: operator-provided finished-sample photos were reviewed.
+- `commercialPrice: verified`: USD 6.00 per piece, freight excluded.
+- `publicImage: approved_sample_photo`: four operator-provided sample views and an English size chart are deployed.
+- Finished-garment printing orders are accepted; the printing route and price remain artwork- and quantity-specific.
 
 ## Marking a field verified
 
