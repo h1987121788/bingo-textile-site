@@ -6,7 +6,8 @@
   const queuedEvents = [];
 
   const hasValue = (value) => typeof value === "string" && !placeholderValues.has(value.trim());
-  const trackingEnabled = hasValue(config.ga4MeasurementId) || hasValue(config.metaPixelId);
+  const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location?.hostname) || window.location?.protocol === "file:";
+  const trackingEnabled = !isLocalPreview && (hasValue(config.ga4MeasurementId) || hasValue(config.metaPixelId));
   const consentRequired = config.requireMarketingConsent !== false;
 
   const loadScript = (src, attrs = {}) => {
@@ -94,7 +95,7 @@
     banner.className = "consent-banner";
     banner.dataset.marketingConsent = "true";
     banner.innerHTML = `
-      <p>We use analytics to understand which garment-development channels bring useful inquiries.</p>
+      <p>Allow analytics to help us improve your browsing experience?</p>
       <div>
         <button type="button" class="button secondary" data-consent-choice="reject">Reject</button>
         <button type="button" class="button primary" data-consent-choice="accept">Accept</button>

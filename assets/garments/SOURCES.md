@@ -17,6 +17,9 @@
 
 ## AW26 English product sheets
 
+- Local showroom V2 adds twenty cropped covers under `assets/garments/aw26/photos/`, taken from the existing operator-supplied `model-CODE.png` assets. The English product-sheet files remain unchanged.
+- The local `aw26-editorial.webp` hero places the existing 04C and 253 on-body crops on one canvas. No new garment or model was generated in this redesign. Image provenance and technical specifications retain the same confirmation boundary as the source catalog.
+
 - Twenty operator-approved English product sheets were prepared from the supplied AW26 catalog and published on 2026-10-22 in four batches of five styles.
 - Public files are stored under `assets/garments/aw26/` and use only Bingo Garments customer-facing identity.
 - Source-supplier names, marketplace details, addresses, telephone numbers and public product prices are excluded.

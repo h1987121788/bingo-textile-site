@@ -1,13 +1,23 @@
 # Project Status - 2026-10-22
 
+## Showroom V2 Release
+
+- Release branch: `codex/showroom-v2-local`, based on `origin/main` at `a84d7e9`.
+- Worktree: `/Users/huang/.codex/worktrees/bingo-showroom-v2/纺织`.
+- Homepage and garment catalog have a new local editorial design, twenty AW26 photograph covers, product dialogs, filters and a shared inquiry list.
+- Preview: `http://127.0.0.1:4173/`; details and QA are in `LOCAL_PREVIEW.md` and `design/qa.md`.
+- The operator approved production publication on 2026-10-22 after the local preview. Publish this release through `origin/main`; GitHub Pages workflow status and live asset checks determine deployment completion.
+- The homepage presents the new AW26 collection, with six featured styles and a direct entry to all twenty new styles. The catalog defaults to AW26 and retains the forty-seven-style core collection in a separate tab.
+- Social publishing and automatic outreach sending remain paused. Local previews disable marketing requests and keep test briefs in the browser; production retains consent-based tracking and receipt-confirmed CRM capture.
+
 ## Garment-First Production Release
 
-- Production baseline for this work: `origin/main` at `74fb52e0088c7cd82c3ecb170b5e1650e58ae7cd`.
-- Clean worktree: `/Users/huang/Documents/poly/bingo-textile-flagship-tee-20260722`.
-- Current branch: `codex/flagship-tee-20260722`.
+- Production baseline for this work: `origin/main` at `a84d7e9a48e37e3bf28c6c1967b0b8b83e91fc02`.
+- Clean worktree: `/Users/huang/.codex/worktrees/bingo-showroom-v2/纺织`.
+- Current release branch: `codex/showroom-v2-local`.
 - The homepage is now garment-first under the `Bingo Garments` customer-facing name.
 - Knit fabric pages remain as the supporting `Material Library`; they are no longer the primary homepage offer.
-- The customer-facing catalog contains 47 garment styles; the homepage features the verified flagship plus five other directions.
+- The customer-facing catalog contains twenty AW26 styles and forty-seven core garment styles. The homepage features six AW26 styles and the verified 280gsm flagship in a dedicated section.
 - `BG-GM-047` is the flagship 100% cotton, 280gsm oversized T-shirt in sizes S-2XL. Public pricing has been removed; current commercial terms are supplied only after quantity, customization and destination review.
 - The other 46 finished sample styles remain available for sourcing inquiries, but no exact commercial price, composition, GSM, size or detail-board claim is displayed until dated supplier evidence marks it verified.
 - The operator confirmed on 2026-07-16 that the original 46 catalog styles correspond to real finished garment samples and confirmed the new flagship sample, specifications and supplied imagery on 2026-07-22.
@@ -37,7 +47,7 @@
 - Production domain: `https://www.bingofabric.com/`
 - Remote repository: `https://github.com/h1987121788/bingo-textile-site.git`
 - Deployment source: `origin/main`
-- Current website worktree: `/Users/huang/Documents/poly/bingo-textile-flagship-tee-20260722`
+- Current website worktree: `/Users/huang/.codex/worktrees/bingo-showroom-v2/纺织`
 - Operations workspace: `/Users/huang/Desktop/纺织`
 
 The operations workspace is not a deployment source. It contains local automation state, reports, outputs, `.env.*.local` files, and private outreach data. Deploy only from `origin/main` or a clean worktree created from `origin/main`.

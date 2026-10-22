@@ -1,5 +1,7 @@
 # Bingo Garments 成衣获客网站
 
+V2 展厅的首页与目录采用图片优先的 AW26 展示。运行 `npm run preview:showroom`，访问 `http://127.0.0.1:4173/`；本地开发和上新步骤见 `LOCAL_PREVIEW.md`。生产发布源为 `origin/main`。
+
 这是 Bingo Garments / Bingo Textile 的成衣优先静态网站。主营页面展示 private-label streetwear 款式参考、打样与采购协调；针织面料页面作为 Material Library 保留。
 
 ## 文件
