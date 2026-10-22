@@ -12,5 +12,12 @@
 
 - Added on 2026-07-22 from four finished-sample photos and one English size chart supplied by the operator for website publication.
 - Public files are stored under `assets/garments/flagship-280gsm-tee/` with the size chart at `assets/garments/details/bg-gm-047-detail.webp`.
-- Operator-confirmed public facts: 100% cotton, 280gsm, sizes S-2XL, USD 6.00 per piece with freight excluded, and finished-garment printing orders accepted after artwork and quantity review.
+- Operator-confirmed public facts: 100% cotton, 280gsm, sizes S-2XL, and finished-garment printing orders accepted after artwork and quantity review. Public pricing is withheld.
 - The repository does not treat the photos as proof of factory ownership, stock, MOQ, lead time or printing price.
+
+## AW26 English product sheets
+
+- Twenty operator-approved English product sheets were prepared from the supplied AW26 catalog and published on 2026-10-22 in four batches of five styles.
+- Public files are stored under `assets/garments/aw26/` and use only Bingo Garments customer-facing identity.
+- Source-supplier names, marketplace details, addresses, telephone numbers and public product prices are excluded.
+- Material, size and colour references remain subject to confirmation against the current sample, quantity and quotation before ordering.

@@ -16,7 +16,7 @@ The original 46 public styles currently inherit these factual statuses:
 
 - `supplierSpecification: verified`: 100% cotton, 280gsm and sizes S-2XL were confirmed by the operator.
 - `physicalSample: verified`: operator-provided finished-sample photos were reviewed.
-- `commercialPrice: verified`: USD 6.00 per piece, freight excluded.
+- `commercialPrice: quote_only_not_published`: no product price is exposed publicly; current terms require a private quotation.
 - `publicImage: approved_sample_photo`: four operator-provided sample views and an English size chart are deployed.
 - Finished-garment printing orders are accepted; the printing route and price remain artwork- and quantity-specific.
 

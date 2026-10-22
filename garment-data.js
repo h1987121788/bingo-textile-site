@@ -1,9 +1,3 @@
-window.bingoGarmentPricing = {
-  currency: "USD",
-  cnyPerUsd: 6.5,
-  decimalPlaces: 2
-};
-
 window.bingoGarmentLaunchCodes = [
   "BG-GM-047",
   "BG-GM-006",
@@ -17,7 +11,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-001",
     name: "Relaxed Basketball Tank",
-    priceCny: 52,
     unit: "piece",
     image: "./assets/garments/bg-gm-001.webp",
     category: "tops",
@@ -34,7 +27,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-002",
     name: "420gsm Washed Terry Shorts",
-    priceCny: 86,
     unit: "piece",
     image: "./assets/garments/bg-gm-002.webp",
     category: "bottoms",
@@ -51,7 +43,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-003",
     name: "275gsm Earth-Tone Oversized Tee",
-    priceCny: 61,
     unit: "piece",
     image: "./assets/garments/bg-gm-003.webp",
     category: "tees",
@@ -68,7 +59,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-004",
     name: "230gsm Double-Yarn Oversized Tee",
-    priceCny: 58,
     unit: "piece",
     image: "./assets/garments/bg-gm-004.webp",
     category: "tees",
@@ -85,7 +75,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-005",
     name: "350gsm Fleece Hoodie Set",
-    priceCny: 83,
     unit: "set",
     image: "./assets/garments/bg-gm-005.webp",
     category: "hoodies",
@@ -102,7 +91,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-006",
     name: "275gsm Cotton Boxy Tee",
-    priceCny: 59,
     unit: "piece",
     image: "./assets/garments/bg-gm-006.webp",
     category: "tees",
@@ -119,7 +107,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-007",
     name: "245gsm Technical-Finish Tee",
-    priceCny: 57,
     unit: "piece",
     image: "./assets/garments/bg-gm-007.webp",
     category: "tees",
@@ -136,7 +123,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-008",
     name: "250gsm Vintage-Wash Oversized Tee",
-    priceCny: 62,
     unit: "piece",
     image: "./assets/garments/bg-gm-008.webp",
     category: "tees",
@@ -153,7 +139,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-009",
     name: "350gsm Fleece Zip Hoodie Set",
-    priceCny: 83,
     unit: "set",
     image: "./assets/garments/bg-gm-009.webp",
     category: "hoodies",
@@ -170,7 +155,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-010",
     name: "350gsm Fleece Straight-Leg Sweatpants",
-    priceCny: 83,
     unit: "piece",
     image: "./assets/garments/bg-gm-010.webp",
     category: "bottoms",
@@ -187,7 +171,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-011",
     name: "350gsm Fleece Oversized Hoodie",
-    priceCny: 93,
     unit: "piece",
     image: "./assets/garments/bg-gm-011.webp",
     category: "hoodies",
@@ -204,7 +187,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-012",
     name: "385gsm Heavyweight Relaxed Tee",
-    priceCny: 75,
     unit: "piece",
     image: "./assets/garments/bg-gm-012.webp",
     category: "tees",
@@ -221,7 +203,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-013",
     name: "190gsm Cotton Oversized Basic Tee",
-    priceCny: 52,
     unit: "piece",
     image: "./assets/garments/bg-gm-013.webp",
     category: "tees",
@@ -238,7 +219,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-014",
     name: "Slub Cotton Relaxed Tee",
-    priceCny: 58,
     unit: "piece",
     image: "./assets/garments/bg-gm-014.webp",
     category: "tees",
@@ -255,7 +235,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-015",
     name: "Women's Slub Cotton Regular Tee",
-    priceCny: 46,
     unit: "piece",
     image: "./assets/garments/bg-gm-015.webp",
     category: "womens",
@@ -272,7 +251,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-016",
     name: "Lightweight Summer Performance Tee",
-    priceCny: 55,
     unit: "piece",
     image: "./assets/garments/bg-gm-016.webp",
     category: "tops",
@@ -289,7 +267,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-017",
     name: "305gsm Earth-Tone Oversized Tee",
-    priceCny: 66,
     unit: "piece",
     image: "./assets/garments/bg-gm-017.webp",
     category: "tees",
@@ -306,7 +283,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-018",
     name: "Women's 210gsm Cropped Tee",
-    priceCny: 45,
     unit: "piece",
     image: "./assets/garments/bg-gm-018.webp",
     category: "womens",
@@ -323,7 +299,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-019",
     name: "Snow-Wash Cropped Boxy Tee",
-    priceCny: 65,
     unit: "piece",
     image: "./assets/garments/bg-gm-019.webp",
     category: "tees",
@@ -340,7 +315,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-020",
     name: "Cropped Fleece Zip Hoodie",
-    priceCny: 112,
     unit: "piece",
     image: "./assets/garments/bg-gm-020.webp",
     category: "hoodies",
@@ -357,7 +331,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-021",
     name: "430gsm Stretch Cotton Training Tank",
-    priceCny: 56,
     unit: "piece",
     image: "./assets/garments/bg-gm-021.webp",
     category: "tops",
@@ -374,7 +347,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-022",
     name: "250gsm Snow-Wash Oversized Tee",
-    priceCny: 64,
     unit: "piece",
     image: "./assets/garments/bg-gm-022.webp",
     category: "tees",
@@ -391,7 +363,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-023",
     name: "250gsm Distressed Spray-Wash Tee",
-    priceCny: 73,
     unit: "piece",
     image: "./assets/garments/bg-gm-023.webp",
     category: "tees",
@@ -408,7 +379,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-024",
     name: "Raw-Edge Wax-Wash Sleeveless Tee",
-    priceCny: 68,
     unit: "piece",
     image: "./assets/garments/bg-gm-024.webp",
     category: "tops",
@@ -425,7 +395,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-025",
     name: "275gsm Wax-Wash Oversized Tee",
-    priceCny: 67,
     unit: "piece",
     image: "./assets/garments/bg-gm-025.webp",
     category: "tees",
@@ -442,7 +411,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-026",
     name: "250gsm Washed Raw-Edge Tee",
-    priceCny: 62,
     unit: "piece",
     image: "./assets/garments/bg-gm-026.webp",
     category: "tees",
@@ -459,7 +427,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-027",
     name: "Wax-Wash Raw-Edge Sleeveless Tee",
-    priceCny: 67,
     unit: "piece",
     image: "./assets/garments/bg-gm-027.webp",
     category: "tops",
@@ -476,7 +443,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-028",
     name: "250gsm Original Graphic Washed Tee",
-    priceCny: 78,
     unit: "piece",
     image: "./assets/garments/bg-gm-028.webp",
     category: "tees",
@@ -493,7 +459,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-029",
     name: "245gsm Honeycomb Knit Sport Tee",
-    priceCny: 55,
     unit: "piece",
     image: "./assets/garments/bg-gm-029.webp",
     category: "tees",
@@ -510,7 +475,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-030",
     name: "275gsm Wax-Wash Cut-Off Tank",
-    priceCny: 65,
     unit: "piece",
     image: "./assets/garments/bg-gm-030.webp",
     category: "tops",
@@ -527,7 +491,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-031",
     name: "275gsm Distressed Washed Tee",
-    priceCny: 63,
     unit: "piece",
     image: "./assets/garments/bg-gm-031.webp",
     category: "tees",
@@ -544,7 +507,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-032",
     name: "245gsm Cross-Grain Cotton Tee",
-    priceCny: 56,
     unit: "piece",
     image: "./assets/garments/bg-gm-032.webp",
     category: "tees",
@@ -561,7 +523,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-033",
     name: "Two-Tone Performance Tank",
-    priceCny: 63,
     unit: "piece",
     image: "./assets/garments/bg-gm-033.webp",
     category: "tops",
@@ -578,7 +539,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-034",
     name: "275gsm Vintage-Wash Oversized Tee",
-    priceCny: 62,
     unit: "piece",
     image: "./assets/garments/bg-gm-034.webp",
     category: "tees",
@@ -595,7 +555,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-035",
     name: "275gsm Cropped Oversized Tee",
-    priceCny: 75,
     unit: "piece",
     image: "./assets/garments/bg-gm-035.webp",
     category: "tees",
@@ -612,7 +571,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-036",
     name: "230gsm Cooling-Feel Performance Tee",
-    priceCny: 64,
     unit: "piece",
     image: "./assets/garments/bg-gm-036.webp",
     category: "tees",
@@ -629,7 +587,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-037",
     name: "Air-Layer Curved-Leg Sweatpants",
-    priceCny: 84,
     unit: "piece",
     image: "./assets/garments/bg-gm-037.webp",
     category: "bottoms",
@@ -646,7 +603,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-038",
     name: "Mock-Neck Fine-Knit Tee",
-    priceCny: 72,
     unit: "piece",
     image: "./assets/garments/bg-gm-038.webp",
     category: "tees",
@@ -663,7 +619,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-039",
     name: "380gsm Air-Layer Long Shorts",
-    priceCny: 72,
     unit: "piece",
     image: "./assets/garments/bg-gm-039.webp",
     category: "bottoms",
@@ -680,7 +635,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-040",
     name: "500gsm Heavyweight Fleece Hoodie",
-    priceCny: 102,
     unit: "piece",
     image: "./assets/garments/bg-gm-040.webp",
     category: "hoodies",
@@ -697,7 +651,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-041",
     name: "285gsm Distressed Layering Long Sleeve",
-    priceCny: 82,
     unit: "piece",
     image: "./assets/garments/bg-gm-041.webp",
     category: "tees",
@@ -714,7 +667,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-042",
     name: "Lightweight Nylon Parachute Pants",
-    priceCny: 91,
     unit: "piece",
     image: "./assets/garments/bg-gm-042.webp",
     category: "bottoms",
@@ -731,7 +683,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-043",
     name: "380gsm Air-Layer Zip Tracksuit",
-    priceCny: 84,
     unit: "set",
     image: "./assets/garments/bg-gm-043.webp",
     category: "hoodies",
@@ -748,7 +699,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-044",
     name: "Lightweight Nylon Athletic Shorts",
-    priceCny: 72,
     unit: "piece",
     image: "./assets/garments/bg-gm-044.webp",
     category: "bottoms",
@@ -765,7 +715,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-045",
     name: "320gsm Waffle-Layer Long Sleeve",
-    priceCny: 94,
     unit: "piece",
     image: "./assets/garments/bg-gm-045.webp",
     category: "tees",
@@ -782,7 +731,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-046",
     name: "Four-Point Training Shorts",
-    priceCny: 62,
     unit: "piece",
     image: "./assets/garments/bg-gm-046.webp",
     category: "bottoms",
@@ -799,7 +747,6 @@ window.bingoGarmentCatalog = [
   {
     code: "BG-GM-047",
     name: "Flagship 280gsm Cotton Oversized Tee",
-    priceCny: 39,
     unit: "piece",
     image: "./assets/garments/flagship-280gsm-tee/black-front.webp",
     category: "tees",
@@ -809,7 +756,7 @@ window.bingoGarmentCatalog = [
     fit: "Oversized",
     sizes: "S-2XL",
     season: "Confirm by market and order",
-    description: "Flagship heavyweight blank for finished-garment printing orders. USD 6.00 per piece; freight excluded.",
+    description: "Flagship heavyweight blank for finished-garment printing orders. Current quotation required.",
     visual: "tee",
     tone: "mint",
     detailPage: "./280gsm-cotton-oversized-t-shirt.html",

@@ -1,5 +1,4 @@
 const garmentCatalog = Array.isArray(window.bingoGarmentCatalog) ? window.bingoGarmentCatalog : [];
-const garmentPricing = window.bingoGarmentPricing || {};
 const garmentReviewRegistry = window.bingoGarmentReviewStatus || {
   defaultReview: {},
   products: {}
@@ -39,45 +38,12 @@ const getPublicGarmentName = (product, review) => {
   return withoutUnverifiedWeight || "Streetwear sample garment";
 };
 
-const renderGarmentPrice = (product, review) => {
-  if (review.commercialPrice !== "verified") {
-    return `
-      <div class="garment-price-block is-unverified" data-commercial-status="quote-required">
-        <span>Current quote required</span>
-        <p><strong>Request verified price</strong></p>
-        <em>Confirmed against the current supplier quote, MOQ, customization and destination.</em>
-      </div>
-    `;
-  }
-
-  const priceCny = Number(product.priceCny);
-  const cnyPerUsd = Number(garmentPricing.cnyPerUsd);
-  const decimalPlaces = Number.isInteger(garmentPricing.decimalPlaces)
-    ? garmentPricing.decimalPlaces
-    : 2;
-
-  if (!Number.isFinite(priceCny) || !Number.isFinite(cnyPerUsd) || cnyPerUsd <= 0) return "";
-
-  const priceUsd = priceCny / cnyPerUsd;
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: decimalPlaces,
-    maximumFractionDigits: decimalPlaces
-  }).format(priceUsd);
-
-  const commercialNote = product.printingOrdersAccepted
-    ? "Base garment price. Freight excluded. Printing is quoted after artwork, placement and quantity review."
-    : `Fixed conversion: USD 1 = CNY ${escapeGarmentHtml(cnyPerUsd)}. Customization, freight, duties and taxes are separate.`;
-
+const renderGarmentPrice = () => {
   return `
-    <div class="garment-price-block">
-      <span>${product.printingOrdersAccepted ? "Verified flagship price" : "USD settlement price"}</span>
-      <p>
-        <strong>${escapeGarmentHtml(formattedPrice)}</strong>
-        <small>/ ${escapeGarmentHtml(product.unit || "piece")}</small>
-      </p>
-      <em>${commercialNote}</em>
+    <div class="garment-price-block is-unverified" data-commercial-status="quote-required">
+      <span>Pricing</span>
+      <p><strong>Request current quotation</strong></p>
+      <em>Quoted privately after quantity, customization, destination and timing are confirmed.</em>
     </div>
   `;
 };
@@ -139,7 +105,7 @@ const renderGarmentCard = (product, contactTarget) => {
       </div>
       <h3>${escapeGarmentHtml(publicName)}</h3>
       <p>${escapeGarmentHtml(product.description)}</p>
-      ${renderGarmentPrice(product, review)}
+      ${renderGarmentPrice()}
       <dl class="product-specs garment-specs">
         <div><dt>Fabric</dt><dd>${escapeGarmentHtml(publicComposition)}</dd></div>
         <div><dt>Weight</dt><dd>${escapeGarmentHtml(publicGsm)}</dd></div>
@@ -149,7 +115,7 @@ const renderGarmentCard = (product, contactTarget) => {
       </dl>
       <p class="verification-note">${verifiedSpecifications
         ? product.printingOrdersAccepted
-          ? "Specification and base price verified on 2026-07-22. Confirm quantity, color, artwork, printing quote, stock and lead time before ordering."
+          ? "Specification verified on 2026-07-22. Confirm quantity, color, artwork, quotation, stock and lead time before ordering."
           : "Verified specifications still require current stock, color, quantity and order confirmation."
         : "Supplier specifications, physical sample, stock and order terms are not yet verified."}</p>
       <div class="garment-card-actions">
@@ -181,6 +147,70 @@ document.querySelectorAll("[data-garment-grid]").forEach((garmentGrid) => {
 
   garmentGrid.innerHTML = products
     .map((product) => renderGarmentCard(product, contactTarget))
+    .join("");
+});
+
+const aw26Batches = Array.isArray(window.bingoAw26ProductBatches)
+  ? window.bingoAw26ProductBatches
+  : [];
+
+const renderAw26Product = (product, batchLabel, contactTarget) => `
+  <article class="aw26-product-card" data-product-code="${escapeGarmentHtml(product.code)}">
+    <a
+      class="aw26-product-sheet"
+      href="${escapeGarmentHtml(product.image)}"
+      target="_blank"
+      rel="noopener"
+      aria-label="Open the English product sheet for ${escapeGarmentHtml(product.code)} ${escapeGarmentHtml(product.name)}"
+    >
+      <img
+        src="${escapeGarmentHtml(product.image)}"
+        alt="English AW26 product sheet for ${escapeGarmentHtml(product.code)} ${escapeGarmentHtml(product.name)}"
+        loading="lazy"
+        decoding="async"
+      />
+      <span>Open English product sheet</span>
+    </a>
+    <div class="aw26-product-copy">
+      <div class="aw26-product-meta">
+        <span>${escapeGarmentHtml(batchLabel)}</span>
+        <strong>${escapeGarmentHtml(product.code)}</strong>
+      </div>
+      <p class="tag">${escapeGarmentHtml(product.category)}</p>
+      <h3>${escapeGarmentHtml(product.name)}</h3>
+      <dl>
+        <div><dt>Material</dt><dd>${escapeGarmentHtml(product.material)}</dd></div>
+        <div><dt>Size range</dt><dd>${escapeGarmentHtml(product.sizes)}</dd></div>
+      </dl>
+      <p class="aw26-product-note">Confirm colours, specifications, MOQ, stock and lead time with the current quotation.</p>
+      <a
+        class="text-link"
+        href="${escapeGarmentHtml(contactTarget)}"
+        data-product-interest="AW26 ${escapeGarmentHtml(product.code)} ${escapeGarmentHtml(product.name)}"
+      >Request a quote for this style</a>
+    </div>
+  </article>
+`;
+
+document.querySelectorAll("[data-aw26-batches]").forEach((catalog) => {
+  const contactTarget = catalog.dataset.contactTarget || "#garment-contact";
+  catalog.innerHTML = aw26Batches
+    .map(
+      (batch) => `
+        <section class="aw26-batch" id="${escapeGarmentHtml(batch.id)}" aria-labelledby="${escapeGarmentHtml(batch.id)}-title">
+          <div class="aw26-batch-heading">
+            <p class="eyebrow">${escapeGarmentHtml(batch.label)} / 5 styles</p>
+            <h3 id="${escapeGarmentHtml(batch.id)}-title">${escapeGarmentHtml(batch.title)}</h3>
+            <p>${escapeGarmentHtml(batch.description)}</p>
+          </div>
+          <div class="aw26-product-grid">
+            ${batch.products
+              .map((product) => renderAw26Product(product, batch.label, contactTarget))
+              .join("")}
+          </div>
+        </section>
+      `
+    )
     .join("");
 });
 

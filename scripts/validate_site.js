@@ -100,8 +100,7 @@ const flagshipPage = fs.readFileSync(path.join(ROOT, flagshipFilename), "utf8");
 for (const [label, pattern] of [
   ["100% cotton specification", /100% cotton/i],
   ["280gsm specification", /280gsm/i],
-  ["USD 6.00 price", /USD 6\.00/i],
-  ["freight exclusion", /freight excluded/i],
+  ["quote-only call to action", /quote on request|current quote required/i],
   ["printing-order offer", /finished-garment printing orders accepted/i],
   ["S-2XL size range", /S-2XL/i],
   ["size chart", /<table class="flagship-size-table">/i]
@@ -131,9 +130,25 @@ if (/\bARTIE\b|artieshop|detail\.1688\.com/i.test(`${garmentPage}\n${flagshipPag
 if (!/garment-review-status\.js/i.test(garmentPage)) {
   errors.push("garments.html must load the public garment review gate");
 }
+if (!/aw26-product-data\.js/i.test(garmentPage) || !/data-aw26-batches/i.test(garmentPage)) {
+  errors.push("garments.html must render the four-batch AW26 catalog");
+}
 if (/public USD prices|USD settlement prices|compare base-style prices/i.test(garmentPage)) {
   errors.push("garments.html advertises unverified public prices");
 }
+const publicCommerceSource = [
+  garmentPage,
+  flagshipPage,
+  fs.readFileSync(path.join(ROOT, "index.html"), "utf8"),
+  fs.readFileSync(path.join(ROOT, "garment-data.js"), "utf8"),
+  fs.readFileSync(path.join(ROOT, "aw26-product-data.js"), "utf8")
+].join("\n");
+if (/USD\s*\d|priceCurrency|product:price:amount|priceCny|cnyPerUsd/i.test(publicCommerceSource)) {
+  errors.push("public garment pages or data still expose a product price");
+}
+const aw26Assets = fs.readdirSync(path.join(ROOT, "assets", "garments", "aw26"))
+  .filter((file) => file.endsWith(".webp"));
+if (aw26Assets.length !== 20) errors.push(`expected 20 AW26 English product sheets, found ${aw26Assets.length}`);
 
 const sitemap = fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8");
 const sitemapUrls = (sitemap.match(/<loc>/g) || []).length;

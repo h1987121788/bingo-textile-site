@@ -8,11 +8,12 @@ const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "garment-data.js"), "utf8"), context);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "garment-review-status.js"), "utf8"), context);
+vm.runInContext(fs.readFileSync(path.join(ROOT, "aw26-product-data.js"), "utf8"), context);
 
 const catalog = context.window.bingoGarmentCatalog;
-const pricing = context.window.bingoGarmentPricing;
 const launchCodes = context.window.bingoGarmentLaunchCodes;
 const publicRegistry = context.window.bingoGarmentReviewStatus;
+const aw26Batches = context.window.bingoAw26ProductBatches;
 const registry = JSON.parse(
   fs.readFileSync(path.join(ROOT, "data", "garment_review_status.json"), "utf8")
 );
@@ -21,7 +22,6 @@ const warnings = [];
 const requiredFields = [
   "code",
   "name",
-  "priceCny",
   "unit",
   "image",
   "category",
@@ -44,8 +44,8 @@ const publicReviewFields = [
 ];
 
 if (!Array.isArray(catalog)) errors.push("window.bingoGarmentCatalog must be an array");
-if (!pricing || pricing.currency !== "USD" || pricing.cnyPerUsd !== 6.5) {
-  errors.push("catalog pricing must explicitly retain USD and CNY 6.5 conversion metadata");
+if (context.window.bingoGarmentPricing) {
+  errors.push("public catalog pricing metadata must not be shipped");
 }
 if (!publicRegistry || !publicRegistry.defaultReview || !publicRegistry.products) {
   errors.push("public garment review status is missing or invalid");
@@ -53,10 +53,10 @@ if (!publicRegistry || !publicRegistry.defaultReview || !publicRegistry.products
 
 const rendererSource = fs.readFileSync(path.join(ROOT, "garments.js"), "utf8");
 for (const marker of [
-  'review.commercialPrice !== "verified"',
   'review.supplierSpecification === "verified"',
   'review.physicalSample === "verified"',
-  'data-commercial-status="quote-required"'
+  'data-commercial-status="quote-required"',
+  'Request current quotation'
 ]) {
   if (!rendererSource.includes(marker)) errors.push(`garment renderer is missing commercial gate: ${marker}`);
 }
@@ -79,8 +79,8 @@ for (let index = 0; index < products.length; index += 1) {
     }
   }
 
-  if (!Number.isFinite(Number(product.priceCny)) || Number(product.priceCny) <= 0) {
-    errors.push(`${product.code} has an invalid priceCny`);
+  if (Object.keys(product).some((field) => /price|cost/i.test(field))) {
+    errors.push(`${product.code} exposes a public price or cost field`);
   }
   if (!["piece", "set"].includes(product.unit)) errors.push(`${product.code} has an invalid unit`);
 
@@ -123,8 +123,8 @@ for (let index = 0; index < products.length; index += 1) {
   if (hasVerifiedStatus && (!review.reviewedAt || !Array.isArray(review.evidence) || !review.evidence.length)) {
     errors.push(`${product.code} has a verified status without dated evidence`);
   }
-  if (strictCommercial && review.commercialPrice !== "verified") {
-    errors.push(`${product.code} commercial price is not verified`);
+  if (strictCommercial && review.commercialPrice !== "quote_only_not_published") {
+    errors.push(`${product.code} must remain quote-only with no public price`);
   }
 }
 
@@ -141,7 +141,6 @@ if (!flagship) {
   errors.push("BG-GM-047 flagship product is missing");
 } else {
   const expectedFlagshipFields = {
-    priceCny: 39,
     unit: "piece",
     gsm: "280gsm",
     composition: "100% cotton",
@@ -169,7 +168,7 @@ if (!flagship) {
 for (const [field, expected] of Object.entries({
   supplierSpecification: "verified",
   physicalSample: "verified",
-  commercialPrice: "verified",
+  commercialPrice: "quote_only_not_published",
   publicImage: "approved_sample_photo",
   reviewedAt: "2026-07-22"
 })) {
@@ -207,11 +206,39 @@ if (unverifiedSupplierSpecificationCount) {
   warnings.push(`${unverifiedSupplierSpecificationCount} products still require supplier specification verification`);
 }
 
-const usdPrices = products.map((product) => Number(product.priceCny) / Number(pricing.cnyPerUsd));
+const aw26Products = Array.isArray(aw26Batches)
+  ? aw26Batches.flatMap((batch) => (Array.isArray(batch.products) ? batch.products : []))
+  : [];
+if (!Array.isArray(aw26Batches) || aw26Batches.length !== 4) {
+  errors.push("AW26 catalog must contain four batches");
+}
+for (const batch of Array.isArray(aw26Batches) ? aw26Batches : []) {
+  if (!Array.isArray(batch.products) || batch.products.length !== 5) {
+    errors.push(`${batch.id || "unknown AW26 batch"} must contain five products`);
+  }
+}
+if (aw26Products.length !== 20) errors.push("AW26 catalog must contain twenty products");
+const aw26Codes = aw26Products.map((product) => product.code);
+if (new Set(aw26Codes).size !== aw26Codes.length) errors.push("duplicate AW26 product codes found");
+for (const product of aw26Products) {
+  for (const field of ["code", "name", "category", "material", "sizes", "image"]) {
+    if (!product[field]) errors.push(`AW26 ${product.code || "unknown"} is missing ${field}`);
+  }
+  if (Object.keys(product).some((field) => /price|cost/i.test(field))) {
+    errors.push(`AW26 ${product.code || "unknown"} exposes a public price or cost field`);
+  }
+  const image = path.resolve(ROOT, String(product.image || "").replace(/^\.\//, ""));
+  if (!fs.existsSync(image) || fs.statSync(image).size < 1024) {
+    errors.push(`AW26 ${product.code || "unknown"} is missing a usable English product sheet`);
+  }
+}
+
 const result = {
   ok: errors.length === 0,
   strictCommercial,
   catalogCount: products.length,
+  aw26BatchCount: Array.isArray(aw26Batches) ? aw26Batches.length : 0,
+  aw26ProductCount: aw26Products.length,
   reviewRegistryCount: Object.keys(registry.products || {}).length,
   publiclyQuotedCount,
   publiclySpecifiedCount,
@@ -224,14 +251,10 @@ const result = {
   flagship: flagship
     ? {
         code: flagship.code,
-        priceUsd: (Number(flagship.priceCny) / Number(pricing.cnyPerUsd)).toFixed(2),
         specificationVerified: flagshipReview.supplierSpecification === "verified",
-        commercialPriceVerified: flagshipReview.commercialPrice === "verified"
+        commercialTerms: flagshipReview.commercialPrice
       }
     : null,
-  usdPriceRange: usdPrices.length
-    ? [Math.min(...usdPrices).toFixed(2), Math.max(...usdPrices).toFixed(2)]
-    : [],
   errors,
   warnings
 };

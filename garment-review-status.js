@@ -4,7 +4,7 @@ window.bingoGarmentReviewStatus = {
     sourceMapping: "not_recorded",
     supplierSpecification: "not_verified",
     physicalSample: "verified",
-    commercialPrice: "formula_only_not_verified",
+    commercialPrice: "quote_only_not_published",
     publicImage: "standardized_catalog_visual",
     reviewedAt: "2026-07-16"
   },
@@ -13,7 +13,7 @@ window.bingoGarmentReviewStatus = {
       sourceMapping: "not_recorded",
       supplierSpecification: "verified",
       physicalSample: "verified",
-      commercialPrice: "verified",
+      commercialPrice: "quote_only_not_published",
       publicImage: "approved_sample_photo",
       reviewedAt: "2026-07-22"
     }

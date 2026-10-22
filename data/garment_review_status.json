@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-22",
+  "updatedAt": "2026-10-22",
   "policy": "A verified status requires dated evidence. Missing evidence must remain explicitly unverified.",
   "defaultReview": {
     "sourceMapping": "not_recorded",
     "supplierSpecification": "not_verified",
     "physicalSample": "verified",
-    "commercialPrice": "formula_only_not_verified",
+    "commercialPrice": "quote_only_not_published",
     "publicImage": "standardized_catalog_visual",
     "reviewedAt": "2026-07-16",
     "evidence": [
@@ -64,13 +64,13 @@
       "sourceMapping": "not_recorded",
       "supplierSpecification": "verified",
       "physicalSample": "verified",
-      "commercialPrice": "verified",
+      "commercialPrice": "quote_only_not_published",
       "publicImage": "approved_sample_photo",
       "reviewedAt": "2026-07-22",
       "evidence": [
         "Operator-provided finished sample photos and English size chart reviewed on 2026-07-22.",
         "Operator-confirmed specification: 100% cotton, 280gsm, sizes S-2XL.",
-        "Operator-confirmed commercial terms: USD 6.00 per piece, freight excluded, and finished-garment printing orders accepted."
+        "Public pricing was removed on 2026-10-22; all commercial terms now require a current private quotation."
       ]
     }
   }
