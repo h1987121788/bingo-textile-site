@@ -1,4 +1,12 @@
-# Project Status - 2026-10-22
+# Project Status - 2026-10-24
+
+## Showroom P0 Function Fixes
+
+- Core filters now follow the recorded garment types: 26 T-shirts, 6 tanks, 2 long sleeves, 3 hoodies, 4 shorts, 3 pants and 3 sets. AW26 retains its own four category filters and all twenty published styles.
+- Inquiry garment type follows the selected styles instead of always using `AW26 mixed collection`. Same-type selections keep their garment type; mixed AW26 selections use the AW26 label, and other mixed selections use `Mixed garment collection`.
+- Adding, restoring or removing a selection updates its automatic type. Removing the final style clears the automatic value without overwriting a manually chosen custom type for an empty inquiry.
+- Twenty-two showroom regression tests are included in `npm run validate` and CI. Full validation and local desktop/mobile browser checks passed before production publication was requested through `origin/main`.
+- This change does not alter product verification, quote-only pricing, CRM submission controls or paused outbound automation.
 
 ## Showroom V2 Release
 

@@ -68,11 +68,18 @@
         material: verified ? product.composition : "Confirm with sample",
         weight: verified ? product.gsm : "",
         sizes: verified ? product.sizes : "Confirm with sample",
-        family: /hoodie/i.test(product.name)
-          ? "hoodies"
-          : /sweatshirt/i.test(product.name)
-            ? "sweatshirts"
-            : "other",
+        family:
+          product.unit === "set" || product.visual === "set"
+            ? "sets"
+            : product.categoryLabel === "Long sleeves"
+              ? "long-sleeves"
+              : ({
+                  tank: "tanks",
+                  shorts: "shorts",
+                  pants: "pants",
+                  hoodie: "hoodies",
+                  tee: "t-shirts",
+                })[product.visual] || "other",
         imageLabel:
           review.publicImage === "approved_sample_photo"
             ? "Finished sample photograph"
@@ -96,15 +103,34 @@
   } catch {
     /* Selection still works in memory if browser storage is unavailable. */
   }
+  const familyNames = {
+    all: "All styles",
+    "t-shirts": "T-shirts",
+    tanks: "Tanks",
+    "long-sleeves": "Long sleeves",
+    sweatshirts: "Sweatshirts",
+    hoodies: "Hoodies",
+    thermal: "Thermal layers",
+    shorts: "Shorts",
+    pants: "Pants",
+    sets: "Sets",
+    other: "Other garments",
+  };
+  const inquiryTypes = {
+    "t-shirts": "T-shirts",
+    tanks: "Tanks / sleeveless tops",
+    "long-sleeves": "Long-sleeve tops",
+    sweatshirts: "Sweatshirts / hoodies",
+    hoodies: "Sweatshirts / hoodies",
+    thermal: "Thermal layers",
+    shorts: "Shorts",
+    pants: "Pants",
+    sets: "Sets / tracksuits",
+    other: "Other garments",
+  };
   const query = new URLSearchParams(location.search);
   let collection = query.get("collection") === "core" ? "core" : "aw26";
-  let family = [
-    "all",
-    "long-sleeves",
-    "sweatshirts",
-    "hoodies",
-    "thermal",
-  ].includes(query.get("category"))
+  let family = Object.hasOwn(familyNames, query.get("category"))
     ? query.get("category")
     : "all";
   let search = "";
@@ -114,13 +140,6 @@
   let toastTimer;
   const productDialog = $("#product-dialog");
   const inquiryDialog = $("#inquiry-dialog");
-  const familyNames = {
-    "long-sleeves": "Long sleeves",
-    sweatshirts: "Sweatshirts",
-    hoodies: "Hoodies",
-    thermal: "Thermal layers",
-    other: "Core essentials",
-  };
   const isNew = (product) => {
     const age =
       Date.now() - new Date(`${product.releasedAt}T00:00:00+08:00`).getTime();
@@ -177,6 +196,26 @@
       reference.value = "";
       delete reference.dataset.selectedCodes;
     }
+    const garmentType = $('select[name="garment_type"]');
+    if (garmentType && selected.length) {
+      const chosenProducts = selected.map((code) => productMap.get(code));
+      const types = new Set(
+        chosenProducts.map((product) => inquiryTypes[product.family]),
+      );
+      garmentType.value =
+        types.size === 1
+          ? [...types][0]
+          : chosenProducts.every((product) => product.collection === "aw26")
+            ? "AW26 mixed collection"
+            : "Mixed garment collection";
+      garmentType.dataset.selectedType = garmentType.value;
+    } else if (
+      garmentType &&
+      garmentType.value === garmentType.dataset.selectedType
+    ) {
+      garmentType.value = "";
+      delete garmentType.dataset.selectedType;
+    }
     icons();
   };
   const toggleStyle = (code) => {
@@ -201,7 +240,22 @@
   const renderCatalog = () => {
     const grid = $("[data-catalog-grid]");
     if (!grid) return;
-    let shown = (collection === "aw26" ? newProducts : coreProducts).filter(
+    const catalogProducts = collection === "aw26" ? newProducts : coreProducts;
+    const availableFamilies = new Set(
+      catalogProducts.map((product) => product.family),
+    );
+    if (family !== "all" && !availableFamilies.has(family)) family = "all";
+    const filters = $(".category-filters");
+    if (filters.dataset.collection !== collection) {
+      filters.innerHTML = Object.entries(familyNames)
+        .filter(([key]) => key === "all" || availableFamilies.has(key))
+        .map(([key, label]) =>
+          `<button data-family="${key}" aria-pressed="false">${label}</button>`,
+        )
+        .join("");
+      filters.dataset.collection = collection;
+    }
+    let shown = catalogProducts.filter(
       (product) =>
         (family === "all" || product.family === family) &&
         `${product.code} ${product.title} ${product.material} ${product.weight}`
@@ -282,16 +336,13 @@
   const toBrief = () => {
     if (productDialog.open) productDialog.close();
     if (inquiryDialog.open) inquiryDialog.close();
-    const reference = $('input[name="reference"]');
+    syncSelection();
     if (selected.length) {
-      reference.value = selected.join(", ");
       try {
         sessionStorage.setItem("productInterest", selected.join(", "));
       } catch {
         /* Optional attribution. */
       }
-      const garmentType = $('select[name="garment_type"]');
-      if (garmentType) garmentType.value = "AW26 mixed collection";
     }
     $("#contact").scrollIntoView({ behavior: "smooth" });
     setTimeout(
