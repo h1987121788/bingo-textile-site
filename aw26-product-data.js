@@ -229,7 +229,8 @@ window.bingoAw26ProductBatches.forEach((batch) => {
       : "pending_review";
     product.sortOrder = aw26DisplayOrder.indexOf(product.code);
     product.featured = product.sortOrder < 6;
-    product.coverImage = `./assets/garments/aw26/photos/${product.code.toLowerCase()}.webp`;
+    product.coverImage = `./assets/garments/aw26/still-life/${product.code.toLowerCase()}.webp`;
+    product.displayMode = "product-only";
     product.family = /hoodie/i.test(product.name)
       ? "hoodies"
       : /sweatshirt/i.test(product.name)

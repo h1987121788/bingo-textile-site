@@ -1,6 +1,6 @@
-# Local Showroom V2
+# AW26 Garment-Only Local Preview
 
-Branch: `codex/showroom-v2-local`, based on `origin/main` at `a84d7e9`.
+Branch: `codex/aw26-still-life-preview`, based on the published P0 release `1fb8a65`.
 
 Preview:
 
@@ -24,14 +24,16 @@ Rebuild after updating product data. The builder computes content hashes for the
 
 `scripts/build_showroom_pages.mjs` owns the homepage and catalog page templates. After changing a template, run `npm run build:showroom`. Shared visual styles and interactive behavior live in `showroom.css` and `showroom.js`.
 
-The twenty cover images are cropped from the existing operator-supplied AW26 model-image assets. They do not add new garment views or constitute specification, inventory or factory evidence. Full English sheets are available in each style dialog. The new hero combines two existing source-image crops, without generating models or garments.
+All twenty AW26 covers now use existing garment-only product objects from the supplied supplier catalog. Sixteen objects were already exported as transparent SKU files; four wash-style objects were extracted directly from the source PDF. No garment was generated, recoloured or reshaped. Assets are optimized for web delivery under `assets/garments/aw26/still-life/`.
+
+The homepage, AW26 directory, dialogs and inquiry thumbnails do not use the earlier AW26 model covers. Model-containing English boards are replaced in the dialog by accessible HTML reference-size tables from the already published catalog data. `aw26-size-guides.js` contains those tables. Commercial and verification boundaries remain unchanged.
 
 To regenerate the derivative images after installing sharp:
 
 ```sh
-node scripts/prepare_showroom_images.mjs /absolute/path/to/aw26/model-images
+node scripts/prepare_aw26_still_life.mjs /absolute/path/to/exported-product-objects
 ```
 
 Lucide 0.468.0 is vendored locally in `assets/vendor/lucide.min.js`; the preview does not require an icon CDN.
 
-The operator approved this design for production publication on 2026-10-22. Production is published through `origin/main`; this localhost preview remains available for development and does not submit real inquiries.
+The operator approved this garment-only design for production publication on 2026-10-25. Production releases use `origin/main`; localhost remains available for development without creating production leads. Confirm release completion from GitHub Pages and live resource/browser checks, not from the local preview alone.

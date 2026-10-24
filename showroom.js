@@ -31,10 +31,11 @@
           collection: "aw26",
           weight: product.name.match(/\d+gsm/i)?.[0] || "",
           title: product.name.replace(/^\d+gsm\s+/i, ""),
-          sheet: product.image,
+          sheet: "",
+          sizeGuide: window.bingoAw26SizeGuides?.[product.code],
           image: product.coverImage,
           material: product.material,
-          imageLabel: "AW26 on-body collection image",
+          imageLabel: "AW26 garment-only product image",
           scope:
             "Collection reference. Confirm current specifications, colours, MOQ, stock and lead time with your quotation.",
         })),
@@ -307,8 +308,12 @@
     const previous = peers[(at - 1 + peers.length) % peers.length];
     const next = peers[(at + 1) % peers.length];
     const chosen = selected.includes(code);
+    const guide = product.sizeGuide;
+    const guideMarkup = guide
+      ? `<div class="size-guide-panel" data-size-guide hidden><p class="kicker">${escape(code)} / SIZE GUIDE</p><h3>Find your fit.</h3><div class="size-guide-scroll" role="region" aria-label="Size guide for ${escape(code)}" tabindex="0"><table><caption>Reference garment measurements</caption><thead><tr>${guide.columns.map((column) => `<th scope="col">${escape(column)}</th>`).join("")}</tr></thead><tbody>${guide.rows.map((row) => `<tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${escape(cell)}</th>` : `<td>${escape(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div><p>Measurements in cm; body weight in kg. Confirm measurement method, size and tolerances before ordering.</p></div>`
+      : "";
     $("[data-product-dialog-content]").innerHTML =
-      `<div class="product-detail"><div class="detail-gallery"><a class="detail-image-link" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open full-size product photograph"><img class="detail-main-image" data-detail-image src="${escape(product.image)}" alt="${escape(`${product.imageLabel}: ${product.title}`)}" width="720" height="900" /></a><div class="detail-gallery-tools"><div class="gallery-tabs" role="group" aria-label="Product image view"><button data-gallery-view="photo" aria-pressed="true">On-body / product</button>${product.sheet ? '<button data-gallery-view="sheet" aria-pressed="false">English sheet</button>' : ""}</div><a class="icon-button" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open image at full size" title="Open full size">${icon("expand")}</a></div></div><div class="detail-copy"><p class="kicker">${product.collection === "aw26" ? `AW26 / ${product.batch}` : "CORE COLLECTION"} / ${escape(code)}</p><h2 id="product-dialog-title">${escape(product.title)}</h2><p>${escape(product.collection === "aw26" ? "A new-season direction for your next private-label collection." : product.description)}</p><dl class="detail-specs"><div><dt>Material</dt><dd>${escape(product.material)}</dd></div><div><dt>Weight</dt><dd>${escape(product.weight || "Confirm with sample")}</dd></div><div><dt>Size range</dt><dd>${escape(product.sizes)}</dd></div><div><dt>Pricing</dt><dd>Current quote on request</dd></div></dl><button class="btn btn-dark" data-toggle-style="${escape(code)}">${chosen ? "Added to inquiry" : "Add to inquiry"} ${icon(chosen ? "check" : "plus")}</button><button class="text-link" data-product-to-brief="${escape(code)}">Ask about this style ${icon("arrow-up-right")}</button><p class="detail-note">${escape(product.scope)}</p>${product.sheet ? `<a class="detail-sheet-link" href="${escape(product.sheet)}" target="_blank" rel="noopener">Open full English product sheet ${icon("external-link")}</a>` : ""}</div></div><div class="detail-pager"><button data-open-product="${escape(previous.code)}">${icon("arrow-left")} Previous style</button><span>${at + 1} / ${peers.length}</span><button data-open-product="${escape(next.code)}">Next style ${icon("arrow-right")}</button></div>`;
+      `<div class="product-detail"><div class="detail-gallery"><div data-detail-visual><a class="detail-image-link" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open full-size product image"><img class="detail-main-image ${product.collection === "aw26" ? "is-product-only" : ""}" data-detail-image src="${escape(product.image)}" alt="${escape(`${product.imageLabel}: ${product.title}`)}" width="720" height="900" /></a></div>${guideMarkup}<div class="detail-gallery-tools"><div class="gallery-tabs" role="group" aria-label="Product image view"><button data-gallery-view="photo" aria-pressed="true">Product</button>${guide ? '<button data-gallery-view="size" aria-pressed="false">Size guide</button>' : ""}${product.sheet ? '<button data-gallery-view="sheet" aria-pressed="false">English sheet</button>' : ""}</div><a class="icon-button" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open image at full size" title="Open full size">${icon("expand")}</a></div></div><div class="detail-copy"><p class="kicker">${product.collection === "aw26" ? `AW26 / ${product.batch}` : "CORE COLLECTION"} / ${escape(code)}</p><h2 id="product-dialog-title">${escape(product.title)}</h2><p>${escape(product.collection === "aw26" ? "A new-season direction for your next private-label collection." : product.description)}</p><dl class="detail-specs"><div><dt>Material</dt><dd>${escape(product.material)}</dd></div><div><dt>Weight</dt><dd>${escape(product.weight || "Confirm with sample")}</dd></div><div><dt>Size range</dt><dd>${escape(product.sizes)}</dd></div><div><dt>Pricing</dt><dd>Current quote on request</dd></div></dl><button class="btn btn-dark" data-toggle-style="${escape(code)}">${chosen ? "Added to inquiry" : "Add to inquiry"} ${icon(chosen ? "check" : "plus")}</button><button class="text-link" data-product-to-brief="${escape(code)}">Ask about this style ${icon("arrow-up-right")}</button><p class="detail-note">${escape(product.scope)}</p>${product.sheet ? `<a class="detail-sheet-link" href="${escape(product.sheet)}" target="_blank" rel="noopener">Open full English product sheet ${icon("external-link")}</a>` : ""}</div></div><div class="detail-pager"><button data-open-product="${escape(previous.code)}">${icon("arrow-left")} Previous style</button><span>${at + 1} / ${peers.length}</span><button data-open-product="${escape(next.code)}">Next style ${icon("arrow-right")}</button></div>`;
     if (!productDialog.open) productDialog.showModal();
     else productDialog.scrollTop = 0;
     icons();
@@ -397,6 +402,10 @@
     }
     if (target.dataset.galleryView && currentProduct) {
       currentGalleryView = target.dataset.galleryView;
+      const sizeView = currentGalleryView === "size";
+      $("[data-detail-visual]").hidden = sizeView;
+      const guidePanel = $("[data-size-guide]");
+      if (guidePanel) guidePanel.hidden = !sizeView;
       const sheet = currentGalleryView === "sheet";
       const src = sheet ? currentProduct.sheet : currentProduct.image;
       $("[data-detail-image]").src = src;
@@ -405,6 +414,7 @@
       $("[data-detail-image]").classList.toggle("is-sheet", sheet);
       $$("[data-full-image]").forEach((link) => {
         link.href = src;
+        link.hidden = sizeView;
       });
       $$("[data-gallery-view]").forEach((button) =>
         button.setAttribute(

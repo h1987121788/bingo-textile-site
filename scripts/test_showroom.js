@@ -56,6 +56,7 @@ function harness(search = "?collection=core", saved = []) {
     "[data-catalog-grid]", "[data-result-count]", "[data-catalog-empty]",
     "[data-collection-note]", "#collection-panel", ".category-filters",
     "#product-dialog", "#inquiry-dialog", "#contact", "[data-product-dialog-content]",
+    "[data-detail-visual]", "[data-size-guide]", "[data-detail-image]",
     "[data-inquiry-items]", "[data-continue-inquiry]", "[data-toast]",
     "[data-menu-toggle]", "#main-nav", "[data-catalog-search]",
     "[data-catalog-sort]", 'input[name="reference"]',
@@ -87,7 +88,7 @@ function harness(search = "?collection=core", saved = []) {
   };
   context.window = context;
   vm.createContext(context);
-  for (const file of ["garment-data.js", "garment-review-status.js", "aw26-product-data.js", "showroom.js"])
+  for (const file of ["garment-data.js", "garment-review-status.js", "aw26-size-guides.js", "aw26-product-data.js", "showroom.js"])
     vm.runInContext(read(file), context, { filename: file });
   const click = (dataset) => document.listeners.click({ target: new Element(dataset) });
   return {
@@ -212,4 +213,50 @@ test("adding or removing styles immediately updates the type and clears the last
 
 test("homepage and catalog offer identical inquiry types", () => {
   assert.deepEqual(optionValues("index.html"), optionValues("garments.html"));
+});
+
+test("all twenty AW26 styles use garment-only assets and text size guides", () => {
+  const page = harness("");
+  const products = page.context.bingoAw26ProductBatches.flatMap((batch) => batch.products);
+  assert.equal(products.length, 20);
+  for (const product of products) {
+    assert.equal(product.displayMode, "product-only");
+    assert(product.coverImage.includes("/still-life/"));
+    assert(fs.existsSync(path.join(root, product.coverImage)));
+    const guide = page.context.bingoAw26SizeGuides[product.code];
+    assert(guide.columns.length >= 5);
+    assert(guide.rows.length >= 5);
+    assert(guide.rows.every((row) => row.length === guide.columns.length));
+    page.click({ openProduct: product.code });
+    const html = page.nodes.get("[data-product-dialog-content]").innerHTML;
+    assert(html.includes('data-gallery-view="size"'));
+    assert(html.includes("Reference garment measurements"));
+    assert(!html.includes(product.image), "Do not link the model-containing English board");
+    assert(!html.includes("/photos/"));
+    assert(!html.includes("On-body"));
+  }
+});
+
+test("size guide switches back to the product without losing inquiry selection", () => {
+  const page = harness("");
+  page.click({ openProduct: "253" });
+  page.click({ toggleStyle: "253" });
+  page.click({ galleryView: "size" });
+  assert.equal(page.nodes.get("[data-detail-visual]").hidden, true);
+  assert.equal(page.nodes.get("[data-size-guide]").hidden, false);
+  page.click({ galleryView: "photo" });
+  assert.equal(page.nodes.get("[data-detail-visual]").hidden, false);
+  assert.equal(page.nodes.get("[data-size-guide]").hidden, true);
+  page.click({ continueInquiry: "" });
+  assert.equal(page.nodes.get('input[name="reference"]').value, "253");
+  assert.equal(page.nodes.get('select[name="garment_type"]').value, "Sweatshirts / hoodies");
+});
+
+test("homepage and catalog do not use the old AW26 model images", () => {
+  for (const file of ["index.html", "garments.html"]) {
+    const html = read(file);
+    assert(!html.includes("/aw26/photos/"));
+    assert(html.includes("aw26-size-guides.js"));
+    assert(html.includes("/aw26/still-life/"));
+  }
 });

@@ -1,4 +1,30 @@
-# Showroom V2 Local QA
+# AW26 Product-Only Preview QA
+
+Date: 2026-10-24. Source of truth: `design/context.md` and the garment-only request.
+Prototype: http://127.0.0.1:4173/
+
+## Product-Only Checks
+
+- All twenty AW26 covers use existing supplier garment-only product objects, not model crops or regenerated garments.
+- The homepage hero, featured grid, categories, AW26 dialog and inquiry thumbnails use the new assets. Model-containing English boards are not linked from AW26 dialogs.
+- All twenty detail images loaded in actual browser checks.
+- Size guides contain real table headings and rows. Product / size switching preserves inquiry selection.
+- The P0 category and automatic inquiry-type regression tests remain covered. Full validation includes 25 showroom tests.
+- Browser checks at 375x667, 390x844, 768x1024, default desktop and 1920x1080 found no document-level horizontal overflow or incoherent image/text overlap. The next homepage section remains hinted below the hero.
+- Mobile menu, collection navigation, product dialog, size-guide toggle and inquiry selection work. No browser console errors were captured in the checked states.
+- Localhost disables marketing requests and real lead submission. This work did not submit a production lead or send a message.
+
+## Current Scope
+
+- Core sample verification, quote-only terms and the legacy flagship detail page remain unchanged. The scope is the homepage and AW26 presentation, not replacement of every historical image on every page.
+- Size-guide values come from the existing English catalog; exact measurement methods and order specifications still require confirmation.
+- Keyboard and visible-layout checks are not a full screen-reader or WCAG audit.
+- These checks were performed on the local preview before deployment. The operator subsequently approved website publication on 2026-10-25; production verification is a separate release check.
+- Screenshots are in the operations workspace at `reports/aw26-still-life-preview/`.
+
+Verdict: LOCAL QA PASSED; PRODUCTION PUBLICATION APPROVED.
+
+## Previous V2 QA (Historical)
 
 Date: 2026-10-22. Source of truth: `design/context.md` and the requested local-only redesign.
 Preview: http://127.0.0.1:4173/

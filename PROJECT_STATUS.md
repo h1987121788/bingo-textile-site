@@ -1,4 +1,12 @@
-# Project Status - 2026-10-24
+# Project Status - 2026-10-25
+
+## AW26 Product-Only Release
+
+- Branch: `codex/aw26-still-life-preview`, based on deployed P0 commit `1fb8a65`.
+- All twenty AW26 covers use existing garment-only supplier product objects. The homepage uses the same real product objects in a quiet still-life layout; no garment generation or recolouring was used.
+- The AW26 detail dialog uses a garment-only image and an HTML reference size guide instead of the old model-containing English board. Inquiry thumbnails follow the same product-only assets.
+- The previous P0 category and inquiry-type fixes remain covered. Full validation now includes 25 showroom tests.
+- Local preview: `http://127.0.0.1:4173/`. The operator approved production publication on 2026-10-25 after reviewing the garment-only preview. Publish through `origin/main`; successful Pages deployment and live asset/browser checks determine completion.
 
 ## Showroom P0 Function Fixes
 
