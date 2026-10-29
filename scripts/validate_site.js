@@ -156,6 +156,23 @@ if (sitemapUrls < 8) errors.push("sitemap.xml contains fewer than eight public U
 if (!sitemap.includes("https://www.bingofabric.com/280gsm-cotton-oversized-t-shirt.html")) {
   errors.push("sitemap.xml is missing the flagship product page");
 }
+const hoodiePage = fs.readFileSync(path.join(ROOT, "private-label-streetwear-hoodies.html"), "utf8");
+for (const [label, pattern] of [
+  ["headline", /private label hoodies for streetwear brands/i],
+  ["pullover sample", /style=252/],
+  ["zip sample", /style=253/],
+  ["reference-specification notice", /specifications and availability before ordering/i],
+  ["order-specific terms", /MOQ and lead time are confirmed/i],
+  ["WhatsApp contact", /https:\/\/wa\.me\/8613827719946/]
+]) {
+  if (!pattern.test(hoodiePage)) errors.push(`private-label-streetwear-hoodies.html is missing ${label}`);
+}
+if (!sitemap.includes("https://www.bingofabric.com/private-label-streetwear-hoodies.html")) {
+  errors.push("sitemap.xml is missing the private-label hoodie page");
+}
+if (!/private-label-streetwear-hoodies\.html/.test(fs.readFileSync(path.join(ROOT, "index.html"), "utf8"))) {
+  errors.push("homepage must link to the hoodie page");
+}
 
 const result = {
   ok: errors.length === 0,
