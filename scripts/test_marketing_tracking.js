@@ -13,6 +13,7 @@ const firstScript = {
 };
 const context = {
   console,
+  URLSearchParams,
   localStorage: {
     getItem: (key) => (key === "bingoMarketingConsent" ? "accept" : null),
     setItem: () => {},
@@ -61,4 +62,50 @@ assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "ViewConte
 assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "Contact"));
 assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "Lead"));
 
-console.log(JSON.stringify({ ok: true, tests: 12 }, null, 2));
+const stored = new Map();
+function visit(search, storageAvailable = true) {
+  const scripts = [];
+  const target = {
+    URLSearchParams,
+    location: { hostname: "www.bingofabric.com", protocol: "https:", search },
+    bingoMarketingConfig: { ga4MeasurementId: "G-TEST", metaPixelId: "123", requireMarketingConsent: false },
+    sessionStorage: {
+      getItem: (key) => { if (!storageAvailable) throw new Error("blocked"); return stored.get(key) || null; },
+      setItem: (key, value) => { if (!storageAvailable) throw new Error("blocked"); stored.set(key, value); },
+      removeItem: (key) => { if (!storageAvailable) throw new Error("blocked"); stored.delete(key); },
+    },
+    localStorage: { getItem: () => "accept" },
+    document: {
+      head: { appendChild: (script) => scripts.push(script.src) },
+      body: { appendChild: () => {} },
+      createElement: () => ({ setAttribute() {} }),
+      getElementsByTagName: () => [{ parentNode: { insertBefore: (script) => scripts.push(script.src) } }],
+      querySelector: () => null,
+      addEventListener: (name, callback) => { if (name === "DOMContentLoaded") callback(); },
+    },
+  };
+  target.window = target;
+  vm.createContext(target);
+  vm.runInContext(trackingSource, target);
+  target.bingoTrackEvent("generate_lead", {});
+  target.bingoTrackEvent("contact_whatsapp", {});
+  return { target, scripts };
+}
+const testVisit = visit("?crm_test=1");
+assert.strictEqual(testVisit.target.bingoCrmTestMode, true);
+assert.deepStrictEqual(testVisit.scripts, []);
+assert.strictEqual(testVisit.target.gtag, undefined);
+assert.strictEqual(testVisit.target.fbq, undefined);
+const continuedVisit = visit("");
+assert.strictEqual(continuedVisit.target.bingoCrmTestMode, true);
+assert.deepStrictEqual(continuedVisit.scripts, []);
+const normalVisit = visit("?crm_test=0");
+assert.strictEqual(normalVisit.target.bingoCrmTestMode, false);
+assert.strictEqual(normalVisit.scripts.length, 2);
+assert(normalVisit.target.dataLayer.some((entry) => entry[0] === "event" && entry[1] === "generate_lead"));
+assert(normalVisit.target.fbq.queue.some((entry) => entry[0] === "track" && entry[1] === "Lead"));
+const blockedStorage = visit("?crm_test=1", false);
+assert.strictEqual(blockedStorage.target.bingoCrmTestMode, true);
+assert.deepStrictEqual(blockedStorage.scripts, []);
+
+console.log(JSON.stringify({ ok: true, tests: 24 }, null, 2));

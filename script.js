@@ -11,7 +11,7 @@ const salesEmail = "57317996@qq.com";
 const minimumFormFillMs = 1800;
 const crmResponseTimeoutMs = 15000;
 const trackingKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
-const isCrmTestMode = new URLSearchParams(window.location.search).get("crm_test") === "1";
+const isCrmTestMode = window.bingoCrmTestMode ?? (new URLSearchParams(window.location.search).get("crm_test") === "1");
 const catalogProducts = Array.isArray(window.bingoProductCatalog) ? window.bingoProductCatalog : [];
 const marketingConfig = window.bingoMarketingConfig || {};
 let productCards = document.querySelectorAll("[data-category]");

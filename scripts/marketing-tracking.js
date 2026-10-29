@@ -7,7 +7,17 @@
 
   const hasValue = (value) => typeof value === "string" && !placeholderValues.has(value.trim());
   const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(window.location?.hostname) || window.location?.protocol === "file:";
-  const trackingEnabled = !isLocalPreview && (hasValue(config.ga4MeasurementId) || hasValue(config.metaPixelId));
+  const testModeParam = new URLSearchParams(window.location?.search || "").get("crm_test");
+  let isCrmTestMode = testModeParam === "1";
+  try {
+    if (testModeParam === "1") sessionStorage.setItem("bingoCrmTestMode", "1");
+    if (testModeParam === "0") sessionStorage.removeItem("bingoCrmTestMode");
+    if (testModeParam !== "0") isCrmTestMode ||= sessionStorage.getItem("bingoCrmTestMode") === "1";
+  } catch {
+    // The URL flag still applies on the current page when storage is unavailable.
+  }
+  window.bingoCrmTestMode = isCrmTestMode;
+  const trackingEnabled = !isLocalPreview && !isCrmTestMode && (hasValue(config.ga4MeasurementId) || hasValue(config.metaPixelId));
   const consentRequired = config.requireMarketingConsent !== false;
 
   const loadScript = (src, attrs = {}) => {
