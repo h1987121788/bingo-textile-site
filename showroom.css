@@ -2301,3 +2301,69 @@ dialog::backdrop {
     animation: none !important;
   }
 }
+
+/* Personal studio presentation. */
+.studio-section-intro { color: var(--muted); font-size: 15px; margin-top: 14px; }
+.studio-about { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); gap: 48px; background: #eeefec; }
+.studio-about-label { display: flex; flex-direction: column; gap: 14px; }
+.studio-about-label > span { color: var(--muted); font-size: 10px; }
+.studio-about-main { max-width: 720px; }
+.studio-about-main h2 { max-width: 650px; font-size: 48px; line-height: 1.1; font-weight: 500; margin-bottom: 30px; }
+.studio-about-main > p { max-width: 610px; font-size: 17px; line-height: 1.65; margin-bottom: 18px; }
+.studio-about-main .text-link { margin-top: 8px; }
+.studio-services { display: flex; flex-wrap: wrap; gap: 12px 26px; padding-top: 34px; margin-top: 34px; border-top: 1px solid #cbcbc8; font-size: 10px; }
+@media (max-width: 640px) {
+  .studio-hero .hero-copy h1 { font-size: 32px; margin-bottom: 12px; }
+  .studio-about { grid-template-columns: 1fr; gap: 30px; }
+  .studio-about-main h2 { font-size: 33px; margin-bottom: 20px; }
+  .studio-about-main > p { font-size: 15px; }
+  .studio-services { margin-top: 24px; padding-top: 24px; }
+}
+
+/* Studio editorial refinements. */
+.showroom-home .announcement { background: #24312e; }
+.showroom-home .studio-hero { background: #efefed; min-height: 480px; }
+.showroom-home .studio-hero .hero-copy h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 65px;
+  font-weight: 400;
+  line-height: .94;
+}
+.showroom-home .studio-hero .hero-copy h1 em { font-weight: 400; color: #7c4d4c; }
+.showroom-home .studio-hero .hero-description { color: #3e4541; font-size: 16px; line-height: 1.5; margin: 22px 0; }
+.showroom-home .studio-hero .hero-service { color: #626b64; }
+.showroom-home .collection-strip { color: #40534a; background: #e5eae4; }
+.showroom-home .new-arrivals { padding-top: 96px; padding-bottom: 96px; }
+.showroom-home .new-arrivals .section-heading h2,
+.showroom-home .studio-about h2,
+.showroom-home .category-section h2,
+.showroom-home .flagship-band h2,
+.showroom-home .contact-heading h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+.showroom-home .new-arrivals .section-heading h2 { font-size: 46px; }
+.showroom-home .new-arrivals .section-heading .kicker { color: #7c4d4c; }
+.showroom-home .new-arrivals .style-grid { gap: 58px 24px; }
+.showroom-home .new-arrivals .style-card:nth-child(3n + 1) .style-image-wrap { background: #ede9e7; }
+.showroom-home .new-arrivals .style-card:nth-child(3n + 2) .style-image-wrap { background: #e7ebe6; }
+.showroom-home .new-arrivals .style-card:nth-child(3n) .style-image-wrap { background: #eeefed; }
+.showroom-home .new-arrivals .style-badge { background: transparent; padding: 0; color: #525953; }
+.showroom-home .new-arrivals .style-info h3 { font-size: 18px; }
+.showroom-home .category-section { background: #e8ede8; }
+.showroom-home .studio-about { background: #26332e; color: #f5f5f2; }
+.showroom-home .studio-about-label > span { color: #c7cec5; }
+.showroom-home .studio-about-main > p { color: #e1e5df; }
+.showroom-home .studio-about .text-link { border-color: #c7cec5; }
+.showroom-home .studio-services { border-color: #657169; color: #cbd4c9; }
+@media (min-width: 641px) and (max-width: 1100px) {
+  .showroom-home .studio-hero .hero-copy h1 { font-size: 50px; }
+}
+@media (max-width: 640px) {
+  .showroom-home .studio-hero { min-height: 440px; }
+  .showroom-home .studio-hero .hero-copy h1 { font-size: 37px; line-height: .9; margin-bottom: 14px; }
+  .showroom-home .new-arrivals { padding-top: 58px; padding-bottom: 58px; }
+  .showroom-home .new-arrivals .section-heading h2 { font-size: 35px; }
+  .showroom-home .new-arrivals .style-grid { row-gap: 38px; }
+  .showroom-home .studio-about-main h2 { font-size: 35px; }
+}

@@ -285,6 +285,14 @@
       collection === "aw26"
         ? "AW26 / AUTUMN-WINTER 2026"
         : "CORE / FINISHED SAMPLE STYLES";
+    if ($("[data-intro-title]")) {
+      $("[data-intro-title]").textContent = collection === "aw26" ? "The new layer." : "The core collection.";
+      $("[data-intro-collection]").textContent = collection === "aw26" ? "AW26" : "CORE";
+      $("[data-intro-description]").textContent = collection === "aw26"
+        ? "Long sleeves, heavy sweats and vintage washes. A new season of possibilities for your label."
+        : "Explore finished sample styles for your next collection. Specifications and order terms are confirmed with your quote.";
+      $("[data-season-mark]").hidden = collection === "core";
+    }
     $$("[data-collection]").forEach((button) => {
       const active = button.dataset.collection === collection;
       button.setAttribute("aria-selected", String(active));
@@ -314,6 +322,12 @@
       : "";
     $("[data-product-dialog-content]").innerHTML =
       `<div class="product-detail"><div class="detail-gallery"><div data-detail-visual><a class="detail-image-link" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open full-size product image"><img class="detail-main-image ${product.collection === "aw26" ? "is-product-only" : ""}" data-detail-image src="${escape(product.image)}" alt="${escape(`${product.imageLabel}: ${product.title}`)}" width="720" height="900" /></a></div>${guideMarkup}<div class="detail-gallery-tools"><div class="gallery-tabs" role="group" aria-label="Product image view"><button data-gallery-view="photo" aria-pressed="true">Product</button>${guide ? '<button data-gallery-view="size" aria-pressed="false">Size guide</button>' : ""}${product.sheet ? '<button data-gallery-view="sheet" aria-pressed="false">English sheet</button>' : ""}</div><a class="icon-button" data-full-image href="${escape(product.image)}" target="_blank" rel="noopener" aria-label="Open image at full size" title="Open full size">${icon("expand")}</a></div></div><div class="detail-copy"><p class="kicker">${product.collection === "aw26" ? `AW26 / ${product.batch}` : "CORE COLLECTION"} / ${escape(code)}</p><h2 id="product-dialog-title">${escape(product.title)}</h2><p>${escape(product.collection === "aw26" ? "A new-season direction for your next private-label collection." : product.description)}</p><dl class="detail-specs"><div><dt>Material</dt><dd>${escape(product.material)}</dd></div><div><dt>Weight</dt><dd>${escape(product.weight || "Confirm with sample")}</dd></div><div><dt>Size range</dt><dd>${escape(product.sizes)}</dd></div><div><dt>Pricing</dt><dd>Current quote on request</dd></div></dl><button class="btn btn-dark" data-toggle-style="${escape(code)}">${chosen ? "Added to inquiry" : "Add to inquiry"} ${icon(chosen ? "check" : "plus")}</button><button class="text-link" data-product-to-brief="${escape(code)}">Ask about this style ${icon("arrow-up-right")}</button><p class="detail-note">${escape(product.scope)}</p>${product.sheet ? `<a class="detail-sheet-link" href="${escape(product.sheet)}" target="_blank" rel="noopener">Open full English product sheet ${icon("external-link")}</a>` : ""}</div></div><div class="detail-pager"><button data-open-product="${escape(previous.code)}">${icon("arrow-left")} Previous style</button><span>${at + 1} / ${peers.length}</span><button data-open-product="${escape(next.code)}">Next style ${icon("arrow-right")}</button></div>`;
+    const detailContent = $("[data-product-dialog-content]");
+    const shareUrl = `./garments.html?collection=${encodeURIComponent(product.collection)}&style=${encodeURIComponent(code)}`;
+    detailContent.innerHTML = detailContent.innerHTML.replace(
+      '<p class="detail-note">',
+      `<a class="detail-share text-link" href="${shareUrl}">Open shareable style link ${icon("external-link")}</a><p class="detail-note">`,
+    );
     if (!productDialog.open) productDialog.showModal();
     else productDialog.scrollTop = 0;
     icons();

@@ -3265,3 +3265,20 @@ body.garment-site .site-footer {
     text-align: center;
   }
 }
+
+/* Align the older product and material pages with the current showroom. */
+body.garment-site { --teal-dark: #171717; --teal: #e9e9e7; --ink: #171717; --paper: #f7f7f5; --line: #dededb; }
+body.garment-site .site-header { background: rgba(255, 255, 255, .97); }
+body.garment-site .header-cta:hover,
+body.garment-site .button.primary:hover,
+body.garment-site .form-button:hover { background: #414141; }
+.material-page .seo-hero { color: #171717; background: #f0f0ee; }
+.material-page .seo-hero::before,
+.material-page .seo-hero::after { display: none; }
+.material-page .seo-hero .breadcrumb,
+.material-page .seo-hero .breadcrumb a,
+.material-page .seo-hero .eyebrow,
+.material-page .seo-hero .hero-lede { color: #444; }
+.material-page .seo-hero .button.secondary { color: #171717; border-color: #777; background: transparent; }
+.material-page .seo-hero .proof-row span { color: #333; background: #fff; border-color: #ddd; }
+.material-page .seo-hero .proof-row strong { color: #171717; }
