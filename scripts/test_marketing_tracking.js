@@ -42,7 +42,7 @@ vm.runInContext(configSource, context, { filename: "marketing-config.js" });
 vm.runInContext(trackingSource, context, { filename: "marketing-tracking.js" });
 
 assert.strictEqual(context.bingoMarketingConfig.ga4MeasurementId, "G-4W8V1TXJGH");
-assert.strictEqual(context.bingoMarketingConfig.metaPixelId, "2252311015604509");
+assert.strictEqual(context.bingoMarketingConfig.metaPixelId, "2194479431494146");
 assert(loadedScripts.some((url) => url.includes("googletagmanager.com/gtag/js?id=G-4W8V1TXJGH")));
 assert(loadedScripts.some((url) => url.includes("connect.facebook.net/en_US/fbevents.js")));
 
@@ -57,7 +57,7 @@ assert(gaCalls.some((entry) => entry[0] === "event" && entry[1] === "contact_wha
 assert(gaCalls.some((entry) => entry[0] === "event" && entry[1] === "generate_lead"));
 
 const metaCalls = context.fbq.queue.map((entry) => Array.from(entry));
-assert(metaCalls.some((entry) => entry[0] === "init" && entry[1] === "2252311015604509"));
+assert(metaCalls.some((entry) => entry[0] === "init" && entry[1] === "2194479431494146"));
 assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "ViewContent"));
 assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "Contact"));
 assert(metaCalls.some((entry) => entry[0] === "track" && entry[1] === "Lead"));

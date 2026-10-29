@@ -37,7 +37,7 @@ https://www.bingofabric.com/sitemap.xml
 The production configuration currently uses the previously provisioned Bingo Pixel:
 
 ```js
-metaPixelId: "2252311015604509"
+metaPixelId: "2194479431494146"
 ```
 
 Tracked website actions:
